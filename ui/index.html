@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GATEKEEPER - Swagger Manager</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      header { padding: 16px 24px; border-bottom: 1px solid #8883; display: flex; align-items: center; justify-content: space-between; }
+      header h1 { font-size: 1.25rem; margin: 0; }
+      .layout { display: grid; grid-template-columns: 360px 1fr; height: calc(100vh - 56px); }
+      .sidebar { border-right: 1px solid #8883; padding: 16px; overflow: auto; }
+      .content { display: grid; grid-template-rows: auto 1fr auto; min-width: 0; }
+      .uploader { border: 2px dashed #8886; border-radius: 8px; padding: 16px; text-align: center; background: #00000006; }
+      .uploader.dragover { background: #3478f61a; border-color: #3478f6; }
+      .uploader input[type="file"] { display: none; }
+      .uploader .hint { margin-top: 8px; opacity: 0.8; }
+      .toolbar { padding: 12px 16px; border-bottom: 1px solid #8883; display: flex; gap: 12px; align-items: center; }
+      .files { margin-top: 16px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { text-align: left; padding: 8px; border-bottom: 1px solid #8883; }
+      tr:hover { background: #00000008; }
+      button, .btn { padding: 6px 10px; border-radius: 6px; border: 1px solid #8883; cursor: pointer; background: transparent; }
+      .pill { font-size: 12px; opacity: 0.8; }
+      .row-actions { display: flex; gap: 6px; }
+      .viewer { width: 100%; height: 100%; border: 0; }
+      .panel { padding: 12px 16px; border-bottom: 1px solid #8883; display: flex; align-items: center; justify-content: space-between; }
+      .summary { padding: 12px 16px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; white-space: pre-wrap; overflow: auto; max-height: 200px; border-top: 1px solid #8883; }
+      .muted { opacity: 0.75; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>GATEKEEPER - Swagger Manager</h1>
+      <div class="muted">Upload, browse, view, and manage OpenAPI specs</div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div id="dropzone" class="uploader">
+          <input id="file" name="file" type="file" accept=".json,.yaml,.yml" />
+          <div>
+            <button id="pick" class="btn">Choose file</button>
+            <span class="pill">or drag & drop here</span>
+          </div>
+          <div class="hint">Accepted: .json, .yaml, .yml</div>
+        </div>
+
+        <div class="files">
+          <div class="panel">
+            <strong>Uploaded files</strong>
+            <button id="refresh" class="btn">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="file-rows"></tbody>
+          </table>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="panel">
+          <div>
+            <strong id="current-name">No file selected</strong>
+            <span id="current-meta" class="pill muted"></span>
+          </div>
+          <div class="row-actions">
+            <button id="download-btn" class="btn" disabled>Download</button>
+            <button id="delete-btn" class="btn" disabled>Delete</button>
+            <button id="ingest-btn" class="btn" disabled>Ingest to DB</button>
+          </div>
+        </div>
+        <iframe id="viewer" class="viewer" src="about:blank" title="Swagger Viewer"></iframe>
+        <div id="summary" class="summary muted">Summary will appear here.</div>
+        <div class="panel"><strong>APIs</strong><span class="pill muted">Select APIs to test</span></div>
+        <div id="api-list" style="padding: 8px 16px; overflow: auto;">
+          <div class="muted">No APIs loaded.</div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const $ = (sel) => document.querySelector(sel);
+      const fileInput = $('#file');
+      const pickBtn = $('#pick');
+      const dropzone = $('#dropzone');
+      const tbody = $('#file-rows');
+      const refreshBtn = $('#refresh');
+      const viewer = $('#viewer');
+      const currentName = $('#current-name');
+      const currentMeta = $('#current-meta');
+      const summaryEl = $('#summary');
+      const downloadBtn = $('#download-btn');
+      const deleteBtn = $('#delete-btn');
+      const ingestBtn = $('#ingest-btn');
+      const apiList = document.getElementById('api-list');
+
+      let selected = null;
+
+      function fmtBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024, sizes = ['B','KB','MB','GB','TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      async function refreshList() {
+        tbody.innerHTML = '<tr><td colspan="3" class="muted">Loading...</td></tr>';
+        try {
+          const res = await fetch('/files');
+          const data = await res.json();
+          const files = data.files || [];
+          if (!files.length) {
+            tbody.innerHTML = '<tr><td colspan="3" class="muted">No files uploaded yet.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '';
+          for (const file of files) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>
+                <a href="#" data-name="${file.filename}">${file.filename}</a>
+                <button data-action="create" data-name="${file.filename}" class="btn pill" title="Ingest to DB">Create</button>
+              </td>
+              <td class="muted">${fmtBytes(file.sizeBytes)}</td>
+              <td class="row-actions">
+                <button data-action="view" data-name="${file.filename}" class="btn">View</button>
+                <button data-action="download" data-name="${file.filename}" class="btn">Download</button>
+                <button data-action="delete" data-name="${file.filename}" class="btn">Delete</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          }
+        } catch (err) {
+          tbody.innerHTML = `<tr><td colspan="3" class="error">${err.message || err}</td></tr>`;
+        }
+      }
+
+      async function setSelected(name) {
+        selected = name;
+        currentName.textContent = name || 'No file selected';
+        currentMeta.textContent = '';
+        const url = `/ui/viewer.html?url=${encodeURIComponent('/uploads/' + name)}`;
+        viewer.src = url;
+        downloadBtn.disabled = !name;
+        deleteBtn.disabled = !name;
+        summaryEl.textContent = 'Loading summary...';
+        summaryEl.classList.remove('muted');
+        ingestBtn.disabled = !name;
+        try {
+          const res = await fetch(`/files/${encodeURIComponent(name)}/summary`);
+          if (!res.ok) throw new Error('Failed to fetch summary');
+          const data = await res.json();
+          currentMeta.textContent = `${data.title || ''} ${data.version ? '(' + data.version + ')' : ''}`;
+          summaryEl.textContent = JSON.stringify(data, null, 2);
+        } catch (err) {
+          summaryEl.textContent = err.message || String(err);
+        }
+      }
+
+      async function doUpload(file) {
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+          const res = await fetch('/upload', { method: 'POST', body: fd });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || 'Upload failed');
+          }
+          await refreshList();
+        } catch (err) {
+          alert(err.message || String(err));
+        }
+      }
+
+      async function loadApis() {
+        if (!apiList) return;
+        apiList.innerHTML = '<div class="muted">Loading APIs...</div>';
+        try {
+          const res = await fetch('/apis');
+          const data = await res.json();
+          const apis = data.apis || [];
+          if (!apis.length) {
+            apiList.innerHTML = '<div class="muted">No APIs found. Ingest a spec first.</div>';
+            return;
+          }
+          const list = document.createElement('div');
+          for (const api of apis) {
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.alignItems = 'center';
+            row.style.gap = '8px';
+            row.style.padding = '6px 0';
+            row.innerHTML = `
+              <input type="checkbox" data-api-id="${api.id}" />
+              <span class="pill" style="min-width:64px; display:inline-block;">${(api.method || '').toUpperCase()}</span>
+              <code style="overflow-wrap:anywhere;">${api.path || ''}</code>
+              <span class="muted" style="margin-left:auto;">${api.summary || ''}</span>
+            `;
+            list.appendChild(row);
+          }
+          apiList.innerHTML = '';
+          apiList.appendChild(list);
+        } catch (err) {
+          apiList.innerHTML = `<div class="error">${err.message || String(err)}</div>`;
+        }
+      }
+
+      // Upload interactions
+      pickBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => fileInput.files[0] && doUpload(fileInput.files[0]));
+      refreshBtn.addEventListener('click', refreshList);
+
+      ;['dragenter','dragover'].forEach((evt) => dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }));
+      ;['dragleave','drop'].forEach((evt) => dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }));
+      dropzone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) doUpload(file);
+      });
+
+      // Table actions
+      tbody.addEventListener('click', async (e) => {
+        const t = e.target.closest('[data-action], a[data-name]');
+        if (!t) return;
+        e.preventDefault();
+        const name = t.getAttribute('data-name') || t.textContent;
+        const action = t.getAttribute('data-action') || 'view';
+        if (action === 'view') {
+          setSelected(name);
+        } else if (action === 'download') {
+          window.open(`/files/${encodeURIComponent(name)}`, '_blank');
+        } else if (action === 'delete') {
+          if (!confirm(`Delete ${name}?`)) return;
+          const res = await fetch(`/files/${encodeURIComponent(name)}`, { method: 'DELETE' });
+          if (!res.ok) { alert('Failed to delete'); return; }
+          if (selected === name) setSelected(null);
+          refreshList();
+        } else if (action === 'create') {
+          // Ingest the selected file into DB
+          setSelected(name);
+          summaryEl.textContent = 'Ingesting into DB...';
+          try {
+            const res = await fetch(`/files/${encodeURIComponent(name)}/ingest`, { method: 'POST' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'Ingestion failed');
+            summaryEl.textContent = JSON.stringify(data, null, 2);
+            loadApis();
+          } catch (err) {
+            summaryEl.textContent = err.message || String(err);
+          }
+        }
+      });
+
+      downloadBtn.addEventListener('click', () => selected && window.open(`/files/${encodeURIComponent(selected)}`, '_blank'));
+      deleteBtn.addEventListener('click', async () => {
+        if (!selected) return;
+        if (!confirm(`Delete ${selected}?`)) return;
+        const res = await fetch(`/files/${encodeURIComponent(selected)}`, { method: 'DELETE' });
+        if (res.ok) { selected = null; setSelected(null); refreshList(); }
+        else { alert('Failed to delete'); }
+      });
+
+      ingestBtn.addEventListener('click', async () => {
+        if (!selected) return;
+        ingestBtn.disabled = true;
+        summaryEl.textContent = 'Ingesting into DB...';
+        try {
+          const res = await fetch(`/files/${encodeURIComponent(selected)}/ingest`, { method: 'POST' });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || 'Ingestion failed');
+          summaryEl.textContent = JSON.stringify(data, null, 2);
+          loadApis();
+        } catch (err) {
+          summaryEl.textContent = err.message || String(err);
+        } finally {
+          ingestBtn.disabled = false;
+        }
+      });
+
+      // Initial
+      refreshList();
+      loadApis();
+    </script>
+  </body>
+  </html>
+
+
