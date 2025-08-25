@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATEKEEPER - API Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .card h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-passed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-error {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-running {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .results-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .results-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .json-editor {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .test-case-item {
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+        }
+
+        .test-case-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .test-case-type {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .type-positive {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .type-negative {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 GATEKEEPER</h1>
+            <p>Comprehensive API Testing Framework</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showTab('apis')">📋 APIs</div>
+            <div class="nav-tab" onclick="showTab('test-cases')">🧪 Test Cases</div>
+            <div class="nav-tab" onclick="showTab('test-runs')">▶️ Test Runs</div>
+            <div class="nav-tab" onclick="showTab('results')">📊 Results</div>
+        </div>
+
+        <!-- APIs Tab -->
+        <div id="apis" class="tab-content active">
+            <div class="section">
+                <h3>📋 Available APIs</h3>
+                <button class="btn" onclick="loadAPIs()">🔄 Refresh APIs</button>
+                <div id="apis-list" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Test Cases Tab -->
+        <div id="test-cases" class="tab-content">
+            <div class="section">
+                <h3>🧪 Test Cases Management</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Generate Test Cases</h4>
+                        <p>Automatically generate positive and negative test cases for your APIs.</p>
+                        <button class="btn btn-success" onclick="showGenerateTestCases()">Generate</button>
+                    </div>
+                    <div class="card">
+                        <h4>Custom Test Case</h4>
+                        <p>Create custom test cases with specific requirements.</p>
+                        <button class="btn" onclick="showCustomTestCaseForm()">Create</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="generate-test-cases-form" class="section" style="display: none;">
+                <h3>🔧 Generate Test Cases</h3>
+                <div class="form-group">
+                    <label for="api-select">Select API:</label>
+                    <select id="api-select">
+                        <option value="">Choose an API...</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" onclick="generateTestCases()">Generate Test Cases</button>
+                <button class="btn btn-secondary" onclick="hideGenerateTestCases()">Cancel</button>
+            </div>
+
+            <div id="custom-test-case-form" class="section" style="display: none;">
+                <h3>🔧 Create Custom Test Case</h3>
+                <div class="form-group">
+                    <label for="custom-api-select">Select API:</label>
+                    <select id="custom-api-select">
+                        <option value="">Choose an API...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="test-case-name">Test Case Name:</label>
+                    <input type="text" id="test-case-name" placeholder="Enter test case name">
+                </div>
+                <div class="form-group">
+                    <label for="test-case-description">Description:</label>
+                    <textarea id="test-case-description" rows="3" placeholder="Enter test case description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="test-case-type">Test Type:</label>
+                    <select id="test-case-type">
+                        <option value="positive">Positive</option>
+                        <option value="negative">Negative</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expected-status">Expected Status Code:</label>
+                    <input type="number" id="expected-status" placeholder="e.g., 200, 201, 400">
+                </div>
+                <div class="form-group">
+                    <label for="request-body">Request Body (JSON):</label>
+                    <textarea id="request-body" rows="5" placeholder='{"key": "value"}' class="json-editor"></textarea>
+                </div>
+                <button class="btn btn-success" onclick="createCustomTestCase()">Create Test Case</button>
+                <button class="btn btn-secondary" onclick="hideCustomTestCaseForm()">Cancel</button>
+            </div>
+
+            <div id="test-cases-list" class="section">
+                <h3>📋 Test Cases</h3>
+                <div class="form-group">
+                    <label for="filter-api">Filter by API:</label>
+                    <select id="filter-api" onchange="loadTestCases()">
+                        <option value="">All APIs</option>
+                    </select>
+                </div>
+                <div id="test-cases-container"></div>
+            </div>
+        </div>
+
+        <!-- Test Runs Tab -->
+        <div id="test-runs" class="tab-content">
+            <div class="section">
+                <h3>▶️ Test Execution</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Create Test Run</h4>
+                        <p>Start a new test execution session.</p>
+                        <button class="btn btn-success" onclick="showCreateTestRun()">Create</button>
+                    </div>
+                    <div class="card">
+                        <h4>Execute Tests</h4>
+                        <p>Run all test cases for your APIs.</p>
+                        <button class="btn btn-warning" onclick="showExecuteTests()">Execute</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="create-test-run-form" class="section" style="display: none;">
+                <h3>🔧 Create Test Run</h3>
+                <div class="form-group">
+                    <label for="test-run-name">Test Run Name:</label>
+                    <input type="text" id="test-run-name" placeholder="Enter test run name">
+                </div>
+                <div class="form-group">
+                    <label for="test-run-description">Description:</label>
+                    <textarea id="test-run-description" rows="3" placeholder="Enter test run description"></textarea>
+                </div>
+                <button class="btn btn-success" onclick="createTestRun()">Create Test Run</button>
+                <button class="btn btn-secondary" onclick="hideCreateTestRun()">Cancel</button>
+            </div>
+
+            <div id="execute-tests-form" class="section" style="display: none;">
+                <h3>🔧 Execute Tests</h3>
+                <div class="form-group">
+                    <label for="execute-test-run">Select Test Run:</label>
+                    <select id="execute-test-run">
+                        <option value="">Choose a test run...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="execute-apis">Select APIs (optional, leave empty for all):</label>
+                    <select id="execute-apis" multiple>
+                        <option value="">Loading APIs...</option>
+                    </select>
+                </div>
+                <button class="btn btn-warning" onclick="executeTests()">Execute Tests</button>
+                <button class="btn btn-secondary" onclick="hideExecuteTests()">Cancel</button>
+            </div>
+
+            <div id="test-runs-list" class="section">
+                <h3>📋 Test Runs</h3>
+                <button class="btn" onclick="loadTestRuns()">🔄 Refresh</button>
+                <div id="test-runs-container"></div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div id="results" class="tab-content">
+            <div class="section">
+                <h3>📊 Test Results & Reports</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>View Results</h4>
+                        <p>Browse test execution results and statistics.</p>
+                        <button class="btn" onclick="loadTestResults()">View Results</button>
+                    </div>
+                    <div class="card">
+                        <h4>Generate Report</h4>
+                        <p>Create detailed HTML reports for test runs.</p>
+                        <button class="btn btn-success" onclick="showGenerateReport()">Generate</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="generate-report-form" class="section" style="display: none;">
+                <h3>🔧 Generate Test Report</h3>
+                <div class="form-group">
+                    <label for="report-test-run">Select Test Run:</label>
+                    <select id="report-test-run">
+                        <option value="">Choose a test run...</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" onclick="generateReport()">Generate Report</button>
+                <button class="btn btn-secondary" onclick="hideGenerateReport()">Cancel</button>
+            </div>
+
+            <div id="results-container" class="section">
+                <h3>📋 Test Results</h3>
+                <div class="form-group">
+                    <label for="filter-results-api">Filter by API:</label>
+                    <select id="filter-results-api" onchange="loadTestResults()">
+                        <option value="">All APIs</option>
+                    </select>
+                </div>
+                <div id="results-table-container"></div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+    </div>
+
+    <script>
+        let currentTab = 'apis';
+        let apis = [];
+        let testRuns = [];
+
+        // Tab management
+        function showTab(tabName) {
+            currentTab = tabName;
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+            
+            // Load data for the tab
+            switch(tabName) {
+                case 'apis':
+                    loadAPIs();
+                    break;
+                case 'test-cases':
+                    loadAPIs();
+                    loadTestCases();
+                    break;
+                case 'test-runs':
+                    loadTestRuns();
+                    break;
+                case 'results':
+                    loadTestResults();
+                    break;
+            }
+        }
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+
+        function showAlert(message, type = 'info') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // API Management
+        async function loadAPIs() {
+            try {
+                showLoading();
+                const response = await fetch('/apis');
+                const data = await response.json();
+                apis = data.apis || [];
+                
+                displayAPIs();
+                populateAPISelects();
+            } catch (error) {
+                showAlert('Failed to load APIs: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayAPIs() {
+            const container = document.getElementById('apis-list');
+            if (apis.length === 0) {
+                container.innerHTML = '<p>No APIs found. Please upload and ingest a Swagger specification first.</p>';
+                return;
+            }
+
+            container.innerHTML = apis.map(api => `
+                <div class="card">
+                    <h4>${api.method} ${api.path}</h4>
+                    <p><strong>Summary:</strong> ${api.summary || 'No description'}</p>
+                    <p><strong>ID:</strong> ${api.id}</p>
+                    <button class="btn btn-success" onclick="generateTestCasesForAPI(${api.id})">Generate Tests</button>
+                </div>
+            `).join('');
+        }
+
+        function populateAPISelects() {
+            const selects = ['api-select', 'custom-api-select', 'filter-api', 'execute-apis', 'filter-results-api'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">Choose an API...</option>' +
+                        apis.map(api => `<option value="${api.id}">${api.method} ${api.path}</option>`).join('');
+                }
+            });
+        }
+
+        // Test Cases Management
+        async function generateTestCasesForAPI(apiId) {
+            try {
+                showLoading();
+                const response = await fetch(`/testing/apis/${apiId}/generate-test-cases`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                showAlert(`Generated ${data.inserted || 0} test cases successfully!`, 'success');
+                loadTestCases();
+            } catch (error) {
+                showAlert('Failed to generate test cases: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showGenerateTestCases() {
+            document.getElementById('generate-test-cases-form').style.display = 'block';
+        }
+
+        function hideGenerateTestCases() {
+            document.getElementById('generate-test-cases-form').style.display = 'none';
+        }
+
+        async function generateTestCases() {
+            const apiId = document.getElementById('api-select').value;
+            if (!apiId) {
+                showAlert('Please select an API', 'error');
+                return;
+            }
+
+            try {
+                showLoading();
+                const response = await fetch(`/testing/apis/${apiId}/generate-test-cases`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                showAlert(`Generated ${data.test_case_ids?.length || 0} test cases successfully!`, 'success');
+                hideGenerateTestCases();
+                loadTestCases();
+            } catch (error) {
+                showAlert('Failed to generate test cases: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showCustomTestCaseForm() {
+            document.getElementById('custom-test-case-form').style.display = 'block';
+        }
+
+        function hideCustomTestCaseForm() {
+            document.getElementById('custom-test-case-form').style.display = 'none';
+        }
+
+        async function createCustomTestCase() {
+            const apiId = document.getElementById('custom-api-select').value;
+            const name = document.getElementById('test-case-name').value;
+            const description = document.getElementById('test-case-description').value;
+            const testType = document.getElementById('test-case-type').value;
+            const expectedStatus = document.getElementById('expected-status').value;
+            const requestBody = document.getElementById('request-body').value;
+
+            if (!apiId || !name || !expectedStatus) {
+                showAlert('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                showLoading();
+                const testCaseData = {
+                    name,
+                    description,
+                    test_type: testType,
+                    expected_status: parseInt(expectedStatus),
+                    request_body: requestBody ? JSON.parse(requestBody) : null
+                };
+
+                const response = await fetch(`/testing/apis/${apiId}/test-cases`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testCaseData)
+                });
+
+                const data = await response.json();
+                showAlert('Test case created successfully!', 'success');
+                hideCustomTestCaseForm();
+                loadTestCases();
+            } catch (error) {
+                showAlert('Failed to create test case: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadTestCases() {
+            const apiId = document.getElementById('filter-api').value;
+            try {
+                showLoading();
+                let url = '/testing/test-cases';
+                if (apiId) {
+                    url = `/testing/apis/${apiId}/test-cases`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                const testCases = data.test_cases || [];
+                
+                displayTestCases(testCases);
+            } catch (error) {
+                showAlert('Failed to load test cases: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayTestCases(testCases) {
+            const container = document.getElementById('test-cases-container');
+            if (testCases.length === 0) {
+                container.innerHTML = '<p>No test cases found. Generate some test cases first.</p>';
+                return;
+            }
+
+            container.innerHTML = testCases.map(testCase => `
+                <div class="test-case-item">
+                    <div class="test-case-header">
+                        <h4>${testCase.name}</h4>
+                        <span class="test-case-type type-${testCase.test_type}">${testCase.test_type}</span>
+                    </div>
+                    <p><strong>Description:</strong> ${testCase.description || 'No description'}</p>
+                    <p><strong>Expected Status:</strong> ${testCase.expected_status}</p>
+                    <p><strong>Created:</strong> ${testCase.created_at || 'Unknown'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Test Runs Management
+        function showCreateTestRun() {
+            document.getElementById('create-test-run-form').style.display = 'block';
+        }
+
+        function hideCreateTestRun() {
+            document.getElementById('create-test-run-form').style.display = 'none';
+        }
+
+        async function createTestRun() {
+            const name = document.getElementById('test-run-name').value;
+            const description = document.getElementById('test-run-description').value;
+
+            if (!name) {
+                showAlert('Please enter a test run name', 'error');
+                return;
+            }
+
+            try {
+                showLoading();
+                const response = await fetch('/testing/test-runs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, description })
+                });
+
+                const data = await response.json();
+                showAlert('Test run created successfully!', 'success');
+                hideCreateTestRun();
+                loadTestRuns();
+            } catch (error) {
+                showAlert('Failed to create test run: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showExecuteTests() {
+            document.getElementById('execute-tests-form').style.display = 'block';
+            loadTestRuns();
+        }
+
+        function hideExecuteTests() {
+            document.getElementById('execute-tests-form').style.display = 'none';
+        }
+
+        async function executeTests() {
+            const testRunId = document.getElementById('execute-test-run').value;
+            if (!testRunId) {
+                showAlert('Please select a test run', 'error');
+                return;
+            }
+
+            try {
+                showLoading();
+                const response = await fetch(`/testing/test-runs/${testRunId}/execute`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+                showAlert('Test execution completed!', 'success');
+                hideExecuteTests();
+                loadTestRuns();
+            } catch (error) {
+                showAlert('Failed to execute tests: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadTestRuns() {
+            try {
+                showLoading();
+                const response = await fetch('/testing/test-runs');
+                const data = await response.json();
+                testRuns = data.test_runs || [];
+                
+                displayTestRuns();
+                populateTestRunSelects();
+            } catch (error) {
+                showAlert('Failed to load test runs: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayTestRuns() {
+            const container = document.getElementById('test-runs-container');
+            if (testRuns.length === 0) {
+                container.innerHTML = '<p>No test runs found. Create a test run first.</p>';
+                return;
+            }
+
+            container.innerHTML = testRuns.map(testRun => `
+                <div class="card">
+                    <h4>${testRun.name}</h4>
+                    <p><strong>Description:</strong> ${testRun.description || 'No description'}</p>
+                    <p><strong>Status:</strong> <span class="status-badge status-${testRun.status}">${testRun.status}</span></p>
+                    <p><strong>Total Tests:</strong> ${testRun.total_tests}</p>
+                    <p><strong>Passed:</strong> ${testRun.passed_tests}</p>
+                    <p><strong>Failed:</strong> ${testRun.failed_tests}</p>
+                    <p><strong>Errors:</strong> ${testRun.error_tests}</p>
+                    <p><strong>Started:</strong> ${testRun.started_at || 'Unknown'}</p>
+                    ${testRun.completed_at ? `<p><strong>Completed:</strong> ${testRun.completed_at}</p>` : ''}
+                    <button class="btn" onclick="viewTestRunResults(${testRun.id})">View Results</button>
+                    <button class="btn btn-success" onclick="generateReport(${testRun.id})">Generate Report</button>
+                </div>
+            `).join('');
+        }
+
+        function populateTestRunSelects() {
+            const selects = ['execute-test-run', 'report-test-run'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">Choose a test run...</option>' +
+                        testRuns.map(testRun => `<option value="${testRun.id}">${testRun.name}</option>`).join('');
+                }
+            });
+        }
+
+        async function viewTestRunResults(testRunId) {
+            try {
+                showLoading();
+                const response = await fetch(`/testing/test-runs/${testRunId}/results`);
+                const data = await response.json();
+                
+                // Switch to results tab and show the results
+                showTab('results');
+                displayTestResults(data.results || []);
+            } catch (error) {
+                showAlert('Failed to load test results: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Results Management
+        function showGenerateReport() {
+            document.getElementById('generate-report-form').style.display = 'block';
+            loadTestRuns();
+        }
+
+        function hideGenerateReport() {
+            document.getElementById('generate-report-form').style.display = 'none';
+        }
+
+        async function generateReport(testRunId = null) {
+            const runId = testRunId || document.getElementById('report-test-run').value;
+            if (!runId) {
+                showAlert('Please select a test run', 'error');
+                return;
+            }
+
+            try {
+                showLoading();
+                const response = await fetch(`/testing/reports/${runId}`);
+                const htmlContent = await response.text();
+                
+                // Open report in new window
+                const newWindow = window.open('', '_blank');
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+                
+                showAlert('Report generated successfully!', 'success');
+                if (!testRunId) {
+                    hideGenerateReport();
+                }
+            } catch (error) {
+                showAlert('Failed to generate report: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadTestResults() {
+            const apiId = document.getElementById('filter-results-api').value;
+            try {
+                showLoading();
+                let url = '/testing/test-results';
+                if (apiId) {
+                    url += `?api_id=${apiId}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                const results = data.results || [];
+                
+                displayTestResults(results);
+            } catch (error) {
+                showAlert('Failed to load test results: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayTestResults(results) {
+            const container = document.getElementById('results-table-container');
+            if (results.length === 0) {
+                container.innerHTML = '<p>No test results found.</p>';
+                return;
+            }
+
+            const table = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Test Case</th>
+                            <th>API</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Response Status</th>
+                            <th>Response Time</th>
+                            <th>Error Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${results.map(result => `
+                            <tr>
+                                <td>${result.test_case_name}</td>
+                                <td>${result.method} ${result.path}</td>
+                                <td>${result.test_type}</td>
+                                <td><span class="status-badge status-${result.status}">${result.status}</span></td>
+                                <td>${result.response_status || 'N/A'}</td>
+                                <td>${result.response_time_ms}ms</td>
+                                <td>${result.error_message || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = table;
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAPIs();
+        });
+    </script>
+</body>
+</html>

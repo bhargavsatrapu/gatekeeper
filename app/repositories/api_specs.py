@@ -1,6 +1,7 @@
 from typing import Dict, List
 
-from psycopg2.extras import Json  # type: ignore
+# Simple JSON wrapper for PostgreSQL compatibility
+Json = lambda x: x
 
 
 DDL = (
@@ -20,9 +21,80 @@ DDL = (
     """
 )
 
+TEST_CASES_DDL = (
+    """
+    CREATE TABLE IF NOT EXISTS test_cases (
+        id SERIAL PRIMARY KEY,
+        api_id INTEGER REFERENCES api_specs(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        description TEXT,
+        test_type TEXT NOT NULL CHECK (test_type IN ('positive', 'negative')),
+        request_body JSONB,
+        expected_status INTEGER,
+        expected_response_schema JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+)
+
+REQUEST_BODIES_DDL = (
+    """
+    CREATE TABLE IF NOT EXISTS request_bodies (
+        id SERIAL PRIMARY KEY,
+        api_id INTEGER REFERENCES api_specs(id) ON DELETE CASCADE,
+        name TEXT NOT NULL,
+        description TEXT,
+        request_body JSONB NOT NULL,
+        is_valid BOOLEAN DEFAULT true,
+        validation_errors JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """
+)
+
+TEST_RESULTS_DDL = (
+    """
+    CREATE TABLE IF NOT EXISTS test_results (
+        id SERIAL PRIMARY KEY,
+        test_case_id INTEGER REFERENCES test_cases(id) ON DELETE CASCADE,
+        api_id INTEGER REFERENCES api_specs(id) ON DELETE CASCADE,
+        test_run_id INTEGER REFERENCES test_runs(id) ON DELETE CASCADE,
+        status TEXT NOT NULL CHECK (status IN ('passed', 'failed', 'error')),
+        response_status INTEGER,
+        response_body JSONB,
+        response_time_ms INTEGER,
+        error_message TEXT,
+        screenshot_path TEXT,
+        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        test_duration_ms INTEGER
+    );
+    """
+)
+
+TEST_RUNS_DDL = (
+    """
+    CREATE TABLE IF NOT EXISTS test_runs (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        total_tests INTEGER DEFAULT 0,
+        passed_tests INTEGER DEFAULT 0,
+        failed_tests INTEGER DEFAULT 0,
+        error_tests INTEGER DEFAULT 0,
+        started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP,
+        status TEXT DEFAULT 'running' CHECK (status IN ('running', 'completed', 'failed'))
+    );
+    """
+)
+
 
 def ensure_table(cur) -> None:
     cur.execute(DDL)
+    cur.execute(TEST_CASES_DDL)
+    cur.execute(REQUEST_BODIES_DDL)
+    cur.execute(TEST_RESULTS_DDL)
+    cur.execute(TEST_RUNS_DDL)
 
 
 def insert_operations(swagger: dict, cur) -> int:

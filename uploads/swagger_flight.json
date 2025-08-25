@@ -1,0 +1,232 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Flight Booking API",
+    "description": "End-to-End API documentation for searching, booking, paying, checking in, and retrieving boarding passes for flights.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@flightbooking.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "https://api.flightbooking.com/v1",
+      "description": "Production Server"
+    }
+  ],
+  "tags": [
+    { "name": "Flights", "description": "Search and retrieve flights" },
+    { "name": "Bookings", "description": "Manage flight bookings" },
+    { "name": "Payments", "description": "Payment operations" },
+    { "name": "Check-in", "description": "Online check-in and boarding passes" }
+  ],
+  "paths": {
+    "/flights/search": {
+      "get": {
+        "tags": ["Flights"],
+        "summary": "Search flights",
+        "parameters": [
+          { "name": "source", "in": "query", "required": true, "schema": { "type": "string" }, "example": "DEL" },
+          { "name": "destination", "in": "query", "required": true, "schema": { "type": "string" }, "example": "DXB" },
+          { "name": "date", "in": "query", "required": true, "schema": { "type": "string", "format": "date" }, "example": "2025-09-01" },
+          { "name": "passengers", "in": "query", "required": true, "schema": { "type": "integer" }, "example": 2 }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available flights",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Flight" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flights/{flightId}": {
+      "get": {
+        "tags": ["Flights"],
+        "summary": "Get flight details",
+        "parameters": [
+          { "name": "flightId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Flight details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Flight" } } } },
+          "404": { "description": "Flight not found" }
+        }
+      }
+    },
+    "/bookings": {
+      "post": {
+        "tags": ["Bookings"],
+        "summary": "Create a booking",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/BookingRequest" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "Booking created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } }
+        }
+      }
+    },
+    "/bookings/{bookingId}": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get booking details",
+        "parameters": [{ "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Booking details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Booking" } } } },
+          "404": { "description": "Booking not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Bookings"],
+        "summary": "Cancel a booking",
+        "parameters": [{ "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "204": { "description": "Booking cancelled" },
+          "404": { "description": "Booking not found" }
+        }
+      }
+    },
+    "/payments": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Make a payment",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Payment successful", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentResponse" } } } },
+          "402": { "description": "Payment failed" }
+        }
+      }
+    },
+    "/checkin/{bookingId}": {
+      "post": {
+        "tags": ["Check-in"],
+        "summary": "Check-in passengers",
+        "parameters": [{ "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CheckinRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Check-in successful", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CheckinResponse" } } } }
+        }
+      }
+    },
+    "/boardingpass/{bookingId}": {
+      "get": {
+        "tags": ["Check-in"],
+        "summary": "Get boarding pass",
+        "parameters": [{ "name": "bookingId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Boarding pass issued", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BoardingPass" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Flight": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "FL123" },
+          "airline": { "type": "string", "example": "Emirates" },
+          "source": { "type": "string", "example": "DEL" },
+          "destination": { "type": "string", "example": "DXB" },
+          "departureTime": { "type": "string", "format": "date-time", "example": "2025-09-01T09:30:00Z" },
+          "arrivalTime": { "type": "string", "format": "date-time", "example": "2025-09-01T12:30:00Z" },
+          "price": { "type": "number", "example": 250.00 },
+          "availableSeats": { "type": "integer", "example": 50 }
+        }
+      },
+      "Passenger": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string", "example": "John" },
+          "lastName": { "type": "string", "example": "Doe" },
+          "age": { "type": "integer", "example": 32 },
+          "passportNumber": { "type": "string", "example": "A1234567" },
+          "seat": { "type": "string", "example": "12A" }
+        }
+      },
+      "BookingRequest": {
+        "type": "object",
+        "properties": {
+          "flightId": { "type": "string", "example": "FL123" },
+          "passengers": { "type": "array", "items": { "$ref": "#/components/schemas/Passenger" } }
+        }
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "BKG98765" },
+          "flight": { "$ref": "#/components/schemas/Flight" },
+          "passengers": { "type": "array", "items": { "$ref": "#/components/schemas/Passenger" } },
+          "status": { "type": "string", "example": "CONFIRMED" }
+        }
+      },
+      "PaymentRequest": {
+        "type": "object",
+        "properties": {
+          "bookingId": { "type": "string", "example": "BKG98765" },
+          "amount": { "type": "number", "example": 250.00 },
+          "paymentMethod": { "type": "string", "example": "CreditCard" },
+          "cardNumber": { "type": "string", "example": "4111111111111111" },
+          "expiry": { "type": "string", "example": "12/26" },
+          "cvv": { "type": "string", "example": "123" }
+        }
+      },
+      "PaymentResponse": {
+        "type": "object",
+        "properties": {
+          "transactionId": { "type": "string", "example": "TXN456789" },
+          "status": { "type": "string", "example": "SUCCESS" }
+        }
+      },
+      "CheckinRequest": {
+        "type": "object",
+        "properties": {
+          "passengers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "passportNumber": { "type": "string", "example": "A1234567" },
+                "seat": { "type": "string", "example": "12A" }
+              }
+            }
+          }
+        }
+      },
+      "CheckinResponse": {
+        "type": "object",
+        "properties": {
+          "checkinId": { "type": "string", "example": "CHK12345" },
+          "status": { "type": "string", "example": "CHECKED_IN" }
+        }
+      },
+      "BoardingPass": {
+        "type": "object",
+        "properties": {
+          "bookingId": { "type": "string", "example": "BKG98765" },
+          "passengerName": { "type": "string", "example": "John Doe" },
+          "flightId": { "type": "string", "example": "FL123" },
+          "seat": { "type": "string", "example": "12A" },
+          "gate": { "type": "string", "example": "G5" },
+          "boardingTime": { "type": "string", "format": "date-time", "example": "2025-09-01T08:45:00Z" }
+        }
+      }
+    }
+  }
+}

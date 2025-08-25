@@ -5,6 +5,7 @@ from app.core.paths import ensure_directories_exist, UI_DIR, UPLOADS_DIR
 from app.db.pool import init_pool, close_pool
 from app.routers import files as files_router
 from app.routers import apis as apis_router
+from app.routers import testing as testing_router
 
 
 app = FastAPI(title="GATEKEEPER")
@@ -27,6 +28,7 @@ def on_shutdown() -> None:
 
 app.include_router(files_router.router)
 app.include_router(apis_router.router)
+app.include_router(testing_router.router)
 
 app.mount("/ui", StaticFiles(directory=str(UI_DIR), html=True), name="ui")
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
