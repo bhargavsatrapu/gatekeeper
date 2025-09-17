@@ -31,7 +31,7 @@ def basic_example():
             "host": "localhost",
             "database": "SWAGGER_API",
             "user": "postgres",
-            "password": "9496"
+            "password": "shirisha@123"
         }
     )
     

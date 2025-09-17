@@ -122,14 +122,41 @@ class APIClient:
             if payload and method in ['POST', 'PUT', 'PATCH']:
                 request_kwargs['json'] = payload
             
-            # Make the request
+            # Make the request with retries on connection errors/timeouts
             import time
             start_time = time.time()
             
-            print("⏳ [API_CLIENT] Sending request...")
-            response = self.session.request(**request_kwargs)
+            retries = getattr(self.config.api, 'max_retries', 3) or 0
+            attempt = 0
+            last_error: Optional[str] = None
+            backoff_seconds = 0.5
+            response = None
+            
+            while True:
+                try:
+                    print("⏳ [API_CLIENT] Sending request...")
+                    response = self.session.request(**request_kwargs)
+                    break
+                except requests.exceptions.Timeout:
+                    last_error = f"Request timeout after {timeout} seconds"
+                except requests.exceptions.ConnectionError:
+                    last_error = "Connection error - unable to reach the server"
+                except requests.exceptions.RequestException as e:
+                    last_error = f"Request failed: {str(e)}"
+                    # Non-retryable by default; break
+                    break
+                
+                if attempt >= retries:
+                    break
+                attempt += 1
+                print(f"🔁 [API_CLIENT] Retry {attempt}/{retries} after error: {last_error}")
+                time.sleep(backoff_seconds)
+                backoff_seconds = min(backoff_seconds * 2, 5)
             
             execution_time_ms = int((time.time() - start_time) * 1000)
+            
+            if response is None:
+                return APIResponse(error=last_error)
             
             # Parse response data
             try:
@@ -154,21 +181,44 @@ class APIClient:
             error_msg = f"Request timeout after {timeout} seconds"
             logger.error(error_msg)
             return APIResponse(error=error_msg)
-            
         except requests.exceptions.ConnectionError:
             error_msg = "Connection error - unable to reach the server"
             logger.error(error_msg)
             return APIResponse(error=error_msg)
-            
         except requests.exceptions.RequestException as e:
             error_msg = f"Request failed: {str(e)}"
             logger.error(error_msg)
             return APIResponse(error=error_msg)
-            
         except Exception as e:
             error_msg = f"Unexpected error: {str(e)}"
             logger.error(error_msg)
             return APIResponse(error=error_msg)
+
+    def check_connectivity(self, base_url: str, retries: Optional[int] = None) -> bool:
+        """Check if the API server is reachable with lightweight GET/HEAD and retries."""
+        import time
+        tries = retries if retries is not None else getattr(self.config.api, 'max_retries', 3)
+        if tries is None:
+            tries = 0
+        backoff_seconds = 0.5
+        for attempt in range(tries + 1):
+            try:
+                # Prefer HEAD; fall back to GET if not allowed
+                resp = self.session.request('HEAD', base_url, timeout=self.config.api.timeout)
+                if resp.status_code < 500:
+                    return True
+            except Exception:
+                pass
+            try:
+                resp = self.session.request('GET', base_url, timeout=self.config.api.timeout)
+                if resp.status_code < 500:
+                    return True
+            except Exception:
+                pass
+            if attempt < tries:
+                time.sleep(backoff_seconds)
+                backoff_seconds = min(backoff_seconds * 2, 5)
+        return False
     
     def get(
         self,

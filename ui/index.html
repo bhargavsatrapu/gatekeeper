@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gatekeeper UI</title>
+    <link rel="stylesheet" href="/ui/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Gatekeeper API Test Runner</h1>
+    </header>
+    <main>
+      <section class="card">
+        <h2>Upload Swagger JSON</h2>
+        <div class="form-grid">
+          <input type="file" id="swaggerFile" accept="application/json" />
+          <button id="uploadSwagger">Upload</button>
+          <div class="muted" id="uploadInfo"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Preview Endpoints</h2>
+        <div class="form-grid">
+          <button id="previewEndpoints">Load Endpoints</button>
+          <span class="muted">Uses current config swagger path</span>
+        </div>
+        <pre id="endpointsPreview"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Generate Testcases (AI)</h2>
+        <div class="form-grid">
+          <button id="generateTestcases">Generate</button>
+          <span class="muted">Generates multiple testcases for each endpoint</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat">Generated Total: <span id="genCount">0</span></div>
+        </div>
+        <pre id="testcasesPreview"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Execute All Generated Testcases</h2>
+        <div class="form-grid">
+          <button id="executeAll">Execute All</button>
+          <span class="muted">Runs all generated cases sequentially</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat">Generated Total: <span id="genCountExec">0</span></div>
+          <div class="stat">Executed Total: <span id="execCount">0</span></div>
+        </div>
+        <pre id="executeAllResults"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Run Orchestration</h2>
+        <div class="form-grid">
+          <label>Base URL <input id="baseUrl" placeholder="http://localhost:3000" /></label>
+          <label>Swagger File Path <input id="swaggerPath" placeholder="C:\\path\\to\\swagger.json" /></label>
+          <button id="startRun">Start Run</button>
+        </div>
+        <div id="startResult" class="muted"></div>
+      </section>
+
+      <section class="card">
+        <h2>Run Status</h2>
+        <div class="form-grid">
+          <label>Run ID <input id="runId" placeholder="paste run id" /></label>
+          <button id="refreshStatus">Refresh</button>
+        </div>
+        <pre id="status"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Execution Logs</h2>
+        <button id="loadLogs">Load Logs</button>
+        <pre id="logs"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Results</h2>
+        <button id="loadResults">Load Results</button>
+        <pre id="results"></pre>
+      </section>
+    </main>
+
+    <script src="/ui/app.js"></script>
+  </body>
+  </html>
+
+

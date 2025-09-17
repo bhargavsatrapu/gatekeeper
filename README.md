@@ -47,7 +47,7 @@ A comprehensive, AI-powered API testing framework that automatically generates a
 3. **Set up PostgreSQL database**
    ```sql
    CREATE DATABASE SWAGGER_API;
-   CREATE USER postgres WITH PASSWORD '9496';
+   CREATE USER postgres WITH PASSWORD 'shirisha@123';
    GRANT ALL PRIVILEGES ON DATABASE SWAGGER_API TO postgres;
    ```
 
@@ -111,7 +111,7 @@ class DatabaseConfig:
     host: str = "localhost"
     database: str = "SWAGGER_API"
     user: str = "postgres"
-    password: str = "9496"
+    password: str = "shirisha@123"
     port: int = 5432
 ```
 
