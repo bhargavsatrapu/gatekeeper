@@ -19,7 +19,7 @@ import json
 import threading
 import uuid
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -55,6 +55,12 @@ except Exception:
     pass
 
 
+# Redirect root to UI for convenience
+@app.get("/")
+def root_redirect():
+    return RedirectResponse(url="/ui")
+
+
 class RunState:
     def __init__(self):
         self.thread: Optional[threading.Thread] = None
@@ -64,6 +70,13 @@ class RunState:
 
 RUNS: Dict[str, RunState] = {}
 parser = SwaggerParser()
+
+# Cache: holds the last generated mapping so execute routes can reuse it
+# Shape: Dict[str, List[Dict[str, Any]]] mapping endpoint -> list of testcases
+LAST_GENERATED_MAPPING: Optional[Dict[str, List[Dict[str, Any]]]] = None
+# Cache last execution results for reporting
+LAST_POSITIVE_RESULTS: Optional[Dict[str, Any]] = None
+LAST_ALL_RESULTS: Optional[Dict[str, Any]] = None
 
 
 def _run_agent(run_id: str) -> None:
@@ -133,6 +146,43 @@ def get_results(run_id: str):
     agent = _get_agent_or_404()
     results = agent.get_test_results() or {}
     return results
+
+
+# Reporting endpoints
+@app.get("/report/last")
+def get_last_report():
+    """Return a consolidated report of the most recent Execute Positive and Execute All runs."""
+    return {
+        "positive": LAST_POSITIVE_RESULTS or {},
+        "all": LAST_ALL_RESULTS or {},
+    }
+
+@app.post("/report/generate")
+def generate_report():
+    """Return a summarized report with pass/fail counts and failed reasons for last runs."""
+    def summarize(results: Optional[Dict[str, Any]]):
+        if not results:
+            return {"total": 0, "passed": 0, "failed": 0, "failed_details": []}
+        logs = results.get("logs", {})
+        failed_details = []
+        for name, entry in logs.items():
+            resp = (entry or {}).get("response", {})
+            success = bool(resp.get("success"))
+            if not success:
+                failed_details.append({
+                    "test_name": name,
+                    "status_code": resp.get("status_code"),
+                    "reason": resp.get("error") or resp.get("message") or "Failed",
+                })
+        total = int(results.get("summary", {}).get("total_tests") or results.get("executed") or 0)
+        passed = int(results.get("summary", {}).get("passed_tests") or 0)
+        failed = max(total - passed, 0)
+        return {"total": total, "passed": passed, "failed": failed, "failed_details": failed_details}
+
+    return {
+        "positive": summarize(LAST_POSITIVE_RESULTS),
+        "all": summarize(LAST_ALL_RESULTS),
+    }
 
 
 @app.post("/runs/{run_id}/cancel")
@@ -225,6 +275,9 @@ def generate_testcases():
     generator = get_test_case_generator()
     mapping = generator.generate_test_cases(endpoints)
     generated_total = sum(len(v) for v in mapping.values())
+    # Store in cache for subsequent executions
+    global LAST_GENERATED_MAPPING
+    LAST_GENERATED_MAPPING = mapping
     return {"total_endpoints": len(mapping), "generated_total": generated_total, "mapping": mapping}
 
 
@@ -268,10 +321,15 @@ def execute_all():
     api_client = get_api_client()
     if not api_client.check_connectivity(cfg.api.base_url):
         raise HTTPException(status_code=503, detail=f"API base URL not reachable: {cfg.api.base_url}")
-    data = parser.load_swagger_file(cfg.swagger_file_path)
-    endpoints = parser.extract_endpoints(data)
-    generator = get_test_case_generator()
-    mapping = generator.generate_test_cases(endpoints)
+    global LAST_GENERATED_MAPPING
+    mapping = LAST_GENERATED_MAPPING
+    # If nothing in cache yet, generate once and cache it
+    if mapping is None:
+        data = parser.load_swagger_file(cfg.swagger_file_path)
+        endpoints = parser.extract_endpoints(data)
+        generator = get_test_case_generator()
+        mapping = generator.generate_test_cases(endpoints)
+        LAST_GENERATED_MAPPING = mapping
 
     # Flatten all cases
     all_cases = []
@@ -297,6 +355,68 @@ def execute_all():
     summary["failed_tests"] = summary["total_tests"] - summary["passed_tests"]
     results["summary"] = summary
     results["generated_counts"] = {k: len(v) for k, v in mapping.items()}
+    # Cache for reporting
+    global LAST_ALL_RESULTS
+    LAST_ALL_RESULTS = results
+    return results
+
+
+@app.post("/execute/positive")
+def execute_positive_flow():
+    cfg = get_config()
+    # Optional connectivity pre-check
+    api_client = get_api_client()
+    if not api_client.check_connectivity(cfg.api.base_url):
+        raise HTTPException(status_code=503, detail=f"API base URL not reachable: {cfg.api.base_url}")
+
+    # Use cached mapping if available; otherwise generate and cache
+    global LAST_GENERATED_MAPPING
+    mapping = LAST_GENERATED_MAPPING
+    if mapping is None:
+        data = parser.load_swagger_file(cfg.swagger_file_path)
+        endpoints = parser.extract_endpoints(data)
+        generator = get_test_case_generator()
+        mapping = generator.generate_test_cases(endpoints)
+        LAST_GENERATED_MAPPING = mapping
+
+    # Select exactly one testcase per endpoint (prefer test_type=="positive"; fallback to first)
+    positive_cases = []
+    for _, arr in mapping.items():
+        if not arr:
+            continue
+        preferred = None
+        for case in arr:
+            if str(case.get("test_type", "")).lower() == "positive":
+                preferred = case
+                break
+        positive_cases.append(preferred or arr[0])
+
+    # Execute positives
+    executor = get_test_executor()
+    results: Dict[str, Any] = {"executed": 0}
+    results["generated_total"] = len(positive_cases)
+    print(f"[EXECUTE_POSITIVE] Total positive cases identified: {len(positive_cases)}")
+    for case in positive_cases:
+        request_data, resp = executor.execute_test_case(case)
+        results.setdefault("logs", {})[case.get("test_name", "")] = {
+            "request": request_data,
+            "response": resp.to_dict(),
+        }
+        results["executed"] += 1
+    print(f"[EXECUTE_POSITIVE] Positive cases executed: {results['executed']}")
+
+    summary = {
+        "total_tests": results["executed"],
+        "passed_tests": sum(1 for log in results["logs"].values() if log["response"].get("success")),
+    }
+    summary["failed_tests"] = summary["total_tests"] - summary["passed_tests"]
+    results["summary"] = summary
+    results["positive_executed"] = results["executed"]
+    # Report how many candidates existed per endpoint and which were chosen
+    results["generated_counts"] = {k: len(v) for k, v in mapping.items()}
+    # Cache for reporting
+    global LAST_POSITIVE_RESULTS
+    LAST_POSITIVE_RESULTS = results
     return results
 
 

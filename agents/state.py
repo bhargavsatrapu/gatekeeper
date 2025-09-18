@@ -183,12 +183,13 @@ class StateManager:
             "database_initialization",
             "endpoint_parsing",
             "endpoint_storage",
+            "endpoint_fetching",
             "test_case_generation",
-            "test_case_validation",
             "test_case_persistence",
             "execution_planning",
-            "test_execution",
-            "report_generation"
+            "positive_flow_execution",
+            "all_tests_execution",
+            "report_generation",
         ]
         
         completed_steps = self.state["completed_steps"]

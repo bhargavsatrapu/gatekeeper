@@ -155,11 +155,13 @@ class WorkflowNodes:
             Updated agent state
         """
         logger.info("Fetching endpoints from database")
+        self.state_manager.set_current_step("endpoint_fetching")
         print("fetching endpoints")
         try:
             endpoints = self.endpoint_repository.get_all_endpoints()
             self.state_manager.update_state(endpoints=endpoints)
             logger.info(f"Fetched {len(endpoints)} endpoints from database")
+            self.state_manager.mark_step_completed("endpoint_fetching")
             return self.state_manager.get_state()
             
         except Exception as e:

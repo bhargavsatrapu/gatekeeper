@@ -25,6 +25,7 @@
         <div class="form-grid">
           <button id="previewEndpoints">Load Endpoints</button>
           <span class="muted">Uses current config swagger path</span>
+          <span id="previewLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading endpoints...</span>
         </div>
         <pre id="endpointsPreview"></pre>
       </section>
@@ -34,6 +35,7 @@
         <div class="form-grid">
           <button id="generateTestcases">Generate</button>
           <span class="muted">Generates multiple testcases for each endpoint</span>
+          <span id="genLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Generating...</span>
         </div>
         <div class="stats-row">
           <div class="stat">Generated Total: <span id="genCount">0</span></div>
@@ -42,14 +44,32 @@
       </section>
 
       <section class="card">
+        <h2>Execute Positive Only</h2>
+        <div class="form-grid">
+          <button id="executePositive">Execute Positive Only</button>
+          <span class="muted">Runs only testcases with test_type = positive</span>
+          <span id="execPositiveLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running positive...</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat">Positive Executed: <span id="posExecCount">0</span></div>
+          <div class="stat">Passed: <span id="posPassCount">0</span></div>
+          <div class="stat">Failed: <span id="posFailCount">0</span></div>
+        </div>
+        <pre id="executePositiveResults"></pre>
+      </section>
+
+      <section class="card">
         <h2>Execute All Generated Testcases</h2>
         <div class="form-grid">
           <button id="executeAll">Execute All</button>
           <span class="muted">Runs all generated cases sequentially</span>
+          <span id="execAllLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running all...</span>
         </div>
         <div class="stats-row">
           <div class="stat">Generated Total: <span id="genCountExec">0</span></div>
           <div class="stat">Executed Total: <span id="execCount">0</span></div>
+          <div class="stat">Passed: <span id="allPassCount">0</span></div>
+          <div class="stat">Failed: <span id="allFailCount">0</span></div>
         </div>
         <pre id="executeAllResults"></pre>
       </section>
@@ -81,8 +101,13 @@
 
       <section class="card">
         <h2>Results</h2>
-        <button id="loadResults">Load Results</button>
+        <div class="form-grid">
+          <button id="loadResults">Load Results</button>
+          <button id="generateReport">Generate Report</button>
+          <span class="muted">Summarizes last Positive/All runs with failure reasons</span>
+        </div>
         <pre id="results"></pre>
+        <pre id="report"></pre>
       </section>
     </main>
 
