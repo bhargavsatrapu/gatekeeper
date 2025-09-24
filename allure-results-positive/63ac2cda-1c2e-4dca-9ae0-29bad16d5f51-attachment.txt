@@ -1,0 +1,13 @@
+{
+  "url": "http://localhost:3000/products",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer string",
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "name": "Super Widget Pro Max",
+    "price": 49.99
+  }
+}

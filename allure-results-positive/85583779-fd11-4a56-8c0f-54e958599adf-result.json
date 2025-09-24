@@ -1,0 +1,66 @@
+{
+  "uuid": "85583779-fd11-4a56-8c0f-54e958599adf",
+  "name": "Successfully retrieve current user profile",
+  "fullName": "Successfully retrieve current user profile",
+  "status": "passed",
+  "start": 1758714515255,
+  "stop": 1758714517304,
+  "description": "",
+  "labels": [
+    {
+      "name": "suite",
+      "value": "API Testing"
+    },
+    {
+      "name": "testClass",
+      "value": "APITestCase"
+    },
+    {
+      "name": "method",
+      "value": "GET"
+    },
+    {
+      "name": "url",
+      "value": "/users/me"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Request Headers",
+      "value": "{\n  \"Authorization\": \"Bearer string\"\n}"
+    },
+    {
+      "name": "Request Body",
+      "value": "{}"
+    },
+    {
+      "name": "Query Params",
+      "value": "{}"
+    },
+    {
+      "name": "Response Status",
+      "value": "200"
+    },
+    {
+      "name": "Response Body",
+      "value": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"497f6eca-6276-4993-bfeb-53cbbbba6f08\",\n    \"username\": \"string\",\n    \"email\": \"user@example.com\",\n    \"createdAt\": \"2019-08-24T14:15:22Z\",\n    \"updatedAt\": \"2019-08-24T14:15:22Z\"\n  }\n}"
+    },
+    {
+      "name": "Expected Status",
+      "value": "200"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Request Data",
+      "source": "dfae17ce-d41b-486b-9322-7daa5361b09b",
+      "type": "text/plain"
+    },
+    {
+      "name": "Response Data",
+      "source": "2dbe5342-6515-4a09-883e-af0c7d5a7d0e",
+      "type": "text/plain"
+    }
+  ],
+  "steps": []
+}

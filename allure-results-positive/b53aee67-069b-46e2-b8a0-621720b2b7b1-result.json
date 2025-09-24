@@ -1,0 +1,66 @@
+{
+  "uuid": "b53aee67-069b-46e2-b8a0-621720b2b7b1",
+  "name": "Successful user login",
+  "fullName": "Successful user login",
+  "status": "passed",
+  "start": 1758714515211,
+  "stop": 1758714515227,
+  "description": "",
+  "labels": [
+    {
+      "name": "suite",
+      "value": "API Testing"
+    },
+    {
+      "name": "testClass",
+      "value": "APITestCase"
+    },
+    {
+      "name": "method",
+      "value": "POST"
+    },
+    {
+      "name": "url",
+      "value": "/users/login"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Request Headers",
+      "value": "{\n  \"Content-Type\": \"application/json\"\n}"
+    },
+    {
+      "name": "Request Body",
+      "value": "{\n  \"email\": \"testuser_unique_123@example.com\",\n  \"password\": \"SecureP@ssw0rd123!\"\n}"
+    },
+    {
+      "name": "Query Params",
+      "value": "{}"
+    },
+    {
+      "name": "Response Status",
+      "value": "200"
+    },
+    {
+      "name": "Response Body",
+      "value": "{\n  \"success\": true,\n  \"data\": {\n    \"token\": \"string\"\n  }\n}"
+    },
+    {
+      "name": "Expected Status",
+      "value": "200"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Request Data",
+      "source": "a582d701-ef61-412c-bdfd-aea326eee12c",
+      "type": "text/plain"
+    },
+    {
+      "name": "Response Data",
+      "source": "e32acbb1-12cf-412a-b858-49840ea536b0",
+      "type": "text/plain"
+    }
+  ],
+  "steps": []
+}

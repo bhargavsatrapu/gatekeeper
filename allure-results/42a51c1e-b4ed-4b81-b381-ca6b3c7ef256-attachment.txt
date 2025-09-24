@@ -1,0 +1,13 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "username": "negUser_invalidEmail",
+    "email": "invalid-email-format",
+    "password": "StrongP@ssw0rd456!"
+  }
+}

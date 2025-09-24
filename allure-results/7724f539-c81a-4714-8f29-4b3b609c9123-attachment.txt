@@ -1,0 +1,12 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "username": "missingPassUser_123",
+    "email": "test.missing.pass@example.com"
+  }
+}

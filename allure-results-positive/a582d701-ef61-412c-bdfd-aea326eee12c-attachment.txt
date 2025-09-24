@@ -1,0 +1,12 @@
+{
+  "url": "http://localhost:3000/users/login",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "testuser_unique_123@example.com",
+    "password": "SecureP@ssw0rd123!"
+  }
+}

@@ -22,20 +22,47 @@ from pathlib import Path
 from typing import Any, Dict, Optional, List
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException, UploadFile, File
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from config import get_config, update_config
 from agents import get_api_testing_agent, create_initial_state
-from database import test_database_connection
+from agents.workflow_nodes import get_workflow_nodes
+from database import test_database_connection, get_endpoint_repository, get_db_initializer
 from parsers.swagger_parser import SwaggerParser
 from generators.test_case_generator import get_test_case_generator
 from runners.test_executor import get_test_executor, get_execution_planner
 from runners.api_client import get_api_client
+from database.models import get_test_case_repository
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+# Optional Allure integration
+try:
+    from reporters.allure_reporter import get_allure_reporter
+    ALLURE_AVAILABLE = True
+    logger.info("Allure reporting is available")
+except ImportError as e:
+    ALLURE_AVAILABLE = False
+    logger.warning(f"Allure reporting not available: {e}")
+    # Create a dummy function to avoid errors
+    def get_allure_reporter():
+        return None
 
 
 app = FastAPI(title="Gatekeeper API Testing Server", version="0.1.0")
+
+# Initialize database at server startup
+@app.on_event("startup")
+def _init_db_on_startup():
+    try:
+        initializer = get_db_initializer()
+        initializer.initialize_database()
+    except Exception:
+        # Fail open: health/db can still report status
+        pass
 
 # CORS (open by default; tighten as needed)
 app.add_middleware(
@@ -261,17 +288,16 @@ def health_db():
 
 @app.get("/endpoints/preview")
 def preview_endpoints():
-    cfg = get_config()
-    data = parser.load_swagger_file(cfg.swagger_file_path)
-    endpoints = parser.extract_endpoints(data)
+    repo = get_endpoint_repository()
+    endpoints = repo.get_all_endpoints()
     return {"count": len(endpoints), "endpoints": endpoints}
 
 
 @app.post("/testcases/generate")
 def generate_testcases():
-    cfg = get_config()
-    data = parser.load_swagger_file(cfg.swagger_file_path)
-    endpoints = parser.extract_endpoints(data)
+    # Generate based on endpoints stored in DB (post-extract)
+    repo = get_endpoint_repository()
+    endpoints = repo.get_all_endpoints()
     generator = get_test_case_generator()
     mapping = generator.generate_test_cases(endpoints)
     generated_total = sum(len(v) for v in mapping.values())
@@ -279,6 +305,82 @@ def generate_testcases():
     global LAST_GENERATED_MAPPING
     LAST_GENERATED_MAPPING = mapping
     return {"total_endpoints": len(mapping), "generated_total": generated_total, "mapping": mapping}
+
+
+@app.post("/testcases/persist")
+def persist_testcases_to_db():
+    """Persist the last generated testcases into DB tables keyed per endpoint."""
+    global LAST_GENERATED_MAPPING
+    if LAST_GENERATED_MAPPING is None:
+        raise HTTPException(status_code=400, detail="No generated testcases available to persist. Generate first.")
+
+    endpoint_repo = get_endpoint_repository()
+    db_init = get_db_initializer()
+    testcase_repo = get_test_case_repository()
+
+    endpoints = endpoint_repo.get_all_endpoints()
+    # Build key mapping method path -> endpoint
+    key_to_endpoint = {f"{ep['method']} {ep['path']}": ep for ep in endpoints}
+
+    endpoint_tables: Dict[int, str] = {}
+    persisted_counts: Dict[str, int] = {}
+
+    def _sanitize_table_name(path: str, method: str) -> str:
+        import re as _re
+        clean_path = _re.sub(r'[^a-zA-Z0-9_]', '_', path.strip("/"))
+        return f"api_testcases_{clean_path.lower()}_{method.lower()}"
+
+    for key, cases in LAST_GENERATED_MAPPING.items():
+        ep = key_to_endpoint.get(key)
+        if not ep or not cases:
+            continue
+        table_name = _sanitize_table_name(ep['path'], ep['method'])
+        db_init.create_test_cases_table(table_name)
+        count = 0
+        for tc in cases:
+            tc["endpoint_id"] = ep["id"]
+            if testcase_repo.insert_test_case(table_name, tc):
+                count += 1
+        endpoint_tables[ep['id']] = table_name
+        persisted_counts[key] = count
+
+    return {
+        "endpoints_processed": len(persisted_counts),
+        "persisted_per_endpoint": persisted_counts,
+        "endpoint_tables": endpoint_tables,
+    }
+
+
+@app.post("/swagger/extract")
+def extract_swagger_to_db():
+    """Parse current swagger file and persist endpoints into DB (no testcase generation)."""
+    cfg = get_config()
+    data = parser.load_swagger_file(cfg.swagger_file_path)
+    paths_count = len((data or {}).get("paths", {}) or {})
+    endpoints = parser.extract_endpoints(data)
+    # Optional: recreate api_endpoints table for a fresh import
+    try:
+        initializer = get_db_initializer()
+        initializer.initialize_database()
+    except Exception:
+        pass
+    repo = get_endpoint_repository()
+    stored = 0
+    failures: List[Dict[str, Any]] = []
+    for ep in endpoints:
+        try:
+            if repo.insert_endpoint(ep):
+                stored += 1
+        except Exception as e:
+            failures.append({"path": ep.get("path"), "method": ep.get("method"), "error": str(e)})
+    return {
+        "swagger_file_path": cfg.swagger_file_path,
+        "paths_detected": paths_count,
+        "extracted_endpoints": len(endpoints),
+        "stored": stored,
+        "total": len(endpoints),
+        "failures": failures,
+    }
 
 
 @app.post("/execute/testcases")
@@ -345,6 +447,7 @@ def execute_all():
         results.setdefault("logs", {})[case.get("test_name", "")] = {
             "request": request_data,
             "response": resp.to_dict(),
+            "case": case,
         }
         results["executed"] += 1
 
@@ -358,6 +461,40 @@ def execute_all():
     # Cache for reporting
     global LAST_ALL_RESULTS
     LAST_ALL_RESULTS = results
+    
+    # Generate Allure report if available
+    if ALLURE_AVAILABLE:
+        try:
+            from reporters.allure_reporter import AllureTestReporter
+            allure_reporter = AllureTestReporter("allure-results-all")
+            allure_reporter.clear_results()
+            suite_uuid = allure_reporter.start_test_suite("Execute All Testcases")
+            
+            for test_name, log_entry in results.get("logs", {}).items():
+                case = log_entry.get("case", {})
+                request_data = log_entry.get("request", {})
+                response_data = log_entry.get("response", {})
+                success = response_data.get("success", False)
+                
+                allure_reporter.add_test_result(
+                    test_name=test_name,
+                    status="passed" if success else "failed",
+                    description=case.get("description", ""),
+                    method=case.get("method", ""),
+                    url=case.get("url", ""),
+                    expected_status=case.get("expected_status", ""),
+                    request_data=request_data,
+                    response_data=response_data,
+                    error_message=response_data.get("error", "") if not success else "",
+                    duration=response_data.get("execution_time_ms", 0)
+                )
+            
+            allure_reporter.finalize_suite(suite_uuid)
+            allure_reporter.generate_report()
+            logger.info("Allure report generated for all tests")
+        except Exception as e:
+            logger.error(f"Failed to generate Allure report: {e}")
+    
     return results
 
 
@@ -401,6 +538,7 @@ def execute_positive_flow():
         results.setdefault("logs", {})[case.get("test_name", "")] = {
             "request": request_data,
             "response": resp.to_dict(),
+            "case": case,
         }
         results["executed"] += 1
     print(f"[EXECUTE_POSITIVE] Positive cases executed: {results['executed']}")
@@ -417,7 +555,247 @@ def execute_positive_flow():
     # Cache for reporting
     global LAST_POSITIVE_RESULTS
     LAST_POSITIVE_RESULTS = results
+    
+    # Generate Allure report for positive tests if available
+    if ALLURE_AVAILABLE:
+        try:
+            from reporters.allure_reporter import AllureTestReporter
+            allure_reporter = AllureTestReporter("allure-results-positive")
+            allure_reporter.clear_results()
+            suite_uuid = allure_reporter.start_test_suite("Execute Positive Testcases")
+            
+            for test_name, log_entry in results.get("logs", {}).items():
+                case = log_entry.get("case", {})
+                request_data = log_entry.get("request", {})
+                response_data = log_entry.get("response", {})
+                success = response_data.get("success", False)
+                
+                allure_reporter.add_test_result(
+                    test_name=test_name,
+                    status="passed" if success else "failed",
+                    description=case.get("description", ""),
+                    method=case.get("method", ""),
+                    url=case.get("url", ""),
+                    expected_status=case.get("expected_status", ""),
+                    request_data=request_data,
+                    response_data=response_data,
+                    error_message=response_data.get("error", "") if not success else "",
+                    duration=response_data.get("execution_time_ms", 0)
+                )
+            
+            allure_reporter.finalize_suite(suite_uuid)
+            allure_reporter.generate_report()
+            logger.info("Allure report generated for positive tests")
+        except Exception as e:
+            logger.error(f"Failed to generate Allure report: {e}")
+    
     return results
+
+
+def _sse_event(data: Dict[str, Any]) -> bytes:
+    return ("data: " + json.dumps(data) + "\n\n").encode("utf-8")
+
+
+@app.get("/stream/positive")
+def stream_execute_positive():
+    cfg = get_config()
+    api_client = get_api_client()
+    if not api_client.check_connectivity(cfg.api.base_url):
+        raise HTTPException(status_code=503, detail=f"API base URL not reachable: {cfg.api.base_url}")
+
+    def _gen():
+        # Use cached mapping or generate once
+        global LAST_GENERATED_MAPPING
+        mapping = LAST_GENERATED_MAPPING
+        if mapping is None:
+            data = parser.load_swagger_file(cfg.swagger_file_path)
+            endpoints = parser.extract_endpoints(data)
+            generator = get_test_case_generator()
+            mapping = generator.generate_test_cases(endpoints)
+            LAST_GENERATED_MAPPING = mapping
+
+        # Use same logic as execute_positive_flow: one case per endpoint
+        positive_cases = []
+        for _, arr in mapping.items():
+            if not arr:
+                continue
+            preferred = None
+            for case in arr:
+                if str(case.get("test_type", "")).lower() == "positive":
+                    preferred = case
+                    break
+            positive_cases.append(preferred or arr[0])
+
+        executor = get_test_executor()
+        executed = 0
+        passed = 0
+        for idx, case in enumerate(positive_cases, start=1):
+            request_data, resp = executor.execute_test_case(case)
+            resp_dict = resp.to_dict()
+            success = bool(resp_dict.get("success"))
+            passed += 1 if success else 0
+            executed += 1
+            yield _sse_event({
+                "type": "test",
+                "seq": idx,
+                "name": case.get("test_name"),
+                "description": case.get("description"),
+                "method": case.get("method"),
+                "url": case.get("url"),
+                "expected_status": case.get("expected_status"),
+                "request": request_data,
+                "response": resp_dict,
+                "success": success,
+            })
+        yield _sse_event({
+            "type": "summary",
+            "executed": executed,
+            "passed": passed,
+            "failed": max(executed - passed, 0),
+        })
+
+    return StreamingResponse(_gen(), media_type="text/event-stream")
+
+
+@app.get("/stream/all")
+def stream_execute_all():
+    cfg = get_config()
+    api_client = get_api_client()
+    if not api_client.check_connectivity(cfg.api.base_url):
+        raise HTTPException(status_code=503, detail=f"API base URL not reachable: {cfg.api.base_url}")
+
+    def _gen():
+        global LAST_GENERATED_MAPPING
+        mapping = LAST_GENERATED_MAPPING
+        if mapping is None:
+            data = parser.load_swagger_file(cfg.swagger_file_path)
+            endpoints = parser.extract_endpoints(data)
+            generator = get_test_case_generator()
+            mapping = generator.generate_test_cases(endpoints)
+            LAST_GENERATED_MAPPING = mapping
+
+        # Flatten
+        all_cases: List[Dict[str, Any]] = []
+        for _, arr in mapping.items():
+            all_cases.extend(arr)
+
+        executor = get_test_executor()
+        executed = 0
+        passed = 0
+        for idx, case in enumerate(all_cases, start=1):
+            request_data, resp = executor.execute_test_case(case)
+            resp_dict = resp.to_dict()
+            success = bool(resp_dict.get("success"))
+            passed += 1 if success else 0
+            executed += 1
+            yield _sse_event({
+                "type": "test",
+                "seq": idx,
+                "name": case.get("test_name"),
+                "description": case.get("description"),
+                "method": case.get("method"),
+                "url": case.get("url"),
+                "expected_status": case.get("expected_status"),
+                "request": request_data,
+                "response": resp_dict,
+                "success": success,
+            })
+        yield _sse_event({
+            "type": "summary",
+            "executed": executed,
+            "passed": passed,
+            "failed": max(executed - passed, 0),
+        })
+
+    return StreamingResponse(_gen(), media_type="text/event-stream")
+
+
+@app.get("/allure/report/positive")
+def open_allure_report_positive():
+    """Open Allure report for positive testcases."""
+    if not ALLURE_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Allure reporting is not available. Please install allure-pytest and allure-python-commons.")
+    
+    from pathlib import Path
+    results_dir = Path("allure-results-positive")
+    
+    if not results_dir.exists() or not any(results_dir.glob("*.json")):
+        raise HTTPException(status_code=404, detail="No Allure report found. Please run positive tests first.")
+    
+    # Return the path to the Allure results directory
+    return {
+        "results_dir": str(results_dir),
+        "message": "Allure report generated. Use 'allure serve' command to view the report.",
+        "command": f"allure serve {results_dir}"
+    }
+
+
+@app.get("/allure/report/all")
+def open_allure_report_all():
+    """Open Allure report for all testcases."""
+    if not ALLURE_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Allure reporting is not available. Please install allure-pytest and allure-python-commons.")
+    
+    from pathlib import Path
+    results_dir = Path("allure-results-all")
+    
+    if not results_dir.exists() or not any(results_dir.glob("*.json")):
+        raise HTTPException(status_code=404, detail="No Allure report found. Please run all tests first.")
+    
+    # Return the path to the Allure results directory
+    return {
+        "results_dir": str(results_dir),
+        "message": "Allure report generated. Use 'allure serve' command to view the report.",
+        "command": f"allure serve {results_dir}"
+    }
+
+
+@app.post("/allure/serve")
+def start_allure_server(request_data: dict = None):
+    """Start Allure live server for real-time report viewing."""
+    if not ALLURE_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Allure reporting is not available. Please install allure-pytest and allure-python-commons.")
+    
+    import subprocess
+    import threading
+    import time
+    from pathlib import Path
+    
+    # Get results directory from request or use default
+    if request_data and "results_dir" in request_data:
+        results_dir = Path(request_data["results_dir"])
+    else:
+        results_dir = Path("allure-results")
+    
+    if not results_dir.exists():
+        raise HTTPException(status_code=404, detail=f"No Allure results directory found: {results_dir}")
+    
+    def run_allure_server():
+        try:
+            # Start Allure server on port 8080
+            subprocess.run([
+                "allure", "serve", str(results_dir), 
+                "--port", "8080", 
+                "--host", "localhost"
+            ], check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to start Allure server: {e}")
+        except FileNotFoundError:
+            logger.error("Allure command not found. Please install Allure CLI.")
+    
+    # Start server in background thread
+    server_thread = threading.Thread(target=run_allure_server, daemon=True)
+    server_thread.start()
+    
+    # Give server time to start
+    time.sleep(2)
+    
+    return {
+        "message": "Allure server started successfully",
+        "url": "http://localhost:8080",
+        "results_dir": str(results_dir),
+        "status": "running"
+    }
 
 
 if __name__ == "__main__":

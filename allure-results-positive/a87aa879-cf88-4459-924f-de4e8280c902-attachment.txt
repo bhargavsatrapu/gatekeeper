@@ -1,0 +1,29 @@
+{
+  "status_code": 200,
+  "headers": {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Expose-Headers": "*",
+    "Content-type": "application/json",
+    "Content-Length": "153",
+    "Date": "Wed, 24 Sep 2025 11:48:26 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "data": {
+    "success": true,
+    "data": [
+      {
+        "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+        "name": "string",
+        "price": 0,
+        "createdBy": "string",
+        "createdAt": "2019-08-24T14:15:22Z"
+      }
+    ]
+  },
+  "error": null,
+  "execution_time_ms": 15,
+  "success": true
+}

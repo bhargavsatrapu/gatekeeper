@@ -1,0 +1,66 @@
+{
+  "uuid": "bf68d95b-6c0f-49a6-a979-1015d5f1e064",
+  "name": "Successfully update current user username",
+  "fullName": "Successfully update current user username",
+  "status": "passed",
+  "start": 1758714515278,
+  "stop": 1758714515298,
+  "description": "",
+  "labels": [
+    {
+      "name": "suite",
+      "value": "API Testing"
+    },
+    {
+      "name": "testClass",
+      "value": "APITestCase"
+    },
+    {
+      "name": "method",
+      "value": "PUT"
+    },
+    {
+      "name": "url",
+      "value": "/users/me"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Request Headers",
+      "value": "{\n  \"Authorization\": \"Bearer string\",\n  \"Content-Type\": \"application/json\"\n}"
+    },
+    {
+      "name": "Request Body",
+      "value": "{\n  \"username\": \"updated_user_profile_123\"\n}"
+    },
+    {
+      "name": "Query Params",
+      "value": "{}"
+    },
+    {
+      "name": "Response Status",
+      "value": "200"
+    },
+    {
+      "name": "Response Body",
+      "value": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"497f6eca-6276-4993-bfeb-53cbbbba6f08\",\n    \"username\": \"string\",\n    \"email\": \"user@example.com\",\n    \"createdAt\": \"2019-08-24T14:15:22Z\",\n    \"updatedAt\": \"2019-08-24T14:15:22Z\"\n  }\n}"
+    },
+    {
+      "name": "Expected Status",
+      "value": "200"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Request Data",
+      "source": "2ea0e97b-a142-4050-9c85-258447755a7e",
+      "type": "text/plain"
+    },
+    {
+      "name": "Response Data",
+      "source": "6349cfd5-d395-4b53-bd3d-c11f1501553f",
+      "type": "text/plain"
+    }
+  ],
+  "steps": []
+}

@@ -1,0 +1,66 @@
+{
+  "uuid": "8872a36c-a6dd-4716-bcd0-98b9c7a8114b",
+  "name": "Successful user logout",
+  "fullName": "Successful user logout",
+  "status": "passed",
+  "start": 1758714515232,
+  "stop": 1758714515246,
+  "description": "",
+  "labels": [
+    {
+      "name": "suite",
+      "value": "API Testing"
+    },
+    {
+      "name": "testClass",
+      "value": "APITestCase"
+    },
+    {
+      "name": "method",
+      "value": "POST"
+    },
+    {
+      "name": "url",
+      "value": "/users/logout"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Request Headers",
+      "value": "{\n  \"Authorization\": \"Bearer string\",\n  \"Content-Type\": \"application/json\"\n}"
+    },
+    {
+      "name": "Request Body",
+      "value": "{}"
+    },
+    {
+      "name": "Query Params",
+      "value": "{}"
+    },
+    {
+      "name": "Response Status",
+      "value": "200"
+    },
+    {
+      "name": "Response Body",
+      "value": "{\n  \"success\": true,\n  \"data\": {\n    \"message\": \"string\"\n  }\n}"
+    },
+    {
+      "name": "Expected Status",
+      "value": "200"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Request Data",
+      "source": "514059b7-4ed3-4d04-b4c5-5a9fcb5b0c96",
+      "type": "text/plain"
+    },
+    {
+      "name": "Response Data",
+      "source": "e7c9a7fd-76a2-401f-83ad-ca3df27365c4",
+      "type": "text/plain"
+    }
+  ],
+  "steps": []
+}

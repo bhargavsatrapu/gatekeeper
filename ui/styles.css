@@ -11,6 +11,192 @@ button { background:var(--accent); color:white; border:0; padding:10px 14px; bor
 button:hover { opacity:.9; }
 .form-grid { display:grid; gap:10px; grid-template-columns: 1fr 1fr auto; align-items: end; }
 pre { background:#0b1220; border:1px solid #1f2937; padding:12px; border-radius:8px; overflow:auto; max-height: 320px; }
+.console { 
+  background:#0b1220; 
+  border:1px solid #1f2937; 
+  padding:12px; 
+  border-radius:8px; 
+  max-height:400px; 
+  overflow:auto; 
+  display:flex; 
+  flex-direction:column-reverse; 
+  gap:12px; 
+  position: relative;
+}
+.console-header {
+  position: sticky;
+  top: 0;
+  background: #0b1220;
+  padding: 8px 0;
+  border-bottom: 1px solid #1f2937;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+.console-title {
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 14px;
+}
+.console-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+}
+.console-stat {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #1f2937;
+}
+.console-stat.passed { color: #10b981; }
+.console-stat.failed { color: #ef4444; }
+.console-stat.running { color: #f59e0b; }
+
+.card-item { 
+  border:1px solid #1f2937; 
+  border-radius:8px; 
+  padding:12px; 
+  background:#0f172a; 
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.card-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+.card-item.running {
+  border-color: #f59e0b;
+  background: linear-gradient(90deg, #0f172a 0%, #1f2937 50%, #0f172a 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+.card-item.pass {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+.card-item.fail {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.card-item .title { 
+  font-weight:600; 
+  margin-bottom:8px; 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.card-item .test-number {
+  background: var(--accent);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+}
+.card-item .test-name {
+  flex: 1;
+  color: var(--text);
+}
+.card-item .test-method {
+  background: #374151;
+  color: var(--text);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.card-item .test-url {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.kv { 
+  display:grid; 
+  grid-template-columns: 140px 1fr; 
+  gap:6px 12px; 
+  font-size:12px; 
+  margin-top: 8px;
+}
+.kv div:nth-child(odd) { 
+  color: var(--muted); 
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+.kv pre {
+  background: #0b1220;
+  border: 1px solid #1f2937;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  max-height: 100px;
+  overflow: auto;
+  margin: 0;
+}
+
+.tag { 
+  display:inline-block; 
+  padding:4px 8px; 
+  border-radius:6px; 
+  font-size:11px; 
+  font-weight:600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tag.pass { background:#065f46; color:#d1fae5; }
+.tag.fail { background:#7f1d1d; color:#fee2e2; }
+.tag.running { 
+  background: #92400e; 
+  color: #fef3c7; 
+  animation: pulse 1.5s infinite;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #1f2937;
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #10b981);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  animation: progress-shimmer 2s infinite;
+}
+@keyframes progress-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.console-empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 20px;
+  font-style: italic;
+}
+.console-empty::before {
+  content: "▶";
+  display: block;
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
 .muted { color: var(--muted); margin-top:8px; font-size: 14px; }
 .stats-row { display:flex; gap:16px; margin: 8px 0; }
 .stat { background:#0b1220; border:1px solid #1f2937; padding:8px 12px; border-radius:8px; }

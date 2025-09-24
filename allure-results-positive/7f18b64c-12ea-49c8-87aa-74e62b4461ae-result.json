@@ -1,0 +1,66 @@
+{
+  "uuid": "7f18b64c-12ea-49c8-87aa-74e62b4461ae",
+  "name": "Successful user registration",
+  "fullName": "Successful user registration",
+  "status": "passed",
+  "start": 1758714515183,
+  "stop": 1758714515277,
+  "description": "",
+  "labels": [
+    {
+      "name": "suite",
+      "value": "API Testing"
+    },
+    {
+      "name": "testClass",
+      "value": "APITestCase"
+    },
+    {
+      "name": "method",
+      "value": "POST"
+    },
+    {
+      "name": "url",
+      "value": "/users/register"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Request Headers",
+      "value": "{\n  \"Content-Type\": \"application/json\"\n}"
+    },
+    {
+      "name": "Request Body",
+      "value": "{\n  \"username\": \"testuser_unique_123\",\n  \"email\": \"testuser_unique_123@example.com\",\n  \"password\": \"SecureP@ssw0rd123!\"\n}"
+    },
+    {
+      "name": "Query Params",
+      "value": "{}"
+    },
+    {
+      "name": "Response Status",
+      "value": "201"
+    },
+    {
+      "name": "Response Body",
+      "value": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"497f6eca-6276-4993-bfeb-53cbbbba6f08\",\n    \"username\": \"string\",\n    \"email\": \"user@example.com\",\n    \"createdAt\": \"2019-08-24T14:15:22Z\",\n    \"updatedAt\": \"2019-08-24T14:15:22Z\"\n  }\n}"
+    },
+    {
+      "name": "Expected Status",
+      "value": "201"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Request Data",
+      "source": "c39849b3-b617-4d8b-913f-ca32590e4a06",
+      "type": "text/plain"
+    },
+    {
+      "name": "Response Data",
+      "source": "79bfc9c8-29ba-41fc-873e-d657bb1120d0",
+      "type": "text/plain"
+    }
+  ],
+  "steps": []
+}

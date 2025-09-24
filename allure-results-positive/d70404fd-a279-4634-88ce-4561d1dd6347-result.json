@@ -1,0 +1,66 @@
+{
+  "uuid": "d70404fd-a279-4634-88ce-4561d1dd6347",
+  "name": "Successfully create a new product",
+  "fullName": "Successfully create a new product",
+  "status": "passed",
+  "start": 1758714515315,
+  "stop": 1758714517352,
+  "description": "",
+  "labels": [
+    {
+      "name": "suite",
+      "value": "API Testing"
+    },
+    {
+      "name": "testClass",
+      "value": "APITestCase"
+    },
+    {
+      "name": "method",
+      "value": "POST"
+    },
+    {
+      "name": "url",
+      "value": "/products"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Request Headers",
+      "value": "{\n  \"Authorization\": \"Bearer string\",\n  \"Content-Type\": \"application/json\"\n}"
+    },
+    {
+      "name": "Request Body",
+      "value": "{\n  \"name\": \"Super Widget Pro Max\",\n  \"price\": 49.99\n}"
+    },
+    {
+      "name": "Query Params",
+      "value": "{}"
+    },
+    {
+      "name": "Response Status",
+      "value": "201"
+    },
+    {
+      "name": "Response Body",
+      "value": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": \"497f6eca-6276-4993-bfeb-53cbbbba6f08\",\n    \"name\": \"string\",\n    \"price\": 0,\n    \"createdBy\": \"string\",\n    \"createdAt\": \"2019-08-24T14:15:22Z\"\n  }\n}"
+    },
+    {
+      "name": "Expected Status",
+      "value": "201"
+    }
+  ],
+  "attachments": [
+    {
+      "name": "Request Data",
+      "source": "63ac2cda-1c2e-4dca-9ae0-29bad16d5f51",
+      "type": "text/plain"
+    },
+    {
+      "name": "Response Data",
+      "source": "6bbae87d-09b3-4e74-9901-b7c43f9cafc8",
+      "type": "text/plain"
+    }
+  ],
+  "steps": []
+}
