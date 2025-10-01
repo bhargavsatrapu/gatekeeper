@@ -73,8 +73,7 @@ async function uploadSwagger() {
   }
   const data = await res.json();
   byId('uploadInfo').textContent = JSON.stringify(data, null, 2);
-  // Auto-refresh preview so endpoints reflect newly uploaded swagger
-  await previewEndpoints();
+  // Don't auto-refresh preview after upload - wait for extraction
 }
 
 async function previewEndpoints() {
@@ -114,6 +113,12 @@ async function generateTestcases() {
     const block = JSON.stringify(header, null, 2) + "\n" + JSON.stringify(data, null, 2);
     byId('testcasesPreview').textContent = (prev ? prev + "\n\n" : "") + `=== Generate @ ${stamp} ===\n` + block;
     byId('genCount').textContent = String(total);
+    
+    // Show persistence results if available
+    if (data.persisted) {
+      const persistMsg = `=== Auto-Persisted @ ${stamp} ===\n` + JSON.stringify(data.persisted, null, 2);
+      byId('persistOutput').textContent = persistMsg;
+    }
   } finally {
     btn.disabled = false; loading.style.display = 'none';
   }
@@ -159,24 +164,62 @@ async function persistTestcases() {
 
 async function openAllureReport(type) {
   try {
-    const endpoint = type === 'positive' ? '/allure/report/positive' : '/allure/report/all';
-    const res = await fetch(endpoint);
+    // Use web-based Allure viewer instead of CLI
+    const resultsDir = type === 'positive' ? 'allure-results-positive' : 'allure-results-all';
+    
+    // Check if results exist
+    const res = await fetch(`/allure/data/${resultsDir}`);
+    if (!res.ok) {
+      alert(`No Allure results found for ${type} tests. Please run tests first.`);
+      return;
+    }
+    
+    // Open web-based Allure viewer
+    const viewerUrl = `/allure-viewer.html?type=${type}&results=${resultsDir}`;
+    window.open(viewerUrl, '_blank');
+    
+  } catch (e) {
+    alert(`Error opening Allure report: ${e.message}`);
+  }
+}
+
+async function generateStaticAllureReport(type) {
+  try {
+    const res = await fetch(`/allure/generate-static/${type}`);
     const data = await res.json();
     
     if (res.ok) {
-      // Start Allure live server with specific results directory
-      await startAllureServer(data.results_dir);
+      alert(`Static Allure report generated!\n\nReport location: ${data.report_dir}\n\nYou can open the index.html file in your browser to view the report.`);
       
-      // Open Allure report in new tab
-      const allureUrl = `http://localhost:8080`;
-      window.open(allureUrl, '_blank');
-      
-      alert(`Allure report server started!\n\nReport is now available at: http://localhost:8080\n\nThis will auto-refresh as new tests run.`);
+      // Try to open the static report
+      const reportUrl = `file://${data.index_file.replace(/\\/g, '/')}`;
+      window.open(reportUrl, '_blank');
     } else {
-      alert(`Error: ${data.detail}`);
+      alert(`Error generating static report: ${data.detail}`);
     }
   } catch (e) {
-    alert(`Error opening Allure report: ${e.message}`);
+    alert(`Error generating static report: ${e.message}`);
+  }
+}
+
+async function openAllureReportEndpoint(endpointId, method, path) {
+  try {
+    // Use web-based Allure viewer for endpoint-specific reports
+    const resultsDir = `allure-results-endpoint-${endpointId}`;
+    
+    // Check if results exist
+    const res = await fetch(`/allure/data/${resultsDir}`);
+    if (!res.ok) {
+      alert(`No Allure results found for ${method} ${path}. Please run tests first.`);
+      return;
+    }
+    
+    // Open web-based Allure viewer
+    const viewerUrl = `/allure-viewer.html?type=endpoint&results=${resultsDir}&endpoint=${method} ${path}`;
+    window.open(viewerUrl, '_blank');
+    
+  } catch (e) {
+    alert(`Error opening Allure report for ${method} ${path}: ${e.message}`);
   }
 }
 
@@ -191,6 +234,12 @@ async function startAllureServer(resultsDir = 'allure-results') {
     if (!res.ok) {
       throw new Error(data.detail || 'Failed to start Allure server');
     }
+    
+    // Check if server actually started
+    if (data.status === 'failed') {
+      throw new Error(data.message + (data.suggestion ? '\n\n' + data.suggestion : ''));
+    }
+    
     return data;
   } catch (e) {
     console.error('Failed to start Allure server:', e);
@@ -199,64 +248,13 @@ async function startAllureServer(resultsDir = 'allure-results') {
 }
 
 async function executeAll() {
-  const btn = byId('executeAll');
-  const loading = byId('execAllLoading');
-  btn.disabled = true; loading.style.display = 'inline-flex';
-  try {
-    const res = await fetch('/execute/all', { method: 'POST' });
-    if (!res.ok) {
-      const text = await res.text();
-      byId('executeAllResults').textContent = JSON.stringify({ error: 'Execute all failed', status: res.status, body: text }, null, 2);
-      return;
-    }
-    const data = await res.json();
-    const header = {
-      generated_total: data.generated_total,
-      executed_total: data.executed,
-      passed_tests: data.summary?.passed_tests,
-      failed_tests: data.summary?.failed_tests
-    };
-    const prev = byId('executeAllResults').textContent;
-    const stamp = new Date().toISOString();
-    const block = JSON.stringify(header, null, 2) + "\n" + JSON.stringify(data, null, 2);
-    byId('executeAllResults').textContent = (prev ? prev + "\n\n" : "") + `=== Execute All @ ${stamp} ===\n` + block;
-    if (typeof data.generated_total === 'number') byId('genCountExec').textContent = String(data.generated_total);
-    if (typeof data.executed === 'number') byId('execCount').textContent = String(data.executed);
-    if (typeof data.summary?.passed_tests === 'number') byId('allPassCount').textContent = String(data.summary.passed_tests);
-    if (typeof data.summary?.failed_tests === 'number') byId('allFailCount').textContent = String(data.summary.failed_tests);
-  } finally {
-    btn.disabled = false; loading.style.display = 'none';
-  }
+  // Use streaming execution instead of regular execution to avoid duplicate runs
+  await streamAll();
 }
 
 async function executePositive() {
-  const btn = byId('executePositive');
-  const loading = byId('execPositiveLoading');
-  btn.disabled = true; loading.style.display = 'inline';
-  try {
-    const res = await fetch('/execute/positive', { method: 'POST' });
-    if (!res.ok) {
-      const text = await res.text();
-      byId('executePositiveResults').textContent = JSON.stringify({ error: 'Execute positive failed', status: res.status, body: text }, null, 2);
-      return;
-    }
-    const data = await res.json();
-    const header = {
-      generated_total: data.generated_total,
-      executed_total: data.executed,
-      passed_tests: data.summary?.passed_tests,
-      failed_tests: data.summary?.failed_tests
-    };
-    const prev = byId('executePositiveResults').textContent;
-    const stamp = new Date().toISOString();
-    const block = JSON.stringify(header, null, 2) + "\n" + JSON.stringify(data, null, 2);
-    byId('executePositiveResults').textContent = (prev ? prev + "\n\n" : "") + `=== Execute Positive @ ${stamp} ===\n` + block;
-    if (typeof data.positive_executed === 'number') byId('posExecCount').textContent = String(data.positive_executed);
-    if (typeof data.summary?.passed_tests === 'number') byId('posPassCount').textContent = String(data.summary.passed_tests);
-    if (typeof data.summary?.failed_tests === 'number') byId('posFailCount').textContent = String(data.summary.failed_tests);
-  } finally {
-    btn.disabled = false; loading.style.display = 'none';
-  }
+  // Use streaming execution instead of regular execution to avoid duplicate runs
+  await streamPositive();
 }
 
 function renderTestCard(containerId, evt) {
@@ -358,11 +356,13 @@ function updateConsoleStats(containerId) {
 
 async function streamPositive() {
   const c = byId('positiveConsole');
-  c.innerHTML = '<div class="console-empty">Click to start live console for positive tests</div>';
+  c.innerHTML = '<div class="console-empty">Starting live execution...</div>';
   const res = await fetch('/stream/positive');
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
+  let testCount = 0;
+  
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -379,12 +379,23 @@ async function streamPositive() {
           // Clear empty state when first test arrives
           const emptyState = c.querySelector('.console-empty');
           if (emptyState) emptyState.remove();
+          
+          // Add test case one by one as they execute
+          testCount++;
           renderTestCard('positiveConsole', evt);
+          
+          // Scroll to show the latest test case
+          c.scrollTop = c.scrollHeight;
         }
         if (evt.type === 'summary') {
           if (typeof evt.passed === 'number') byId('posPassCount').textContent = String(evt.passed);
           if (typeof evt.failed === 'number') byId('posFailCount').textContent = String(evt.failed);
           if (typeof evt.executed === 'number') byId('posExecCount').textContent = String(evt.executed);
+          
+          // Auto-refresh preview after execution completes
+          setTimeout(() => {
+            previewEndpoints();
+          }, 1000);
         }
       } catch {}
     }
@@ -429,7 +440,105 @@ async function streamAll() {
 
 byId('uploadSwagger').addEventListener('click', uploadSwagger);
 byId('previewEndpoints').addEventListener('click', previewEndpoints);
+async function loadEndpoints() {
+  const btn = byId('loadEndpoints');
+  const loading = byId('loadEndpointsLoading');
+  btn.disabled = true; loading.style.display = 'inline-flex';
+  try {
+    const res = await fetch('/endpoints/preview');
+    if (!res.ok) {
+      const text = await res.text();
+      byId('endpointsList').innerHTML = `<div class="error">Failed to load endpoints: ${text}</div>`;
+      return;
+    }
+    const data = await res.json();
+    const endpoints = data.endpoints || [];
+    
+    let html = '<div class="endpoints-grid">';
+    endpoints.forEach(ep => {
+      const endpointKey = `${ep.method} ${ep.path}`;
+            html += `
+              <div class="endpoint-card">
+                <div class="endpoint-header">
+                  <span class="method ${ep.method.toLowerCase()}">${ep.method}</span>
+                  <span class="path">${ep.path}</span>
+                </div>
+                <div class="endpoint-info">
+                  <div class="endpoint-id">ID: ${ep.id}</div>
+                  <div class="endpoint-summary">${ep.summary || 'No summary'}</div>
+                </div>
+                <div class="endpoint-actions">
+                  <button class="run-endpoint-btn" data-endpoint-id="${ep.id}" data-method="${ep.method}" data-path="${ep.path}">
+                    Run Testcases
+                  </button>
+                  <button class="allure-endpoint-btn" data-endpoint-id="${ep.id}" data-method="${ep.method}" data-path="${ep.path}">
+                    Allure Report
+                  </button>
+                </div>
+              </div>
+            `;
+    });
+    html += '</div>';
+    byId('endpointsList').innerHTML = html;
+    
+    // Add click handlers to all run buttons
+    document.querySelectorAll('.run-endpoint-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const endpointId = parseInt(e.target.dataset.endpointId);
+        const method = e.target.dataset.method;
+        const path = e.target.dataset.path;
+        runEndpointTestcases(endpointId, method, path);
+      });
+    });
+    
+    // Add click handlers to all allure report buttons
+    document.querySelectorAll('.allure-endpoint-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const endpointId = parseInt(e.target.dataset.endpointId);
+        const method = e.target.dataset.method;
+        const path = e.target.dataset.path;
+        openAllureReportEndpoint(endpointId, method, path);
+      });
+    });
+    
+  } finally {
+    btn.disabled = false; loading.style.display = 'none';
+  }
+}
+
+async function runEndpointTestcases(endpointId, method, path) {
+  const btn = document.querySelector(`[data-endpoint-id="${endpointId}"]`);
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+  
+  try {
+    const res = await fetch(`/execute/endpoint/${endpointId}`, { method: 'POST' });
+    if (!res.ok) {
+      const text = await res.text();
+      byId('endpointResults').textContent = JSON.stringify({ error: 'Execute endpoint failed', status: res.status, body: text }, null, 2);
+      return;
+    }
+    const data = await res.json();
+    const header = {
+      endpoint: `${method} ${path}`,
+      endpoint_id: endpointId,
+      total_tests: data.summary?.total_tests,
+      passed_tests: data.summary?.passed_tests,
+      failed_tests: data.summary?.failed_tests
+    };
+    const prev = byId('endpointResults').textContent;
+    const stamp = new Date().toISOString();
+    const block = `=== Execute Endpoint @ ${stamp} ===\n` + JSON.stringify(header, null, 2) + "\n" + JSON.stringify(data, null, 2);
+    byId('endpointResults').textContent = (prev ? prev + "\n\n" : "") + block;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
 byId('generateTestcases').addEventListener('click', generateTestcases);
+byId('loadEndpoints').addEventListener('click', loadEndpoints);
 byId('executeAll').addEventListener('click', executeAll);
 byId('executePositive').addEventListener('click', executePositive);
 byId('startRun').addEventListener('click', startRun);
@@ -437,8 +546,6 @@ byId('refreshStatus').addEventListener('click', refreshStatus);
 byId('loadLogs').addEventListener('click', loadLogs);
 byId('loadResults').addEventListener('click', loadResults);
 byId('generateReport').addEventListener('click', generateReport);
-byId('streamPositive').addEventListener('click', streamPositive);
-byId('streamAll').addEventListener('click', streamAll);
 byId('allureReportPositive').addEventListener('click', () => openAllureReport('positive'));
 byId('allureReportAll').addEventListener('click', () => openAllureReport('all'));
 byId('extractSwagger').addEventListener('click', extractSwagger);

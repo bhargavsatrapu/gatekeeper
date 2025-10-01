@@ -24,8 +24,8 @@
       <section class="card">
         <h2>Preview Endpoints</h2>
         <div class="form-grid">
-          <button id="previewEndpoints">Load Endpoints</button>
-          <span class="muted">Shows endpoints fetched from the database</span>
+          <button id="previewEndpoints">Load Endpoints from DB</button>
+          <span class="muted">Shows endpoints stored in database (after extraction)</span>
           <span id="previewLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading endpoints...</span>
         </div>
         <pre id="endpointsPreview"></pre>
@@ -50,7 +50,6 @@
         <h2>Execute Positive Only</h2>
         <div class="form-grid">
           <button id="executePositive">Execute Positive Only</button>
-          <button id="streamPositive">Live Console (Positive)</button>
           <button id="allureReportPositive">Allure Report (Positive)</button>
           <span class="muted">Runs only testcases with test_type = positive</span>
           <span id="execPositiveLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running positive...</span>
@@ -61,16 +60,25 @@
           <div class="stat">Failed: <span id="posFailCount">0</span></div>
         </div>
         <div id="positiveConsole" class="console">
-          <div class="console-empty">Click "Live Console (Positive)" to start real-time test monitoring</div>
+          <div class="console-empty">Click "Execute Positive Only" to start real-time test monitoring</div>
         </div>
-        <pre id="executePositiveResults"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Execute Individual Endpoints</h2>
+        <div class="form-grid">
+          <button id="loadEndpoints">Load Endpoints</button>
+          <span class="muted">Load all endpoints with their testcase counts</span>
+          <span id="loadEndpointsLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading...</span>
+        </div>
+        <div id="endpointsList"></div>
+        <pre id="endpointResults"></pre>
       </section>
 
       <section class="card">
         <h2>Execute All Generated Testcases</h2>
         <div class="form-grid">
           <button id="executeAll">Execute All</button>
-          <button id="streamAll">Live Console (All)</button>
           <button id="allureReportAll">Allure Report (All)</button>
           <span class="muted">Runs all generated cases sequentially</span>
           <span id="execAllLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running all...</span>
@@ -82,9 +90,8 @@
           <div class="stat">Failed: <span id="allFailCount">0</span></div>
         </div>
         <div id="allConsole" class="console">
-          <div class="console-empty">Click "Live Console (All)" to start real-time test monitoring</div>
+          <div class="console-empty">Click "Execute All" to start real-time test monitoring</div>
         </div>
-        <pre id="executeAllResults"></pre>
       </section>
 
       <section class="card">

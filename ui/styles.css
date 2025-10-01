@@ -201,6 +201,96 @@ pre { background:#0b1220; border:1px solid #1f2937; padding:12px; border-radius:
 .stats-row { display:flex; gap:16px; margin: 8px 0; }
 .stat { background:#0b1220; border:1px solid #1f2937; padding:8px 12px; border-radius:8px; }
 
+.endpoints-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.endpoint-card {
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #0b1220;
+}
+
+.endpoint-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.method {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.method.get { background: #065f46; color: #d1fae5; }
+.method.post { background: #1e40af; color: #dbeafe; }
+.method.put { background: #92400e; color: #fef3c7; }
+.method.delete { background: #7f1d1d; color: #fee2e2; }
+.method.patch { background: #374151; color: #d1d5db; }
+
+.path {
+  font-family: monospace;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.endpoint-info {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.endpoint-id {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.endpoint-summary {
+  color: var(--text);
+  margin-top: 0.25rem;
+}
+
+.endpoint-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.run-endpoint-btn, .allure-endpoint-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.run-endpoint-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.allure-endpoint-btn {
+  background: #28a745;
+}
+
+.allure-endpoint-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.run-endpoint-btn:disabled, .allure-endpoint-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
 /* (sticky removed per request) */
 
 

@@ -1,7 +1,0 @@
-{
-  "url": "http://localhost:3000/products",
-  "method": "GET",
-  "headers": {},
-  "query_params": {},
-  "payload": {}
-}

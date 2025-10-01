@@ -267,10 +267,35 @@ def upload_swagger(file: UploadFile = File(...)):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
+    # Save to project root with consistent name
     dest = Path("swagger.json")
     dest.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    update_config(swagger_file_path=str(dest.resolve()))
-    return {"path": str(dest.resolve())}
+    dest_path = str(dest.resolve())
+    
+    # Update config to point to the uploaded file
+    update_config(swagger_file_path=dest_path)
+    
+    # Verify the file is ready for extraction
+    try:
+        parser = SwaggerParser()
+        test_data = parser.load_swagger_file(dest_path)
+        paths_count = len((test_data or {}).get("paths", {}) or {})
+        endpoints_count = len(parser.extract_endpoints(test_data))
+    except Exception as e:
+        return {
+            "path": dest_path,
+            "uploaded": True,
+            "ready_for_extract": False,
+            "error": str(e)
+        }
+    
+    return {
+        "path": dest_path,
+        "uploaded": True,
+        "ready_for_extract": True,
+        "paths_detected": paths_count,
+        "endpoints_available": endpoints_count
+    }
 
 
 @app.get("/health")
@@ -298,13 +323,72 @@ def generate_testcases():
     # Generate based on endpoints stored in DB (post-extract)
     repo = get_endpoint_repository()
     endpoints = repo.get_all_endpoints()
+    if not endpoints:
+        raise HTTPException(status_code=400, detail="No endpoints found in database. Please extract endpoints first.")
+    
     generator = get_test_case_generator()
     mapping = generator.generate_test_cases(endpoints)
     generated_total = sum(len(v) for v in mapping.values())
     # Store in cache for subsequent executions
     global LAST_GENERATED_MAPPING
     LAST_GENERATED_MAPPING = mapping
-    return {"total_endpoints": len(mapping), "generated_total": generated_total, "mapping": mapping}
+    
+    # Automatically persist test cases to database
+    persisted_summary: Dict[str, Any] = {}
+    try:
+        initializer = get_db_initializer()
+        testcase_repo = get_test_case_repository()
+        
+        # Build key mapping method path -> endpoint
+        key_to_endpoint = {f"{ep['method']} {ep['path']}": ep for ep in endpoints}
+        
+        endpoint_tables: Dict[int, str] = {}
+        persisted_counts: Dict[str, int] = {}
+        errors: List[str] = []
+        
+        def _sanitize_table_name(path: str, method: str) -> str:
+            import re as _re
+            clean_path = _re.sub(r'[^a-zA-Z0-9_]', '_', path.strip("/"))
+            return f"api_testcases_{clean_path.lower()}_{method.lower()}"
+        
+        for key, cases in mapping.items():
+            ep = key_to_endpoint.get(key)
+            if not ep:
+                errors.append(f"Endpoint not found in database for key: {key}")
+                continue
+            if not cases:
+                errors.append(f"No test cases generated for endpoint: {key}")
+                continue
+                
+            try:
+                table_name = _sanitize_table_name(ep['path'], ep['method'])
+                initializer.create_test_cases_table(table_name)
+                count = 0
+                for tc in cases:
+                    tc["endpoint_id"] = ep["id"]
+                    if testcase_repo.insert_test_case(table_name, tc):
+                        count += 1
+                endpoint_tables[ep['id']] = table_name
+                persisted_counts[key] = count
+            except Exception as e:
+                errors.append(f"Error persisting test cases for {key}: {str(e)}")
+        
+        persisted_summary = {
+            "endpoints_processed": len(persisted_counts),
+            "persisted_per_endpoint": persisted_counts,
+            "endpoint_tables": endpoint_tables,
+            "errors": errors,
+            "total_testcases_persisted": sum(persisted_counts.values())
+        }
+    except Exception as e:
+        persisted_summary = {"error": str(e)}
+    
+    return {
+        "total_endpoints": len(mapping), 
+        "generated_total": generated_total, 
+        "mapping": mapping,
+        "persisted": persisted_summary
+    }
 
 
 @app.post("/testcases/persist")
@@ -319,11 +403,15 @@ def persist_testcases_to_db():
     testcase_repo = get_test_case_repository()
 
     endpoints = endpoint_repo.get_all_endpoints()
+    if not endpoints:
+        raise HTTPException(status_code=400, detail="No endpoints found in database. Please extract endpoints first.")
+    
     # Build key mapping method path -> endpoint
     key_to_endpoint = {f"{ep['method']} {ep['path']}": ep for ep in endpoints}
 
     endpoint_tables: Dict[int, str] = {}
     persisted_counts: Dict[str, int] = {}
+    errors: List[str] = []
 
     def _sanitize_table_name(path: str, method: str) -> str:
         import re as _re
@@ -332,22 +420,32 @@ def persist_testcases_to_db():
 
     for key, cases in LAST_GENERATED_MAPPING.items():
         ep = key_to_endpoint.get(key)
-        if not ep or not cases:
+        if not ep:
+            errors.append(f"Endpoint not found in database for key: {key}")
             continue
-        table_name = _sanitize_table_name(ep['path'], ep['method'])
-        db_init.create_test_cases_table(table_name)
-        count = 0
-        for tc in cases:
-            tc["endpoint_id"] = ep["id"]
-            if testcase_repo.insert_test_case(table_name, tc):
-                count += 1
-        endpoint_tables[ep['id']] = table_name
-        persisted_counts[key] = count
+        if not cases:
+            errors.append(f"No test cases generated for endpoint: {key}")
+            continue
+            
+        try:
+            table_name = _sanitize_table_name(ep['path'], ep['method'])
+            db_init.create_test_cases_table(table_name)
+            count = 0
+            for tc in cases:
+                tc["endpoint_id"] = ep["id"]
+                if testcase_repo.insert_test_case(table_name, tc):
+                    count += 1
+            endpoint_tables[ep['id']] = table_name
+            persisted_counts[key] = count
+        except Exception as e:
+            errors.append(f"Error persisting test cases for {key}: {str(e)}")
 
     return {
         "endpoints_processed": len(persisted_counts),
         "persisted_per_endpoint": persisted_counts,
         "endpoint_tables": endpoint_tables,
+        "errors": errors,
+        "total_testcases_persisted": sum(persisted_counts.values())
     }
 
 
@@ -494,6 +592,96 @@ def execute_all():
             logger.info("Allure report generated for all tests")
         except Exception as e:
             logger.error(f"Failed to generate Allure report: {e}")
+    
+    return results
+
+
+@app.post("/execute/endpoint/{endpoint_id}")
+def execute_endpoint_testcases(endpoint_id: int):
+    """Execute all testcases for a specific endpoint from its DB table."""
+    cfg = get_config()
+    api_client = get_api_client()
+    if not api_client.check_connectivity(cfg.api.base_url):
+        raise HTTPException(status_code=503, detail=f"API base URL not reachable: {cfg.api.base_url}")
+
+    # Get endpoint details
+    endpoint_repo = get_endpoint_repository()
+    endpoint = endpoint_repo.get_endpoint_by_id(endpoint_id)
+    if not endpoint:
+        raise HTTPException(status_code=404, detail=f"Endpoint with ID {endpoint_id} not found")
+
+    # Get testcases from the endpoint's table
+    testcase_repo = get_test_case_repository()
+    import re as _re
+    def _sanitize_table_name(path: str, method: str) -> str:
+        clean_path = _re.sub(r'[^a-zA-Z0-9_]', '_', path.strip("/"))
+        return f"api_testcases_{clean_path.lower()}_{method.lower()}"
+    
+    table_name = _sanitize_table_name(endpoint['path'], endpoint['method'])
+    testcases = testcase_repo.get_test_cases(table_name)
+    
+    if not testcases:
+        raise HTTPException(status_code=404, detail=f"No testcases found for endpoint {endpoint['method']} {endpoint['path']}")
+
+    # Execute all testcases for this endpoint
+    executor = get_test_executor()
+    results: Dict[str, Any] = {"executed": 0}
+    results["endpoint_info"] = {
+        "id": endpoint_id,
+        "method": endpoint['method'],
+        "path": endpoint['path'],
+        "table_name": table_name
+    }
+    results["generated_total"] = len(testcases)
+    
+    for case in testcases:
+        request_data, resp = executor.execute_test_case(case)
+        results.setdefault("logs", {})[case.get("test_name", "")] = {
+            "request": request_data,
+            "response": resp.to_dict(),
+            "case": case,
+        }
+        results["executed"] += 1
+
+    summary = {
+        "total_tests": results["executed"],
+        "passed_tests": sum(1 for log in results["logs"].values() if log["response"].get("success")),
+    }
+    summary["failed_tests"] = summary["total_tests"] - summary["passed_tests"]
+    results["summary"] = summary
+    
+    # Generate Allure report for individual endpoint if available
+    if ALLURE_AVAILABLE:
+        try:
+            from reporters.allure_reporter import AllureTestReporter
+            allure_reporter = AllureTestReporter(f"allure-results-endpoint-{endpoint_id}")
+            allure_reporter.clear_results()
+            suite_uuid = allure_reporter.start_test_suite(f"Execute Endpoint {endpoint['method']} {endpoint['path']}")
+            
+            for case_name, log_data in results["logs"].items():
+                case = log_data["case"]
+                response = log_data["response"]
+                request_data = log_data["request"]
+                
+                allure_reporter.add_test_result(
+                    test_name=case_name,
+                    status="passed" if response.get("success") else "failed",
+                    description=case.get("description", ""),
+                    method=endpoint['method'],
+                    url=endpoint['path'],
+                    expected_status=str(case.get("expected_status", "")),
+                    request_data=request_data,
+                    response_data=response,
+                    error_message=response.get("error", ""),
+                    duration=response.get("duration", 0)
+                )
+            
+            allure_reporter.finalize_suite(suite_uuid)
+            allure_reporter.generate_report()
+            logger.info(f"Allure report generated for endpoint {endpoint_id}")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate Allure report for endpoint {endpoint_id}: {e}")
     
     return results
 
@@ -750,6 +938,108 @@ def open_allure_report_all():
     }
 
 
+@app.get("/allure/report/endpoint/{endpoint_id}")
+def open_allure_report_endpoint(endpoint_id: int):
+    """Open Allure report for individual endpoint testcases."""
+    if not ALLURE_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Allure reporting is not available. Please install allure-pytest and allure-python-commons.")
+    
+    from pathlib import Path
+    results_dir = Path(f"allure-results-endpoint-{endpoint_id}")
+    
+    if not results_dir.exists() or not any(results_dir.glob("*.json")):
+        raise HTTPException(status_code=404, detail=f"No Allure report found for endpoint {endpoint_id}. Please run tests for this endpoint first.")
+    
+    # Return the path to the Allure results directory
+    return {
+        "results_dir": str(results_dir),
+        "message": f"Allure report generated for endpoint {endpoint_id}. Use 'allure serve' command to view the report.",
+        "command": f"allure serve {results_dir}"
+    }
+
+
+@app.get("/allure/generate-static/{report_type}")
+def generate_static_allure_report(report_type: str):
+    """Generate static Allure report and return download link."""
+    if not ALLURE_AVAILABLE:
+        raise HTTPException(status_code=503, detail="Allure reporting is not available. Please install allure-pytest and allure-python-commons.")
+    
+    import subprocess
+    from pathlib import Path
+    
+    # Determine results directory based on report type
+    if report_type == "positive":
+        results_dir = Path("allure-results-positive")
+    elif report_type == "all":
+        results_dir = Path("allure-results-all")
+    elif report_type.startswith("endpoint-"):
+        endpoint_id = report_type.replace("endpoint-", "")
+        results_dir = Path(f"allure-results-endpoint-{endpoint_id}")
+    else:
+        results_dir = Path("allure-results")
+    
+    if not results_dir.exists() or not any(results_dir.glob("*.json")):
+        raise HTTPException(status_code=404, detail=f"No Allure results found for {report_type}. Please run tests first.")
+    
+    # Generate static report
+    static_dir = Path(f"allure-report-{report_type}")
+    try:
+        subprocess.run([
+            "allure", "generate", str(results_dir), 
+            "--output", str(static_dir),
+            "--clean"
+        ], check=True, capture_output=True, text=True)
+        
+        return {
+            "message": f"Static Allure report generated for {report_type}",
+            "report_dir": str(static_dir),
+            "index_file": str(static_dir / "index.html"),
+            "status": "generated"
+        }
+    except subprocess.CalledProcessError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate static report: {e.stderr}")
+    except FileNotFoundError:
+        raise HTTPException(status_code=503, detail="Allure CLI not found. Please install Allure CLI.")
+
+
+@app.get("/allure/data/{results_dir}")
+def get_allure_data(results_dir: str):
+    """Get Allure data files as JSON for web viewer."""
+    from pathlib import Path
+    import json
+    
+    results_path = Path(results_dir)
+    
+    if not results_path.exists():
+        raise HTTPException(status_code=404, detail=f"Results directory not found: {results_dir}")
+    
+    test_results = []
+    containers = []
+    
+    # Load test results
+    for result_file in results_path.glob("*-result.json"):
+        try:
+            with open(result_file, 'r', encoding='utf-8') as f:
+                test_results.append(json.load(f))
+        except Exception as e:
+            logger.error(f"Failed to load result file {result_file}: {e}")
+    
+    # Load containers
+    for container_file in results_path.glob("*-container.json"):
+        try:
+            with open(container_file, 'r', encoding='utf-8') as f:
+                containers.append(json.load(f))
+        except Exception as e:
+            logger.error(f"Failed to load container file {container_file}: {e}")
+    
+    return {
+        "testResults": test_results,
+        "containers": containers,
+        "totalTests": len(test_results),
+        "resultsDir": str(results_path)
+    }
+
+
 @app.post("/allure/serve")
 def start_allure_server(request_data: dict = None):
     """Start Allure live server for real-time report viewing."""
@@ -770,32 +1060,65 @@ def start_allure_server(request_data: dict = None):
     if not results_dir.exists():
         raise HTTPException(status_code=404, detail=f"No Allure results directory found: {results_dir}")
     
+    # Check if port 8080 is already in use
+    import socket
+    def is_port_in_use(port):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(('localhost', port)) == 0
+    
+    if is_port_in_use(8080):
+        return {
+            "message": "Allure server already running",
+            "results_dir": str(results_dir),
+            "url": "http://localhost:8080",
+            "status": "already_running"
+        }
+    
     def run_allure_server():
         try:
-            # Start Allure server on port 8080
-            subprocess.run([
+            # Start Allure server on port 8080 with proper subprocess handling
+            process = subprocess.Popen([
                 "allure", "serve", str(results_dir), 
                 "--port", "8080", 
                 "--host", "localhost"
-            ], check=True)
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Failed to start Allure server: {e}")
+            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            
+            # Wait a bit to see if it starts successfully
+            time.sleep(3)
+            if process.poll() is None:
+                logger.info("Allure server started successfully on port 8080")
+            else:
+                stdout, stderr = process.communicate()
+                logger.error(f"Allure server failed to start. stdout: {stdout}, stderr: {stderr}")
+                
         except FileNotFoundError:
             logger.error("Allure command not found. Please install Allure CLI.")
+        except Exception as e:
+            logger.error(f"Failed to start Allure server: {e}")
     
     # Start server in background thread
     server_thread = threading.Thread(target=run_allure_server, daemon=True)
     server_thread.start()
     
     # Give server time to start
-    time.sleep(2)
+    time.sleep(3)
     
-    return {
-        "message": "Allure server started successfully",
-        "url": "http://localhost:8080",
-        "results_dir": str(results_dir),
-        "status": "running"
-    }
+    # Check if server is actually running
+    if is_port_in_use(8080):
+        return {
+            "message": "Allure server started successfully",
+            "results_dir": str(results_dir),
+            "url": "http://localhost:8080",
+            "status": "started"
+        }
+    else:
+        return {
+            "message": "Failed to start Allure server. Please check if Allure CLI is installed and try again.",
+            "results_dir": str(results_dir),
+            "url": "http://localhost:8080",
+            "status": "failed",
+            "suggestion": "Try running 'allure serve' command manually in terminal"
+        }
 
 
 if __name__ == "__main__":
