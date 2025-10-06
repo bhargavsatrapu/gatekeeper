@@ -7,129 +7,259 @@
     <link rel="stylesheet" href="/ui/styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Gatekeeper API Test Runner</h1>
-    </header>
-    <main>
-      <section class="card">
-        <h2>Upload Swagger JSON</h2>
-        <div class="form-grid">
-          <input type="file" id="swaggerFile" accept="application/json" />
-          <button id="uploadSwagger">Upload</button>
-          <button id="extractSwagger">Extract JSON</button>
-          <div class="muted" id="uploadInfo"></div>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>Gatekeeper</h1>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <span class="arrow-left">‹</span>
+        </button>
+      </div>
+      
+      <div class="sidebar-content">
+        <div class="nav-section setup">
+          <h3>Setup</h3>
+          <ul class="nav-list">
+            <li><a href="#swagger-upload" class="nav-link active" data-section="swagger-upload">
+              <span class="nav-icon">📄</span>
+              <span class="nav-text">Swagger Upload</span>
+            </a></li>
+            <li><a href="#endpoints" class="nav-link" data-section="endpoints">
+              <span class="nav-icon">🔗</span>
+              <span class="nav-text">Endpoints</span>
+            </a></li>
+          </ul>
         </div>
-      </section>
+        
+        <div class="nav-section generation">
+          <h3>Test Generation</h3>
+          <ul class="nav-list">
+            <li><a href="#testcases" class="nav-link" data-section="testcases">
+              <span class="nav-icon">🤖</span>
+              <span class="nav-text">Generate Testcases</span>
+            </a></li>
+          </ul>
+        </div>
+        
+        <div class="nav-section execution">
+          <h3>Test Execution</h3>
+          <ul class="nav-list">
+            <li><a href="#positive-tests" class="nav-link" data-section="positive-tests">
+              <span class="nav-icon">✅</span>
+              <span class="nav-text">Positive Tests</span>
+            </a></li>
+            <li><a href="#individual-tests" class="nav-link" data-section="individual-tests">
+              <span class="nav-icon">🎯</span>
+              <span class="nav-text">Individual Tests</span>
+            </a></li>
+            <li><a href="#all-tests" class="nav-link" data-section="all-tests">
+              <span class="nav-icon">🚀</span>
+              <span class="nav-text">All Tests</span>
+            </a></li>
+          </ul>
+        </div>
+        
+        <div class="nav-section reports">
+          <h3>Reports & Results</h3>
+          <ul class="nav-list">
+            <li><a href="#reports" class="nav-link" data-section="reports">
+              <span class="nav-icon">📊</span>
+              <span class="nav-text">Reports</span>
+            </a></li>
+            <li><a href="#orchestration" class="nav-link" data-section="orchestration">
+              <span class="nav-icon">⚙️</span>
+              <span class="nav-text">Orchestration</span>
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-      <section class="card">
-        <h2>Preview Endpoints</h2>
-        <div class="form-grid">
-          <button id="previewEndpoints">Load Endpoints from DB</button>
-          <span class="muted">Shows endpoints stored in database (after extraction)</span>
-          <span id="previewLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading endpoints...</span>
+    <!-- Main Content Area -->
+    <div class="main-container">
+      <header class="main-header">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        
+        <div class="header-content">
+          <h2 id="pageTitle">Swagger Upload</h2>
         </div>
-        <pre id="endpointsPreview"></pre>
-      </section>
+        
+        <div class="header-actions">
+          <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span class="status-text">Ready</span>
+          </div>
+        </div>
+      </header>
+      
+      <main class="main-content">
+        <!-- Swagger Upload Section -->
+        <div class="content-section active" id="swagger-upload">
+          <section class="card">
+            <h2>📄 Upload Swagger JSON</h2>
+            <p class="card-description">Upload your Swagger/OpenAPI specification file to get started with API testing</p>
+            
+            <div class="form-grid">
+              <div class="file-input">
+                <label class="file-input-wrapper">
+                  <span>📁 Choose Swagger File</span>
+                  <input type="file" id="swaggerFile" accept="application/json" />
+                </label>
+                <div class="file-name" id="fileName">No file selected</div>
+              </div>
+              
+              <div class="action-buttons">
+                <button id="uploadSwagger" class="primary-btn">
+                  <span>⬆️</span> Upload File
+                </button>
+                <button id="extractSwagger" class="secondary-btn">
+                  <span>🔍</span> Extract JSON
+                </button>
+              </div>
+              
+              <div class="upload-status" id="uploadInfo"></div>
+            </div>
+          </section>
+        </div>
 
-      <section class="card">
-        <h2>Generate Testcases (AI)</h2>
-        <div class="form-grid">
-          <button id="generateTestcases">Generate</button>
-          <span class="muted">Generates multiple testcases for each endpoint</span>
-          <span id="genLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Generating...</span>
+        <!-- Endpoints Section -->
+        <div class="content-section" id="endpoints">
+          <section class="card">
+            <h2>Preview Endpoints</h2>
+            <div class="form-grid">
+              <button id="previewEndpoints">Load Endpoints from DB</button>
+              <span class="muted">Shows endpoints stored in database (after extraction)</span>
+              <span id="previewLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading endpoints...</span>
+            </div>
+            <pre id="endpointsPreview" class="placeholder-text">Click "Load Endpoints from DB" to view endpoints stored in the database</pre>
+          </section>
         </div>
-        <div class="stats-row">
-          <div class="stat">Generated Total: <span id="genCount">0</span></div>
-          <button id="persistTestcases">Store Testcases to DB</button>
-        </div>
-        <pre id="testcasesPreview"></pre>
-        <pre id="persistOutput"></pre>
-      </section>
 
-      <section class="card">
-        <h2>Execute Positive Only</h2>
-        <div class="form-grid">
-          <button id="executePositive">Execute Positive Only</button>
-          <button id="allureReportPositive">Allure Report (Positive)</button>
-          <span class="muted">Runs only testcases with test_type = positive</span>
-          <span id="execPositiveLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running positive...</span>
+        <!-- Testcases Section -->
+        <div class="content-section" id="testcases">
+          <section class="card">
+            <h2>Generate Testcases (AI)</h2>
+            <div class="form-grid">
+              <button id="generateTestcases">Generate</button>
+              <span class="muted">Generates multiple testcases for each endpoint</span>
+              <span id="genLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Generating...</span>
+            </div>
+            <div class="stats-row">
+              <div class="stat">Generated Total: <span id="genCount">0</span></div>
+              <button id="persistTestcases">Store Testcases to DB</button>
+            </div>
+            <pre id="testcasesPreview"></pre>
+            <pre id="persistOutput"></pre>
+          </section>
         </div>
-        <div class="stats-row">
-          <div class="stat">Positive Executed: <span id="posExecCount">0</span></div>
-          <div class="stat">Passed: <span id="posPassCount">0</span></div>
-          <div class="stat">Failed: <span id="posFailCount">0</span></div>
-        </div>
-        <div id="positiveConsole" class="console">
-          <div class="console-empty">Click "Execute Positive Only" to start real-time test monitoring</div>
-        </div>
-      </section>
 
-      <section class="card">
-        <h2>Execute Individual Endpoints</h2>
-        <div class="form-grid">
-          <button id="loadEndpoints">Load Endpoints</button>
-          <span class="muted">Load all endpoints with their testcase counts</span>
-          <span id="loadEndpointsLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading...</span>
+        <!-- Positive Tests Section -->
+        <div class="content-section" id="positive-tests">
+          <section class="card">
+            <h2>Execute Positive Only</h2>
+            <div class="form-grid">
+              <button id="executePositive">Execute Positive Only</button>
+              <button id="allureReportPositive">Allure Report (Positive)</button>
+              <span class="muted">Runs only testcases with test_type = positive</span>
+              <span id="execPositiveLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running positive...</span>
+            </div>
+            <div class="stats-row">
+              <div class="stat">Positive Executed: <span id="posExecCount">0</span></div>
+              <div class="stat">Passed: <span id="posPassCount">0</span></div>
+              <div class="stat">Failed: <span id="posFailCount">0</span></div>
+            </div>
+            <div id="positiveConsole" class="console">
+              <div class="console-empty">Click "Execute Positive Only" to start real-time test monitoring</div>
+            </div>
+          </section>
         </div>
-        <div id="endpointsList"></div>
-        <pre id="endpointResults"></pre>
-      </section>
 
-      <section class="card">
-        <h2>Execute All Generated Testcases</h2>
-        <div class="form-grid">
-          <button id="executeAll">Execute All</button>
-          <button id="allureReportAll">Allure Report (All)</button>
-          <span class="muted">Runs all generated cases sequentially</span>
-          <span id="execAllLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running all...</span>
+        <!-- Individual Tests Section -->
+        <div class="content-section" id="individual-tests">
+          <section class="card">
+            <h2>Execute Individual Endpoints</h2>
+            <div class="form-grid">
+              <button id="loadEndpoints">Load Endpoints</button>
+              <span class="muted">Load all endpoints with their testcase counts</span>
+              <span id="loadEndpointsLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading...</span>
+            </div>
+            <div id="endpointsList"></div>
+            <pre id="endpointResults"></pre>
+          </section>
         </div>
-        <div class="stats-row">
-          <div class="stat">Generated Total: <span id="genCountExec">0</span></div>
-          <div class="stat">Executed Total: <span id="execCount">0</span></div>
-          <div class="stat">Passed: <span id="allPassCount">0</span></div>
-          <div class="stat">Failed: <span id="allFailCount">0</span></div>
-        </div>
-        <div id="allConsole" class="console">
-          <div class="console-empty">Click "Execute All" to start real-time test monitoring</div>
-        </div>
-      </section>
 
-      <section class="card">
-        <h2>Run Orchestration</h2>
-        <div class="form-grid">
-          <label>Base URL <input id="baseUrl" placeholder="http://localhost:3000" /></label>
-          <label>Swagger File Path <input id="swaggerPath" placeholder="C:\\path\\to\\swagger.json" /></label>
-          <button id="startRun">Start Run</button>
+        <!-- All Tests Section -->
+        <div class="content-section" id="all-tests">
+          <section class="card">
+            <h2>Execute All Generated Testcases</h2>
+            <div class="form-grid">
+              <button id="executeAll">Execute All</button>
+              <button id="allureReportAll">Allure Report (All)</button>
+              <span class="muted">Runs all generated cases sequentially</span>
+              <span id="execAllLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running all...</span>
+            </div>
+            <div class="stats-row">
+              <div class="stat">Generated Total: <span id="genCountExec">0</span></div>
+              <div class="stat">Executed Total: <span id="execCount">0</span></div>
+              <div class="stat">Passed: <span id="allPassCount">0</span></div>
+              <div class="stat">Failed: <span id="allFailCount">0</span></div>
+            </div>
+            <div id="allConsole" class="console">
+              <div class="console-empty">Click "Execute All" to start real-time test monitoring</div>
+            </div>
+          </section>
         </div>
-        <div id="startResult" class="muted"></div>
-      </section>
 
-      <section class="card">
-        <h2>Run Status</h2>
-        <div class="form-grid">
-          <label>Run ID <input id="runId" placeholder="paste run id" /></label>
-          <button id="refreshStatus">Refresh</button>
+        <!-- Reports Section -->
+        <div class="content-section" id="reports">
+          <section class="card">
+            <h2>Results & Reports</h2>
+            <div class="form-grid">
+              <button id="loadResults">Load Results</button>
+              <button id="generateReport">Generate Report</button>
+              <span class="muted">Summarizes last Positive/All runs with failure reasons</span>
+            </div>
+            <pre id="results"></pre>
+            <pre id="report"></pre>
+          </section>
+          
+          <section class="card">
+            <h2>Execution Logs</h2>
+            <button id="loadLogs">Load Logs</button>
+            <pre id="logs"></pre>
+          </section>
         </div>
-        <pre id="status"></pre>
-      </section>
 
-      <section class="card">
-        <h2>Execution Logs</h2>
-        <button id="loadLogs">Load Logs</button>
-        <pre id="logs"></pre>
-      </section>
+        <!-- Orchestration Section -->
+        <div class="content-section" id="orchestration">
+          <section class="card">
+            <h2>Run Orchestration</h2>
+            <div class="form-grid">
+              <label>Base URL <input id="baseUrl" placeholder="http://localhost:3000" /></label>
+              <label>Swagger File Path <input id="swaggerPath" placeholder="C:\\path\\to\\swagger.json" /></label>
+              <button id="startRun">Start Run</button>
+            </div>
+            <div id="startResult" class="muted"></div>
+          </section>
 
-      <section class="card">
-        <h2>Results</h2>
-        <div class="form-grid">
-          <button id="loadResults">Load Results</button>
-          <button id="generateReport">Generate Report</button>
-          <span class="muted">Summarizes last Positive/All runs with failure reasons</span>
+          <section class="card">
+            <h2>Run Status</h2>
+            <div class="form-grid">
+              <label>Run ID <input id="runId" placeholder="paste run id" /></label>
+              <button id="refreshStatus">Refresh</button>
+            </div>
+            <pre id="status"></pre>
+          </section>
         </div>
-        <pre id="results"></pre>
-        <pre id="report"></pre>
-      </section>
-    </main>
+      </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script src="/ui/app.js"></script>
   </body>

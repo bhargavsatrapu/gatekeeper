@@ -1,5 +1,211 @@
 const byId = (id) => document.getElementById(id);
 
+// Navigation and UI Management
+let currentSection = 'swagger-upload';
+
+// Section titles mapping
+const sectionTitles = {
+  'swagger-upload': 'Swagger Upload',
+  'endpoints': 'Endpoints',
+  'testcases': 'Generate Testcases',
+  'positive-tests': 'Positive Tests',
+  'individual-tests': 'Individual Tests',
+  'all-tests': 'All Tests',
+  'reports': 'Reports & Results',
+  'orchestration': 'Orchestration'
+};
+
+// Initialize navigation
+function initNavigation() {
+  const sidebar = byId('sidebar');
+  const sidebarToggle = byId('sidebarToggle');
+  const mobileMenuToggle = byId('mobileMenuToggle');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const pageTitle = byId('pageTitle');
+
+  console.log('Initializing navigation...');
+  console.log('Sidebar:', sidebar);
+  console.log('Mobile menu toggle:', mobileMenuToggle);
+
+  // Sidebar toggle functionality
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      console.log('Sidebar toggled, classes:', sidebar.className);
+    });
+  }
+
+  // Mobile menu toggle
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        console.log('Mobile menu closed');
+      } else {
+        sidebar.classList.add('open');
+        console.log('Mobile menu opened');
+      }
+    });
+  }
+
+  // Navigation link clicks
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const section = link.dataset.section;
+      if (section) {
+        showSection(section);
+        
+        // Update active nav link
+        navLinks.forEach(nav => nav.classList.remove('active'));
+        link.classList.add('active');
+        
+        // Close mobile menu if open
+        sidebar.classList.remove('open');
+      }
+    });
+  });
+
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 && 
+        sidebar.classList.contains('open') &&
+        !sidebar.contains(e.target) && 
+        !mobileMenuToggle.contains(e.target)) {
+      sidebar.classList.remove('open');
+      console.log('Mobile menu closed by outside click');
+    }
+  });
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      sidebar.classList.remove('open');
+    }
+  });
+}
+
+// Show specific section
+function showSection(sectionId) {
+  // Hide all sections
+  const sections = document.querySelectorAll('.content-section');
+  sections.forEach(section => {
+    section.classList.remove('active');
+  });
+
+  // Show target section
+  const targetSection = byId(sectionId);
+  if (targetSection) {
+    targetSection.classList.add('active');
+    currentSection = sectionId;
+    
+    // Update page title
+    const pageTitle = byId('pageTitle');
+    if (pageTitle && sectionTitles[sectionId]) {
+      pageTitle.textContent = sectionTitles[sectionId];
+    }
+    
+    // Reset endpoints preview when navigating to endpoints section
+    if (sectionId === 'endpoints') {
+      const preview = byId('endpointsPreview');
+      if (preview) {
+        preview.textContent = 'Click "Load Endpoints from DB" to view endpoints stored in the database';
+        preview.className = 'placeholder-text';
+      }
+    }
+  }
+}
+
+// Toast Notification Functions
+function showToast(type, title, message, duration = 5000) {
+  const container = byId('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️'
+  };
+  
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="removeToast(this.parentElement)">×</button>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Auto remove after duration
+  setTimeout(() => {
+    if (toast.parentElement) {
+      removeToast(toast);
+    }
+  }, duration);
+  
+  return toast;
+}
+
+function removeToast(toast) {
+  toast.style.animation = 'slideOut 0.3s ease';
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.parentElement.removeChild(toast);
+    }
+  }, 300);
+}
+
+// Initialize on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  initNavigation();
+  
+  // File input handling
+  const swaggerFile = byId('swaggerFile');
+  const fileName = byId('fileName');
+  
+  if (swaggerFile && fileName) {
+    swaggerFile.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        fileName.textContent = `Selected: ${file.name}`;
+        fileName.style.color = 'var(--accent)';
+        fileName.style.fontWeight = '500';
+      } else {
+        fileName.textContent = 'No file selected';
+        fileName.style.color = 'var(--muted)';
+        fileName.style.fontWeight = 'normal';
+      }
+    });
+  }
+  
+  // Fallback mobile menu toggle
+  const mobileMenuToggle = byId('mobileMenuToggle');
+  const sidebar = byId('sidebar');
+  
+  if (mobileMenuToggle && sidebar) {
+    // Add additional event listener as fallback
+    mobileMenuToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        console.log('Mobile menu closed');
+      } else {
+        sidebar.classList.add('open');
+        console.log('Mobile menu opened');
+      }
+    });
+  }
+});
+
 async function startRun() {
   const baseUrl = byId('baseUrl').value.trim();
   const swaggerPath = byId('swaggerPath').value.trim();
@@ -79,18 +285,27 @@ async function uploadSwagger() {
 async function previewEndpoints() {
   const btn = byId('previewEndpoints');
   const loading = byId('previewLoading');
-  btn.disabled = true; loading.style.display = 'inline-flex';
+  const preview = byId('endpointsPreview');
+  
+  btn.disabled = true; 
+  loading.style.display = 'inline-flex';
+  
+  // Clear any previous results and show loading state
+  preview.textContent = 'Loading endpoints from database...';
+  preview.className = ''; // Remove placeholder styling
+  
   try {
     const res = await fetch('/endpoints/preview');
     if (!res.ok) {
       const text = await res.text();
-      byId('endpointsPreview').textContent = JSON.stringify({ error: 'Preview failed', status: res.status, body: text }, null, 2);
+      preview.textContent = JSON.stringify({ error: 'Preview failed', status: res.status, body: text }, null, 2);
       return;
     }
     const data = await res.json();
-    byId('endpointsPreview').textContent = JSON.stringify(data, null, 2);
+    preview.textContent = JSON.stringify(data, null, 2);
   } finally {
-    btn.disabled = false; loading.style.display = 'none';
+    btn.disabled = false; 
+    loading.style.display = 'none';
   }
 }
 
@@ -134,8 +349,7 @@ async function extractSwagger() {
     const stamp = new Date().toISOString();
     const msg = `=== Extracted @ ${stamp} ===\n` + JSON.stringify(data, null, 2);
     byId('uploadInfo').textContent = (prev ? prev + "\n\n" : "") + msg;
-    // Auto-refresh endpoints preview so UI reflects DB contents right after extract
-    await previewEndpoints();
+    // Note: Endpoints preview will need to be manually refreshed after extraction
   } finally {
     btn.disabled = false;
   }
@@ -144,21 +358,40 @@ async function extractSwagger() {
 async function persistTestcases() {
   const btn = byId('persistTestcases');
   btn.disabled = true;
+  btn.textContent = 'Storing...';
+  
   try {
     const res = await fetch('/testcases/persist', { method: 'POST' });
     if (!res.ok) {
       const text = await res.text();
       const prev = byId('testcasesPreview').textContent;
       byId('testcasesPreview').textContent = (prev ? prev + "\n\n" : "") + JSON.stringify({ error: 'Persist failed', status: res.status, body: text }, null, 2);
+      
+      // Show error toast
+      showToast('error', 'Storage Failed', 'Failed to store testcases to database. Please try again.');
       return;
     }
+    
     const data = await res.json();
     const prev = byId('testcasesPreview').textContent;
     const stamp = new Date().toISOString();
     const msg = `=== Persisted @ ${stamp} ===\n` + JSON.stringify(data, null, 2);
     byId('testcasesPreview').textContent = (prev ? prev + "\n\n" : "") + msg;
+    
+    // Check if there's data to store
+    if (data && (data.stored_count > 0 || data.persisted_count > 0)) {
+      const count = data.stored_count || data.persisted_count || 0;
+      showToast('success', 'Successfully Stored', `${count} testcases have been stored to the database.`);
+    } else {
+      showToast('warning', 'Nothing to Store', 'No testcases were found to store. Please generate testcases first.');
+    }
+    
+  } catch (error) {
+    console.error('Error persisting testcases:', error);
+    showToast('error', 'Storage Error', 'An error occurred while storing testcases. Please try again.');
   } finally {
     btn.disabled = false;
+    btn.textContent = 'Store Testcases to DB';
   }
 }
 
@@ -307,7 +540,13 @@ function renderTestCard(containerId, evt) {
   updateConsoleStats(containerId);
   
   // Auto-scroll to top to show the newest test (since we use column-reverse)
+  // Ensure we can see all results by scrolling to top
   c.scrollTop = 0;
+  
+  // Ensure the container is scrollable and shows all content
+  setTimeout(() => {
+    c.scrollTop = 0;
+  }, 100);
   
   // Add smooth animation for new cards
   wrap.style.opacity = '0';
@@ -392,10 +631,7 @@ async function streamPositive() {
           if (typeof evt.failed === 'number') byId('posFailCount').textContent = String(evt.failed);
           if (typeof evt.executed === 'number') byId('posExecCount').textContent = String(evt.executed);
           
-          // Auto-refresh preview after execution completes
-          setTimeout(() => {
-            previewEndpoints();
-          }, 1000);
+          // Note: Endpoints preview can be manually refreshed if needed
         }
       } catch {}
     }
