@@ -206,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
 async function startRun() {
   const baseUrl = byId('baseUrl').value.trim();
   const swaggerPath = byId('swaggerPath').value.trim();
@@ -266,6 +267,124 @@ async function generateReport() {
   }
 }
 
+async function clearDatabase() {
+  const btn = byId('clearDatabase');
+  const originalText = btn.innerHTML;
+  
+  // Get table information first
+  let tableInfo = '';
+  try {
+    const res = await fetch('/database/tables');
+    const data = await res.json();
+    
+    if (data.status === 'success' && data.tables) {
+      tableInfo = `\n\nTables that will be cleared:\n`;
+      data.tables.forEach(table => {
+        if (table.record_count > 0) {
+          tableInfo += `• ${table.table_name}: ${table.record_count} records\n`;
+        }
+      });
+      tableInfo += `\nTotal: ${data.total_tables} tables, ${data.total_records} records`;
+    }
+  } catch (error) {
+    tableInfo = '\n\n(Unable to get table information)';
+  }
+  
+  // Show confirmation dialog with table info
+  const confirmed = confirm(
+    '⚠️ WARNING: This will delete ALL data from ALL tables in the database!' +
+    tableInfo +
+    '\n\nThis action cannot be undone!\n\n' +
+    'Are you sure you want to continue?'
+  );
+  
+  if (!confirmed) {
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Clearing Database...';
+  
+  try {
+    const res = await fetch('/database/clear', { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    if (!res.ok) {
+      const text = await res.text();
+      showToast('error', 'Clear Failed', `Failed to clear database: ${text}`);
+      return;
+    }
+    
+    const data = await res.json();
+    
+    // Show detailed success message
+    if (data.status === 'success') {
+      const totalRecords = data.total_records || 0;
+      const tablesCleared = data.tables_cleared || 0;
+      const clearedTables = data.cleared_tables || [];
+      const verification = data.verification || {};
+      
+      let message = `Successfully cleared ${totalRecords} records from ${tablesCleared} tables.`;
+      
+      if (clearedTables.length > 0) {
+        message += '\n\nTables cleared and dropped:';
+        clearedTables.forEach(table => {
+          if (table.table_dropped) {
+            message += `\n• ${table.table_name}: ${table.records_deleted} records deleted, table dropped`;
+          } else if (table.records_deleted > 0) {
+            message += `\n• ${table.table_name}: ${table.records_deleted} records deleted`;
+          }
+        });
+      }
+      
+      // Add verification results
+      if (verification.all_tables_empty) {
+        message += '\n\n✅ Verification: All tables are now empty';
+      } else if (verification.total_remaining_records > 0) {
+        message += `\n\n⚠️ Warning: ${verification.total_remaining_records} records still remain in some tables`;
+        if (verification.verification_results) {
+          verification.verification_results.forEach(result => {
+            if (result.remaining_records > 0) {
+              message += `\n• ${result.table_name}: ${result.remaining_records} records remaining`;
+            }
+          });
+        }
+      }
+      
+      if (data.warning) {
+        message += `\n\n⚠️ ${data.warning}`;
+      }
+      
+      showToast('success', 'Database Cleared', message);
+    } else {
+      showToast('error', 'Clear Failed', data.message || 'Failed to clear database');
+    }
+    
+    // Clear file input
+    const swaggerFile = byId('swaggerFile');
+    const fileName = byId('fileName');
+    if (swaggerFile) swaggerFile.value = '';
+    if (fileName) {
+      fileName.textContent = 'No file selected';
+      fileName.style.color = 'var(--muted)';
+      fileName.style.fontWeight = 'normal';
+    }
+    
+    // Clear upload info
+    const uploadInfo = byId('uploadInfo');
+    if (uploadInfo) uploadInfo.textContent = '';
+    
+  } catch (error) {
+    console.error('Error clearing database:', error);
+    showToast('error', 'Clear Error', 'An error occurred while clearing the database.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
+}
+
 async function uploadSwagger() {
   const input = byId('swaggerFile');
   if (!input.files || !input.files[0]) return;
@@ -281,6 +400,7 @@ async function uploadSwagger() {
   byId('uploadInfo').textContent = JSON.stringify(data, null, 2);
   // Don't auto-refresh preview after upload - wait for extraction
 }
+
 
 async function previewEndpoints() {
   const btn = byId('previewEndpoints');
@@ -674,6 +794,7 @@ async function streamAll() {
   }
 }
 
+byId('clearDatabase').addEventListener('click', clearDatabase);
 byId('uploadSwagger').addEventListener('click', uploadSwagger);
 byId('previewEndpoints').addEventListener('click', previewEndpoints);
 async function loadEndpoints() {

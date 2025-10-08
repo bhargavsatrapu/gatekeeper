@@ -652,6 +652,33 @@ button:active {
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
+.danger-btn {
+  background: var(--error);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.danger-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.danger-btn:active {
+  transform: translateY(0);
+}
+
+
 .upload-status {
   grid-column: 1 / -1;
   margin-top: 24px;
@@ -664,6 +691,7 @@ button:active {
   line-height: 1.5;
   color: var(--text);
 }
+
 pre { 
   background: #f8fafc; 
   border: 1px solid var(--border-color); 

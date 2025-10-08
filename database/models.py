@@ -278,6 +278,25 @@ class EndpointRepository:
         except Exception as e:
             logger.error(f"Failed to retrieve endpoint {endpoint_id}: {e}")
             return None
+    
+    def clear_all_endpoints(self) -> int:
+        """
+        Clear all endpoints from the database.
+        
+        Returns:
+            Number of endpoints deleted
+        """
+        try:
+            with self.db_manager.get_connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("DELETE FROM api_endpoints")
+                    deleted_count = cur.rowcount
+                    conn.commit()
+                    return deleted_count
+                    
+        except Exception as e:
+            logger.error(f"Failed to clear endpoints: {e}")
+            return 0
 
 
 class TestCaseRepository:
@@ -366,6 +385,256 @@ class TestCaseRepository:
         except Exception as e:
             logger.error(f"Failed to retrieve test case {test_case_id} from {table_name}: {e}")
             return None
+    
+    def clear_all_testcases(self) -> int:
+        """
+        Clear all test cases from all test case tables.
+        
+        Returns:
+            Number of test cases deleted
+        """
+        try:
+            total_deleted = 0
+            with self.db_manager.get_connection() as conn:
+                with conn.cursor() as cur:
+                    # Get all test case tables
+                    cur.execute("""
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public' 
+                        AND table_name LIKE '%testcases%'
+                    """)
+                    tables = cur.fetchall()
+                    
+                    if not tables:
+                        logger.info("No test case tables found to clear")
+                        return 0
+                    
+                    # Clear each test case table
+                    for table in tables:
+                        table_name = table[0]
+                        cur.execute(f"DELETE FROM {table_name}")
+                        deleted_count = cur.rowcount
+                        total_deleted += deleted_count
+                        logger.info(f"Cleared {deleted_count} test cases from {table_name}")
+                    
+                    conn.commit()
+                    return total_deleted
+                    
+        except Exception as e:
+            logger.error(f"Failed to clear test cases: {e}")
+            return 0
+    
+    def clear_all_tables(self) -> Dict[str, Any]:
+        """
+        Clear ALL tables from the database (complete reset).
+        
+        Returns:
+            Dictionary with clearing results
+        """
+        try:
+            cleared_tables = []
+            total_records = 0
+            
+            with self.db_manager.get_connection() as conn:
+                with conn.cursor() as cur:
+                    # Get all tables in the public schema
+                    cur.execute("""
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public'
+                        AND table_type = 'BASE TABLE'
+                    """)
+                    tables = cur.fetchall()
+                    
+                    if not tables:
+                        logger.info("No tables found to clear")
+                        return {
+                            "status": "success",
+                            "cleared_tables": [],
+                            "total_records": 0,
+                            "message": "No tables found to clear"
+                        }
+                    
+                    logger.info(f"Found {len(tables)} tables to clear")
+                    
+                    # Clear each table
+                    for table in tables:
+                        table_name = table[0]
+                        try:
+                            # Get count before clearing
+                            cur.execute(f"SELECT COUNT(*) FROM {table_name}")
+                            record_count = cur.fetchone()[0]
+                            
+                            logger.info(f"Clearing table {table_name} with {record_count} records")
+                            
+                            # Clear the table (DELETE FROM)
+                            cur.execute(f"DELETE FROM {table_name}")
+                            deleted_count = cur.rowcount
+                            
+                            # Also drop the table completely to remove it from PostgreSQL
+                            cur.execute(f"DROP TABLE IF EXISTS {table_name} CASCADE")
+                            
+                            cleared_tables.append({
+                                "table_name": table_name,
+                                "records_deleted": deleted_count,
+                                "original_count": record_count,
+                                "table_dropped": True
+                            })
+                            
+                            total_records += deleted_count
+                            logger.info(f"Successfully cleared and dropped table {table_name}")
+                            
+                        except Exception as table_error:
+                            logger.error(f"Failed to clear table {table_name}: {table_error}")
+                            cleared_tables.append({
+                                "table_name": table_name,
+                                "error": str(table_error),
+                                "records_deleted": 0,
+                                "table_dropped": False
+                            })
+                    
+                    # Commit the transaction
+                    conn.commit()
+                    logger.info(f"Transaction committed. Total records cleared: {total_records}")
+                    
+                    return {
+                        "status": "success",
+                        "cleared_tables": cleared_tables,
+                        "total_records": total_records,
+                        "tables_cleared": len([t for t in cleared_tables if "error" not in t]),
+                        "message": f"Successfully cleared {total_records} records from {len(cleared_tables)} tables"
+                    }
+                    
+        except Exception as e:
+            logger.error(f"Failed to clear all tables: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "message": "Failed to clear all tables"
+            }
+    
+    def get_all_tables_info(self) -> Dict[str, Any]:
+        """
+        Get information about all tables in the database.
+        
+        Returns:
+            Dictionary with table information
+        """
+        try:
+            with self.db_manager.get_connection() as conn:
+                with conn.cursor() as cur:
+                    # Get all tables in the public schema
+                    cur.execute("""
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public'
+                        AND table_type = 'BASE TABLE'
+                        ORDER BY table_name
+                    """)
+                    tables = cur.fetchall()
+                    
+                    table_info = []
+                    total_records = 0
+                    
+                    for table in tables:
+                        table_name = table[0]
+                        try:
+                            # Get record count for each table
+                            cur.execute(f"SELECT COUNT(*) FROM {table_name}")
+                            record_count = cur.fetchone()[0]
+                            
+                            table_info.append({
+                                "table_name": table_name,
+                                "record_count": record_count
+                            })
+                            
+                            total_records += record_count
+                            
+                        except Exception as table_error:
+                            table_info.append({
+                                "table_name": table_name,
+                                "record_count": 0,
+                                "error": str(table_error)
+                            })
+                    
+                    return {
+                        "status": "success",
+                        "tables": table_info,
+                        "total_tables": len(tables),
+                        "total_records": total_records,
+                        "message": f"Found {len(tables)} tables with {total_records} total records"
+                    }
+                    
+        except Exception as e:
+            logger.error(f"Failed to get table info: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "message": "Failed to get table information"
+            }
+    
+    def verify_tables_cleared(self) -> Dict[str, Any]:
+        """
+        Verify that all tables are actually empty after clearing.
+        
+        Returns:
+            Dictionary with verification results
+        """
+        try:
+            with self.db_manager.get_connection() as conn:
+                with conn.cursor() as cur:
+                    # Get all tables in the public schema
+                    cur.execute("""
+                        SELECT table_name 
+                        FROM information_schema.tables 
+                        WHERE table_schema = 'public'
+                        AND table_type = 'BASE TABLE'
+                    """)
+                    tables = cur.fetchall()
+                    
+                    verification_results = []
+                    total_remaining_records = 0
+                    
+                    for table in tables:
+                        table_name = table[0]
+                        try:
+                            cur.execute(f"SELECT COUNT(*) FROM {table_name}")
+                            remaining_count = cur.fetchone()[0]
+                            
+                            verification_results.append({
+                                "table_name": table_name,
+                                "remaining_records": remaining_count,
+                                "is_empty": remaining_count == 0
+                            })
+                            
+                            total_remaining_records += remaining_count
+                            
+                        except Exception as table_error:
+                            verification_results.append({
+                                "table_name": table_name,
+                                "error": str(table_error),
+                                "remaining_records": -1,
+                                "is_empty": False
+                            })
+                    
+                    all_empty = all(result.get("is_empty", False) for result in verification_results)
+                    
+                    return {
+                        "status": "success",
+                        "all_tables_empty": all_empty,
+                        "total_remaining_records": total_remaining_records,
+                        "verification_results": verification_results,
+                        "message": f"Verification complete. {total_remaining_records} records remaining across {len(tables)} tables"
+                    }
+                    
+        except Exception as e:
+            logger.error(f"Failed to verify table clearing: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "message": "Failed to verify table clearing"
+            }
 
 
 # Global repository instances

@@ -41,7 +41,7 @@ class APIConfig:
 @dataclass
 class LLMConfig:
     """LLM configuration settings."""
-    api_key: str = "AIzaSyD-CG_QPfquLY5SkDCw6ChjF8yo-lcy7Mc"
+    api_key: str = "AIzaSyClX2CqGXQyQBoycWObhadYHWM7mmotWEY"
     model: str = "gemini-2.5-flash"
     max_tokens: int = 4000
 
