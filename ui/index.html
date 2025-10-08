@@ -168,13 +168,21 @@
               <button id="executePositive">Execute Positive Only</button>
               <button id="allureReportPositive">Allure Report (Positive)</button>
               <span class="muted">Runs only testcases with test_type = positive</span>
-              <span id="execPositiveLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running positive...</span>
+              <span id="execPositiveLoading" class="spinner" style="display:none">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span> Running positive...
+              </span>
             </div>
             <div class="stats-row">
               <div class="stat">Positive Executed: <span id="posExecCount">0</span></div>
               <div class="stat">Passed: <span id="posPassCount">0</span></div>
               <div class="stat">Failed: <span id="posFailCount">0</span></div>
             </div>
+          
+            <!-- NEW: Console Controls (Clear only) -->
+            <div class="console-controls">
+              <button id="clearPositiveConsole">Clear Console</button>
+            </div>
+            
             <div id="positiveConsole" class="console">
               <div class="console-empty">Click "Execute Positive Only" to start real-time test monitoring</div>
             </div>
@@ -190,6 +198,10 @@
               <span class="muted">Load all endpoints with their testcase counts</span>
               <span id="loadEndpointsLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Loading...</span>
             </div>
+             <!--NEW: Console Controls for Individual Tests -->
+            <div class="console-controls" id="individualTestsControls" style="display:none;">
+              <button id="clearIndividualResults">Clear Results</button>
+            </div>
             <div id="endpointsList"></div>
             <pre id="endpointResults"></pre>
           </section>
@@ -203,7 +215,9 @@
               <button id="executeAll">Execute All</button>
               <button id="allureReportAll">Allure Report (All)</button>
               <span class="muted">Runs all generated cases sequentially</span>
-              <span id="execAllLoading" class="spinner" style="display:none"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Running all...</span>
+              <span id="execAllLoading" class="spinner" style="display:none">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span> Running all...
+              </span>
             </div>
             <div class="stats-row">
               <div class="stat">Generated Total: <span id="genCountExec">0</span></div>
@@ -211,6 +225,12 @@
               <div class="stat">Passed: <span id="allPassCount">0</span></div>
               <div class="stat">Failed: <span id="allFailCount">0</span></div>
             </div>
+            
+            <!-- NEW: Console Controls (Clear only) -->
+            <div class="console-controls">
+              <button id="clearAllConsole">Clear Console</button>
+            </div>
+                        
             <div id="allConsole" class="console">
               <div class="console-empty">Click "Execute All" to start real-time test monitoring</div>
             </div>

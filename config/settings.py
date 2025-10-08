@@ -16,7 +16,7 @@ class DatabaseConfig:
     host: str = "localhost"
     database: str = "SWAGGER_API"
     user: str = "postgres"
-    password: str = "shirisha@123"
+    password: str = "0000"
     port: int = 5432
 
     def to_dict(self) -> Dict[str, Any]:
@@ -41,7 +41,7 @@ class APIConfig:
 @dataclass
 class LLMConfig:
     """LLM configuration settings."""
-    api_key: str = "AIzaSyClX2CqGXQyQBoycWObhadYHWM7mmotWEY"
+    api_key: str = "AIzaSyA-_S-6bLg--uX_VSK_zqEyxNSyak2WS30"
     model: str = "gemini-2.5-flash"
     max_tokens: int = 4000
 
@@ -49,7 +49,7 @@ class LLMConfig:
 @dataclass
 class AppConfig:
     """Main application configuration."""
-    swagger_file_path: str = r"C:\Users\shirisha.mannem\Documents\AI-Program\UI_Implementation\gatekeeper\swagger.json"
+    swagger_file_path: str = r"swagger.json"
     log_level: str = "INFO"
     execution_delay: int = 10  # seconds between API calls
     

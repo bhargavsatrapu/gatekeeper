@@ -184,6 +184,28 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+  // IMPORTANT: Initialize clear console buttons
+  console.log('Setting up clear console buttons...');
+  setupClearConsole('positiveConsole', 'clearPositiveConsole', ['posExecCount', 'posPassCount', 'posFailCount']);
+  setupClearConsole('allConsole', 'clearAllConsole', ['execCount', 'allPassCount', 'allFailCount', 'genCountExec']);
+  
+  // Individual tests clear button
+  const clearIndividualBtn = byId('clearIndividualResults');
+  if (clearIndividualBtn) {
+    clearIndividualBtn.addEventListener('click', clearIndividualResults);
+    console.log('Individual clear button setup complete');
+  }
+  
+  //  IMPORTANT: Initialize Load Endpoints button
+  console.log('Setting up load endpoints button...');
+  const loadEndpointsBtn = byId('loadEndpoints');
+  if (loadEndpointsBtn) {
+    loadEndpointsBtn.addEventListener('click', loadEndpoints);
+    console.log('Load endpoints button setup complete');
+  }
+  
+  console.log('Initialization complete');
+
   
   // Fallback mobile menu toggle
   const mobileMenuToggle = byId('mobileMenuToggle');
@@ -610,73 +632,136 @@ async function executePositive() {
   await streamPositive();
 }
 
+// ============================================
+// MODIFIED: renderTestCard with individual scroll
+// ============================================
 function renderTestCard(containerId, evt) {
   const c = byId(containerId);
-  const wrap = document.createElement('div');
   
-  // Determine status and styling
-  let statusClass = 'running';
-  let statusTag = '<span class="tag running">RUNNING</span>';
+  // Clear empty state when first test arrives
+  const emptyState = c.querySelector('.console-empty');
+  if (emptyState) emptyState.remove();
   
-  if (evt.success !== undefined) {
-    statusClass = evt.success ? 'pass' : 'fail';
-    statusTag = `<span class="tag ${statusClass}">${evt.success ? 'PASS' : 'FAIL'}</span>`;
-  }
+  // Create test case wrapper with new structure
+  const testCase = document.createElement('div');
+  testCase.className = `test-case ${evt.success === undefined ? 'running' : (evt.success ? 'passed' : 'failed')}`;
+  testCase.dataset.testId = `test-${evt.seq}`;
   
-  wrap.className = `card-item ${statusClass}`;
+  // Determine status
+  let statusClass = evt.success === undefined ? 'running' : (evt.success ? 'passed' : 'failed');
+  let statusText = evt.success === undefined ? 'RUNNING' : (evt.success ? 'PASSED' : 'FAILED');
   
   const req = evt.request || {};
   const resp = evt.response || {};
   const body = typeof resp.data === 'string' ? resp.data : JSON.stringify(resp.data, null, 2);
   
-  // Format request/response data for better readability
+  // Format JSON helper
   const formatJson = (obj) => {
     if (!obj || Object.keys(obj).length === 0) return 'N/A';
     return JSON.stringify(obj, null, 2);
   };
   
-  wrap.innerHTML = `
-    <div class="title">
-      <span class="test-number">#${evt.seq}</span>
-      <span class="test-name">${evt.name || '(unnamed)'}</span>
-      <span class="test-method">${evt.method || 'GET'}</span>
-      ${statusTag}
+  // Build HTML with new structure - IMPORTANT: test-body is scrollable
+  testCase.innerHTML = `
+    <div class="test-header">
+      <div class="test-title-section">
+        <span class="test-status-dot ${statusClass}"></span>
+        <span class="test-number">#${evt.seq}</span>
+        <span class="test-name-text">${evt.name || '(unnamed)'}</span>
+        <span class="test-method">${evt.method || 'GET'}</span>
+        <span class="status-tag ${statusClass}">${statusText}</span>
+      </div>
+      <div class="test-header-controls">
+        <span class="test-duration">${evt.duration || 'Running...'}</span>
+        <span class="collapse-icon" title="Click to expand/collapse">▼</span>
+      </div>
     </div>
-    <div class="test-url">${evt.url || ''}</div>
-    <div class="kv">
-      <div>Description</div><div>${evt.description || 'No description available'}</div>
-      <div>Expected Status</div><div>${evt.expected_status || 'N/A'}</div>
-      <div>Actual Status</div><div>${resp.status_code || 'Pending...'}</div>
-      <div>Headers</div><div><pre>${formatJson(req.headers)}</pre></div>
-      <div>Request Body</div><div><pre>${formatJson(req.payload)}</pre></div>
-      <div>Response Body</div><div><pre>${body || 'No response yet...'}</pre></div>
+   <div class="test-body">
+      <div class="test-details">
+        <div class="test-url" style="margin-bottom: 16px; color: var(--muted); font-size: 13px; font-family: monospace;">
+          ${evt.url || ''}
+        </div>
+        <div class="kv">
+          <div>Description</div><div>${evt.description || 'No description available'}</div>
+          <div>Expected Status</div><div>${evt.expected_status || 'N/A'}</div>
+          <div>Actual Status</div><div>${resp.status_code || 'Pending...'}</div>
+          <div>Headers</div><div><pre>${formatJson(req.headers)}</pre></div>
+          <div>Request Body</div><div><pre>${formatJson(req.payload)}</pre></div>
+          <div>Response Body</div><div><pre>${body || 'No response yet...'}</pre></div>
+        </div>
+      </div>
     </div>
   `;
   
-  // Insert new test case at the top (most recent first)
-  c.insertBefore(wrap, c.firstChild);
+  // Add click handler for collapse/expand toggle
+  const header = testCase.querySelector('.test-header');
+  header.addEventListener('click', (e) => {
+    // Prevent event bubbling
+    e.stopPropagation();
+    
+    // Toggle collapsed state
+    const isCollapsed = testCase.classList.contains('collapsed');
+    testCase.classList.toggle('collapsed');
+    
+    // Log for debugging
+    console.log(`Test #${evt.seq} ${isCollapsed ? 'expanded' : 'collapsed'}`);
+    
+    // Ensure the test body is visible when expanded
+    if (testCase.classList.contains('collapsed')) {
+      testCase.querySelector('.test-body').style.display = 'none';
+    } else {
+      testCase.querySelector('.test-body').style.display = 'block';
+    }
+  });
+  
+  // Append to container (newest at bottom)
+  c.appendChild(testCase);
   
   // Update console header stats
   updateConsoleStats(containerId);
   
-  // Auto-scroll to top to show the newest test (since we use column-reverse)
-  // Ensure we can see all results by scrolling to top
-  c.scrollTop = 0;
-  
-  // Ensure the container is scrollable and shows all content
+  // Auto-scroll to bottom to show newest test
   setTimeout(() => {
-    c.scrollTop = 0;
+    c.scrollTop = c.scrollHeight;
   }, 100);
   
-  // Add smooth animation for new cards
-  wrap.style.opacity = '0';
-  wrap.style.transform = 'translateY(-10px)';
-  setTimeout(() => {
-    wrap.style.transition = 'all 0.3s ease';
-    wrap.style.opacity = '1';
-    wrap.style.transform = 'translateY(0)';
-  }, 50);
+  return testCase;
 }
+// ============================================
+// END OF MODIFIED renderTestCard
+// ============================================
+
+function setupClearConsole(consoleId, clearButtonId, statsIds) {
+  const clearBtn = byId(clearButtonId);
+  const consoleArea = byId(consoleId); 
+
+  if (clearBtn && consoleArea) {
+    clearBtn.addEventListener('click', () => {
+      consoleArea.innerHTML = '<div class="console-empty">Console cleared. Run tests to see results.</div>';
+
+      // Reset stats if provided
+      if (statsIds) {
+        statsIds.forEach(statId => {
+          const stat = byId(statId);
+          if (stat) stat.textContent = '0';
+        });
+      }
+    });
+  }
+}
+
+
+function clearIndividualResults() {
+  const resultsArea = byId('endpointResults');
+  if (resultsArea) {
+    resultsArea.textContent = '';
+    resultsArea.className = 'placeholder-text';
+    resultsArea.textContent = 'Results cleared. Run endpoint tests to see new results.';
+  }
+}
+// ============================================
+// END OF NEW FUNCTIONS
+// ============================================
 
 function updateConsoleStats(containerId) {
   const c = byId(containerId);
@@ -888,6 +973,9 @@ async function runEndpointTestcases(endpointId, method, path) {
     const stamp = new Date().toISOString();
     const block = `=== Execute Endpoint @ ${stamp} ===\n` + JSON.stringify(header, null, 2) + "\n" + JSON.stringify(data, null, 2);
     byId('endpointResults').textContent = (prev ? prev + "\n\n" : "") + block;
+    // NEW: Show individual test controls when results are displayed
+    const controls = byId('individualTestsControls');
+    if (controls) controls.style.display = 'flex';
   } finally {
     btn.disabled = false;
     btn.textContent = originalText;
