@@ -10,6 +10,6 @@ DB_CONFIG = {
 SWAGGER_FILE = os.environ.get("SWAGGER_FILE", r"C:\Bhargav\SMALL_API\swagger.json")
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:3000")
 
-GOOGLE_GENAI_API_KEY = os.environ.get("GOOGLE_GENAI_API_KEY", "AIzaSyB3cm8W8O6U8498FbS1EXt5o8qHVe43yjc")
+GOOGLE_GENAI_API_KEY = os.environ.get("GOOGLE_GENAI_API_KEY", "")
 
 
