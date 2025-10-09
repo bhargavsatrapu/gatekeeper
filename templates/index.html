@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Smart API Test Runner</h1>
+
+{% if msg %}
+<div class="notice">{{ msg }}</div>
+{% endif %}
+
+<div class="tabs">
+  <section id="tab-upload" class="tab active">
+    <h2>Swagger Upload</h2>
+    <div class="upload-section">
+      <form action="/upload-swagger" method="post" enctype="multipart/form-data">
+        <input type="file" name="swagger_file" accept="application/json" required />
+        <div class="button-group">
+          <button type="submit">Upload</button>
+          <button type="button" onclick="loadEndpoints()">View Endpoints</button>
+        </div>
+      </form>
+    </div>
+    
+    <div id="endpoints-section" class="endpoints-section" style="display: none;">
+      <h3>Loaded Endpoints</h3>
+      <div class="endpoints-controls">
+        <input type="text" id="endpoint-search" placeholder="Search endpoints..." onkeyup="filterEndpoints()">
+        <button onclick="clearEndpoints()">Clear View</button>
+      </div>
+      <div id="endpoints-table-container" class="table-container">
+        <!-- Endpoints will be loaded here -->
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-generate" class="tab">
+    <h2>Generate Testcases</h2>
+    <div class="generate-section">
+      <form action="/generate-testcases" method="post" id="generate-form">
+        <button type="submit" id="generate-btn">Generate Testcases</button>
+      </form>
+      <div class="button-group" style="margin-top: 16px;">
+        <button type="button" onclick="loadTestcases()" id="view-testcases-btn" style="display: {% if show_view_btn %}block{% else %}none{% endif %};">View Testcases</button>
+        <button type="button" onclick="clearTestcases()" id="clear-testcases-btn" style="display: none;">Clear View</button>
+      </div>
+    </div>
+    
+    <div id="testcases-section" class="testcases-section" style="display: none;">
+      <h3>Generated Test Cases</h3>
+      <div class="testcases-controls">
+        <input type="text" id="testcase-search" placeholder="Search test cases..." onkeyup="filterTestcases()">
+        <select id="endpoint-filter" onchange="filterByEndpoint()">
+          <option value="">All Endpoints</option>
+        </select>
+      </div>
+      <div id="testcases-container" class="testcases-container">
+        <!-- Test cases will be loaded here -->
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-positive" class="tab">
+    <h2>Positive Tests</h2>
+    <form action="/run-positive" method="post">
+      <button type="submit">Run Positive Flow</button>
+    </form>
+  </section>
+
+  <section id="tab-all" class="tab">
+    <h2>All Tests</h2>
+    <form action="/run-all-tests" method="post">
+      <button type="submit">Run All Tests</button>
+    </form>
+  </section>
+
+  <section id="tab-console" class="tab">
+    <h2>Execution Console</h2>
+    <div class="console-controls">
+      <button onclick="clearConsole()">Clear Console</button>
+      <button onclick="toggleAutoScroll()">Auto Scroll: <span id="auto-scroll-status">ON</span></button>
+    </div>
+    <div id="console-output" class="console-output">
+      <div class="console-line">Console ready. Execute tests to see logs...</div>
+    </div>
+  </section>
+
+  <section id="tab-results" class="tab">
+    <h2>Latest Messages</h2>
+    <p>Messages appear here after actions (top bar notice shows success).</p>
+  </section>
+</div>
+
+{% endblock %}
+
+
