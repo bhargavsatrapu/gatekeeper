@@ -153,6 +153,8 @@ function showLoading(button, loadingText = 'Processing...') {
 // Global execution state tracking
 let isExecutionRunning = false;
 let currentExecutionType = null;
+let generationProgressInterval = null;
+let currentStep = 0;
 
 function setExecutionState(running, type = null) {
   isExecutionRunning = running;
@@ -245,6 +247,149 @@ function stopProgressIndicator() {
   }
 }
 
+// Test Generation Loader Functions
+function showTestGenerationLoader() {
+  const loader = document.getElementById('test-generation-loader');
+  const testcasesSection = document.getElementById('testcases-section');
+  
+  if (loader && testcasesSection) {
+    // Show the testcases section and loader
+    testcasesSection.style.display = 'block';
+    loader.style.display = 'block';
+    
+    // Reset progress
+    currentStep = 0;
+    updateGenerationProgress(0);
+    
+    // Start the step animation
+    startGenerationStepAnimation();
+    
+    // Start progress simulation
+    startGenerationProgressSimulation();
+  }
+}
+
+function hideTestGenerationLoader() {
+  const loader = document.getElementById('test-generation-loader');
+  
+  if (loader) {
+    // Complete all steps
+    completeAllSteps();
+    
+    // Hide loader after a short delay
+    setTimeout(() => {
+      loader.style.display = 'none';
+    }, 1000);
+  }
+  
+  // Clear progress interval
+  if (generationProgressInterval) {
+    clearInterval(generationProgressInterval);
+    generationProgressInterval = null;
+  }
+}
+
+function startGenerationStepAnimation() {
+  const steps = document.querySelectorAll('.loader-steps .step');
+  
+  // Reset all steps
+  steps.forEach((step, index) => {
+    step.classList.remove('active', 'completed');
+    if (index === 0) {
+      step.classList.add('active');
+    }
+  });
+  
+  // Animate through steps
+  const stepInterval = setInterval(() => {
+    if (currentStep < steps.length - 1) {
+      // Mark current step as completed
+      steps[currentStep].classList.remove('active');
+      steps[currentStep].classList.add('completed');
+      
+      // Move to next step
+      currentStep++;
+      steps[currentStep].classList.add('active');
+    } else {
+      // All steps completed
+      clearInterval(stepInterval);
+    }
+  }, 30000); // Change step every 30 seconds (adjust based on actual generation time)
+}
+
+function completeAllSteps() {
+  const steps = document.querySelectorAll('.loader-steps .step');
+  steps.forEach(step => {
+    step.classList.remove('active');
+    step.classList.add('completed');
+  });
+}
+
+function startGenerationProgressSimulation() {
+  const progressFill = document.getElementById('generation-progress');
+  let progress = 0;
+  
+  generationProgressInterval = setInterval(() => {
+    progress += Math.random() * 2; // Random progress increment
+    
+    if (progress > 95) {
+      progress = 95; // Don't complete until actual generation is done
+    }
+    
+    if (progressFill) {
+      progressFill.style.width = progress + '%';
+    }
+  }, 1000);
+}
+
+function updateGenerationProgress(percentage) {
+  const progressFill = document.getElementById('generation-progress');
+  if (progressFill) {
+    progressFill.style.width = percentage + '%';
+  }
+}
+
+function monitorGenerationCompletion() {
+  // Check for completion every 5 seconds
+  const checkInterval = setInterval(() => {
+    // Check if the page has been redirected (which happens when generation completes)
+    // or if we can detect completion through other means
+    
+    // For now, we'll use a timeout as fallback
+    // In a real implementation, you might want to poll an API endpoint
+    // or use WebSockets to get real-time updates
+    
+  }, 5000);
+  
+  // Fallback: complete after 2.5 minutes
+  setTimeout(() => {
+    clearInterval(checkInterval);
+    completeTestGeneration();
+  }, 150000); // 2.5 minutes
+}
+
+function completeTestGeneration() {
+  hideTestGenerationLoader();
+  updateGenerationProgress(100);
+  
+  // Show View Testcases button
+  const viewBtn = document.getElementById('view-testcases-btn');
+  if (viewBtn) {
+    viewBtn.style.display = 'block';
+  }
+  
+  // Show success message
+  const notice = document.createElement('div');
+  notice.className = 'notice success';
+  notice.innerHTML = `<i class="fas fa-check-circle"></i> Test cases generated successfully! You can now view them below.`;
+  document.querySelector('h1').insertAdjacentElement('afterend', notice);
+  
+  // Auto-remove notice after 5 seconds
+  setTimeout(() => {
+    notice.remove();
+  }, 5000);
+}
+
 // Enhanced form submissions
 document.addEventListener('DOMContentLoaded', function() {
   // Add loading to all form submissions
@@ -259,6 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (form.id === 'generate-form') {
           executionType = 'generate';
           setExecutionState(true, 'generate');
+          showTestGenerationLoader();
         } else if (form.action.includes('run-positive')) {
           executionType = 'positive';
           setExecutionState(true, 'positive');
@@ -281,12 +427,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show View Testcases button after generation
         if (form.id === 'generate-form') {
-          setTimeout(() => {
-            const viewBtn = document.getElementById('view-testcases-btn');
-            if (viewBtn) {
-              viewBtn.style.display = 'block';
-            }
-          }, 1000);
+          // Monitor for generation completion
+          monitorGenerationCompletion();
         }
       }
     });

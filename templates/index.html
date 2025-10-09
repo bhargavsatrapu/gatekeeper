@@ -81,6 +81,50 @@
           <option value="">All Endpoints</option>
         </select>
       </div>
+      
+      <!-- Loading State for Test Generation -->
+      <div id="test-generation-loader" class="test-generation-loader" style="display: none;">
+        <div class="loader-container">
+          <div class="main-loader">
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+            <div class="loader-ring"></div>
+          </div>
+          <div class="loader-content">
+            <h4><i class="fas fa-magic"></i> Generating Test Cases</h4>
+            <p>Creating comprehensive test scenarios for your API endpoints...</p>
+            <div class="loader-steps">
+              <div class="step active">
+                <i class="fas fa-cog fa-spin"></i>
+                <span>Analyzing API endpoints</span>
+              </div>
+              <div class="step">
+                <i class="fas fa-code"></i>
+                <span>Generating positive test cases</span>
+              </div>
+              <div class="step">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Creating negative test scenarios</span>
+              </div>
+              <div class="step">
+                <i class="fas fa-shield-alt"></i>
+                <span>Building authentication tests</span>
+              </div>
+              <div class="step">
+                <i class="fas fa-check-circle"></i>
+                <span>Finalizing test suite</span>
+              </div>
+            </div>
+            <div class="progress-info">
+              <div class="progress-bar">
+                <div class="progress-fill" id="generation-progress"></div>
+              </div>
+              <span class="progress-text">This may take 2-3 minutes...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div id="testcases-container" class="testcases-container">
         <!-- Test cases will be loaded here -->
       </div>
