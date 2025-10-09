@@ -30,7 +30,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
 # Import console logging system
-from console_logger import get_console_logs, clear_console
+from console_logger import get_console_logs, clear_console, log_to_console
 
 
 @app.get("/")
@@ -64,14 +64,36 @@ def generate_testcases():
 
 @app.post("/run-positive")
 def run_positive():
-    __run_only_positive_flow()
-    return RedirectResponse(url="/?msg=Positive%20flow%20executed", status_code=303)
+    def run_positive_background():
+        try:
+            log_to_console("Starting positive flow execution", "info")
+            __run_only_positive_flow()
+            log_to_console("Positive flow execution completed successfully", "success")
+        except Exception as e:
+            log_to_console(f"Positive flow execution failed: {str(e)}", "error")
+    
+    # Start background thread
+    thread = threading.Thread(target=run_positive_background, daemon=True)
+    thread.start()
+    
+    return RedirectResponse(url="/?msg=Positive%20flow%20execution%20started", status_code=303)
 
 
 @app.post("/run-all-tests")
 def run_all_tests():
-    __execute_all_test_cases_differnt_endpoint()
-    return RedirectResponse(url="/?msg=All%20tests%20execution%20triggered", status_code=303)
+    def run_all_tests_background():
+        try:
+            log_to_console("Starting all tests execution", "info")
+            __execute_all_test_cases_differnt_endpoint()
+            log_to_console("All tests execution completed successfully", "success")
+        except Exception as e:
+            log_to_console(f"All tests execution failed: {str(e)}", "error")
+    
+    # Start background thread
+    thread = threading.Thread(target=run_all_tests_background, daemon=True)
+    thread.start()
+    
+    return RedirectResponse(url="/?msg=All%20tests%20execution%20started", status_code=303)
 
 
 @app.post("/run-individual-endpoints")
@@ -92,8 +114,18 @@ async def run_individual_endpoints(request: Request):
                 content={"error": "No endpoint IDs provided"}
             )
         
-        # Call the backend function with the selected endpoint IDs
-        __execute_all_test_cases_differnt_endpoint(endpoint_ids)
+        # Start execution in background thread to allow real-time log updates
+        def run_tests_background():
+            try:
+                log_to_console(f"Starting test execution for {len(endpoint_ids)} endpoints", "info")
+                __execute_all_test_cases_differnt_endpoint(endpoint_ids)
+                log_to_console("Test execution completed successfully", "success")
+            except Exception as e:
+                log_to_console(f"Test execution failed: {str(e)}", "error")
+        
+        # Start background thread
+        thread = threading.Thread(target=run_tests_background, daemon=True)
+        thread.start()
         
         return JSONResponse(
             status_code=200,

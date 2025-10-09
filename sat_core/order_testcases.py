@@ -1,5 +1,7 @@
 import json
 import time
+import sys
+import os
 from typing import Dict, Any, List
 
 import psycopg2
@@ -9,6 +11,10 @@ from sat_core.ai_client import get_gemini_client
 from sat_core.fetch_endpoints import fetch_endpoints
 from sat_core.global_state import endpoint_tables
 from sat_core.call_api import call_api
+
+# Add parent directory to path to import console logger
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from console_logger import log_to_console
 
 
 def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int]]:
@@ -21,11 +27,15 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
 
     print("endpoints_list------------------------------")
     print(endpoints_list)
+    
+    log_to_console(f"Processing {len(endpoints_list)} selected endpoints", "info")
 
     if len(endpoints_list) == 0 :
         endpoints_to_test=endpoint_tables
+        log_to_console("No specific endpoints selected, testing all endpoints", "info")
     else:
         endpoints_to_test = {k: endpoint_tables[k] for k in endpoints_list if k in endpoint_tables}
+        log_to_console(f"Testing {len(endpoints_to_test)} selected endpoints", "info")
 
 
     for endpoint_id, table_name in endpoints_to_test.items():
@@ -43,6 +53,9 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
         print("############## ",table_name," ##############")
         print("############## ",all_testcases[0]["url"]," ##############")
         print("=====================================================================\n\n\n")
+        
+        log_to_console(f"Starting execution for endpoint: {table_name}", "info")
+        log_to_console(f"Found {len(all_testcases)} test cases for this endpoint", "info")
         llm_prompt = (
             "You are an expert API test execution planner.\n"
             "I will provide you with two things:\n"
@@ -89,11 +102,15 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
 
         try:
             order = json.loads(cleaned_output)
+            log_to_console(f"Generated execution order with {len(order)} steps", "info")
         except Exception:
             order = []
+            log_to_console("Failed to parse execution order, using empty order", "warning")
 
         # execute the produced order
-        for item in order:
+        log_to_console(f"Starting execution of {len(order)} test steps", "info")
+        for step_index, item in enumerate(order, 1):
+            log_to_console(f"Executing step {step_index}/{len(order)}", "info")
             if "all_endpoints" in item:
                 # pick any one testcase for that endpoint to generate data/logs
                 dep_table = endpoint_tables.get(item["all_endpoints"])  # could be None
@@ -184,11 +201,14 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
             }
             res = call_api(req["method"], req["url"], req["headers"], req["query_params"], req["payload"], req["test_description"]) 
             executions_logs[testcase.get("test_name", req["url"])] = {"request": req, "response": res}
+            log_to_console(f"Completed step {step_index}/{len(order)} - {req['test_description']}", "success")
             time.sleep(1)
 
         execution_orders.extend(order)
+        log_to_console(f"Completed execution for endpoint: {table_name}", "success")
 
     print("✅ Final execution order:", execution_orders)
+    log_to_console("All endpoint executions completed successfully", "success")
     return execution_orders
 
 
