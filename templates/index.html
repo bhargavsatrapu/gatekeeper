@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Smart API Test Runner</h1>
+<h1><i class="fas fa-flask"></i> Smart API Test Runner</h1>
 
 {% if msg %}
 <div class="notice">{{ msg }}</div>
@@ -9,22 +9,38 @@
 
 <div class="tabs">
   <section id="tab-upload" class="tab active">
-    <h2>Swagger Upload</h2>
+    <h2><i class="fas fa-upload"></i> Swagger Upload</h2>
     <div class="upload-section">
       <form action="/upload-swagger" method="post" enctype="multipart/form-data">
-        <input type="file" name="swagger_file" accept="application/json" required />
+        <div class="file-upload-area">
+          <input type="file" name="swagger_file" accept="application/json" required id="swagger-file-input" />
+          <label for="swagger-file-input" class="file-upload-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose Swagger JSON file or drag & drop</span>
+            <small>Supports .json files only</small>
+          </label>
+        </div>
         <div class="button-group">
-          <button type="submit">Upload</button>
-          <button type="button" onclick="loadEndpoints()">View Endpoints</button>
+          <button type="submit" id="upload-btn">
+            <i class="fas fa-upload"></i> Upload
+          </button>
+          <button type="button" onclick="loadEndpoints()" id="view-endpoints-btn">
+            <i class="fas fa-eye"></i> View Endpoints
+          </button>
         </div>
       </form>
     </div>
     
     <div id="endpoints-section" class="endpoints-section" style="display: none;">
-      <h3>Loaded Endpoints</h3>
+      <h3><i class="fas fa-list"></i> Loaded Endpoints</h3>
       <div class="endpoints-controls">
-        <input type="text" id="endpoint-search" placeholder="Search endpoints..." onkeyup="filterEndpoints()">
-        <button onclick="clearEndpoints()">Clear View</button>
+        <div class="search-input-wrapper">
+          <i class="fas fa-search"></i>
+          <input type="text" id="endpoint-search" placeholder="Search endpoints..." onkeyup="filterEndpoints()">
+        </div>
+        <button onclick="clearEndpoints()">
+          <i class="fas fa-times"></i> Clear View
+        </button>
       </div>
       <div id="endpoints-table-container" class="table-container">
         <!-- Endpoints will be loaded here -->
@@ -33,21 +49,34 @@
   </section>
 
   <section id="tab-generate" class="tab">
-    <h2>Generate Testcases</h2>
+    <h2><i class="fas fa-magic"></i> Generate Testcases</h2>
     <div class="generate-section">
+      <div class="info-card">
+        <i class="fas fa-info-circle"></i>
+        <p>Generate comprehensive test cases including positive, negative, edge cases, and authentication tests for all your API endpoints.</p>
+      </div>
       <form action="/generate-testcases" method="post" id="generate-form">
-        <button type="submit" id="generate-btn">Generate Testcases</button>
+        <button type="submit" id="generate-btn">
+          <i class="fas fa-code"></i> Generate Testcases
+        </button>
       </form>
       <div class="button-group" style="margin-top: 16px;">
-        <button type="button" onclick="loadTestcases()" id="view-testcases-btn" style="display: {% if show_view_btn %}block{% else %}none{% endif %};">View Testcases</button>
-        <button type="button" onclick="clearTestcases()" id="clear-testcases-btn" style="display: none;">Clear View</button>
+        <button type="button" onclick="loadTestcases()" id="view-testcases-btn" style="display: {% if show_view_btn %}block{% else %}none{% endif %};">
+          <i class="fas fa-eye"></i> View Testcases
+        </button>
+        <button type="button" onclick="clearTestcases()" id="clear-testcases-btn" style="display: none;">
+          <i class="fas fa-times"></i> Clear View
+        </button>
       </div>
     </div>
     
     <div id="testcases-section" class="testcases-section" style="display: none;">
-      <h3>Generated Test Cases</h3>
+      <h3><i class="fas fa-list-check"></i> Generated Test Cases</h3>
       <div class="testcases-controls">
-        <input type="text" id="testcase-search" placeholder="Search test cases..." onkeyup="filterTestcases()">
+        <div class="search-input-wrapper">
+          <i class="fas fa-search"></i>
+          <input type="text" id="testcase-search" placeholder="Search test cases..." onkeyup="filterTestcases()">
+        </div>
         <select id="endpoint-filter" onchange="filterByEndpoint()">
           <option value="">All Endpoints</option>
         </select>
@@ -59,36 +88,56 @@
   </section>
 
   <section id="tab-positive" class="tab">
-    <h2>Positive Tests</h2>
+    <h2><i class="fas fa-check-circle"></i> Positive Tests</h2>
+    <div class="info-card">
+      <i class="fas fa-info-circle"></i>
+      <p>Run basic positive tests to verify that each endpoint is working correctly before extensive testing.</p>
+    </div>
     <form action="/run-positive" method="post">
-      <button type="submit">Run Positive Flow</button>
+      <button type="submit" id="run-positive-btn">
+        <i class="fas fa-play"></i> Run Positive Flow
+      </button>
     </form>
   </section>
 
   <section id="tab-all" class="tab">
-    <h2>All Tests</h2>
+    <h2><i class="fas fa-list-check"></i> All Tests</h2>
+    <div class="info-card">
+      <i class="fas fa-info-circle"></i>
+      <p>Execute comprehensive testing including positive, negative, edge cases, and authentication tests for all endpoints.</p>
+    </div>
     <form action="/run-all-tests" method="post">
-      <button type="submit">Run All Tests</button>
+      <button type="submit" id="run-all-btn">
+        <i class="fas fa-rocket"></i> Run All Tests
+      </button>
     </form>
   </section>
 
   <section id="tab-individual" class="tab">
-    <h2>Test Individual Endpoints</h2>
+    <h2><i class="fas fa-bullseye"></i> Test Individual Endpoints</h2>
+    <div class="info-card">
+      <i class="fas fa-info-circle"></i>
+      <p>Select specific endpoints to test individually. This allows you to focus on particular APIs or test them in isolation.</p>
+    </div>
     <div class="individual-endpoints-section">
       <div class="endpoints-controls">
-        <button type="button" onclick="loadIndividualEndpoints()">Load Endpoints</button>
-        <button type="button" onclick="clearIndividualEndpoints()" id="clear-individual-btn" style="display: none;">Clear View</button>
+        <button type="button" onclick="loadIndividualEndpoints()" id="load-individual-btn">
+          <i class="fas fa-download"></i> Load Endpoints
+        </button>
+        <button type="button" onclick="clearIndividualEndpoints()" id="clear-individual-btn" style="display: none;">
+          <i class="fas fa-times"></i> Clear View
+        </button>
       </div>
       
       <div id="individual-endpoints-container" class="individual-endpoints-container" style="display: none;">
-        <h3>Select Endpoints to Test</h3>
+        <h3><i class="fas fa-mouse-pointer"></i> Select Endpoints to Test</h3>
         <div class="endpoints-grid" id="endpoints-grid">
           <!-- Endpoint cards will be loaded here -->
         </div>
         
         <div class="run-endpoints-section">
           <button type="button" onclick="runSelectedEndpoints()" id="run-endpoints-btn" disabled>
-            Run Endpoints (<span id="selected-count">0</span> selected)
+            <i class="fas fa-play"></i> Run Endpoints (<span id="selected-count">0</span> selected)
           </button>
         </div>
       </div>
@@ -96,19 +145,28 @@
   </section>
 
   <section id="tab-console" class="tab">
-    <h2>Execution Console</h2>
+    <h2><i class="fas fa-terminal"></i> Execution Console</h2>
     <div class="console-controls">
-      <button onclick="clearConsole()">Clear Console</button>
-      <button onclick="toggleAutoScroll()">Auto Scroll: <span id="auto-scroll-status">ON</span></button>
+      <button onclick="clearConsole()">
+        <i class="fas fa-trash"></i> Clear Console
+      </button>
+      <button onclick="toggleAutoScroll()">
+        <i class="fas fa-arrows-alt-v"></i> Auto Scroll: <span id="auto-scroll-status">ON</span>
+      </button>
     </div>
     <div id="console-output" class="console-output">
-      <div class="console-line">Console ready. Execute tests to see logs...</div>
+      <div class="console-line info">
+        <i class="fas fa-info-circle"></i> Console ready. Execute tests to see logs...
+      </div>
     </div>
   </section>
 
   <section id="tab-results" class="tab">
-    <h2>Latest Messages</h2>
-    <p>Messages appear here after actions (top bar notice shows success).</p>
+    <h2><i class="fas fa-message"></i> Latest Messages</h2>
+    <div class="info-card">
+      <i class="fas fa-info-circle"></i>
+      <p>Success and error messages appear here after actions. The top bar notice also shows success messages.</p>
+    </div>
   </section>
 </div>
 

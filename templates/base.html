@@ -7,25 +7,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <h2>Smart API</h2>
+      <h2><i class="fas fa-rocket"></i> SmartAPI Tester</h2>
       <nav>
         <ul>
-          <li class="section">Setup</li>
-          <li><a href="#tab-upload" onclick="selectTab(event, 'tab-upload')">Swagger Upload</a></li>
-          <li class="section">Test Generation</li>
-          <li><a href="#tab-generate" onclick="selectTab(event, 'tab-generate')">Generate Testcases</a></li>
-          <li class="section">Test Execution</li>
-          <li><a href="#tab-positive" onclick="selectTab(event, 'tab-positive')">Positive Tests</a></li>
-          <li><a href="#tab-all" onclick="selectTab(event, 'tab-all')">All Tests</a></li>
-          <li><a href="#tab-individual" onclick="selectTab(event, 'tab-individual')">Test Individual Endpoints</a></li>
-          <li class="section">Reports & Results</li>
-          <li><a href="#tab-console" onclick="selectTab(event, 'tab-console')">Execution Console</a></li>
-          <li><a href="#tab-results" onclick="selectTab(event, 'tab-results')">Latest Messages</a></li>
+          <li class="section"><i class="fas fa-cog"></i> Setup</li>
+          <li><a href="#tab-upload" onclick="selectTab(event, 'tab-upload')"><i class="fas fa-upload"></i> Swagger Upload</a></li>
+          <li class="section"><i class="fas fa-magic"></i> Test Generation</li>
+          <li><a href="#tab-generate" onclick="selectTab(event, 'tab-generate')"><i class="fas fa-code"></i> Generate Testcases</a></li>
+          <li class="section"><i class="fas fa-play"></i> Test Execution</li>
+          <li><a href="#tab-positive" onclick="selectTab(event, 'tab-positive')"><i class="fas fa-check-circle"></i> Positive Tests</a></li>
+          <li><a href="#tab-all" onclick="selectTab(event, 'tab-all')"><i class="fas fa-list-check"></i> All Tests</a></li>
+          <li><a href="#tab-individual" onclick="selectTab(event, 'tab-individual')"><i class="fas fa-bullseye"></i> Individual Endpoints</a></li>
+          <li class="section"><i class="fas fa-chart-line"></i> Reports & Results</li>
+          <li><a href="#tab-console" onclick="selectTab(event, 'tab-console')"><i class="fas fa-terminal"></i> Execution Console</a></li>
+          <li><a href="#tab-results" onclick="selectTab(event, 'tab-results')"><i class="fas fa-message"></i> Latest Messages</a></li>
         </ul>
       </nav>
     </aside>

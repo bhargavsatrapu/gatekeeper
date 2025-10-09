@@ -28,6 +28,8 @@ function selectTab(event, id) {
 let consolePollingInterval = null;
 let autoScroll = true;
 let lastLogCount = 0;
+let executionStartTime = null;
+let progressInterval = null;
 
 function startConsolePolling() {
   if (consolePollingInterval) return;
@@ -55,25 +57,54 @@ function fetchConsoleLogs() {
 
 function updateConsole(logs) {
   const consoleOutput = document.getElementById('console-output');
+  const currentLogCount = consoleOutput.children.length;
   
-  // Clear and rebuild with animation
-  consoleOutput.innerHTML = '';
-  
-  logs.forEach((log, index) => {
-    const line = document.createElement('div');
-    line.className = `console-line ${log.type || 'info'}`;
-    line.textContent = `[${log.timestamp}] ${log.message}`;
-    line.style.opacity = '0';
-    line.style.transform = 'translateY(10px)';
-    consoleOutput.appendChild(line);
+  // Only add new logs to avoid rebuilding everything
+  if (logs.length > currentLogCount) {
+    const newLogs = logs.slice(currentLogCount);
     
-    // Animate in
-    setTimeout(() => {
-      line.style.transition = 'all 0.3s ease';
-      line.style.opacity = '1';
-      line.style.transform = 'translateY(0)';
-    }, index * 50);
-  });
+    newLogs.forEach((log, index) => {
+      const line = document.createElement('div');
+      line.className = `console-line ${log.type || 'info'}`;
+      
+      // Add appropriate icon based on log type
+      let icon = '';
+      switch(log.type) {
+        case 'success':
+          icon = '<i class="fas fa-check-circle"></i>';
+          break;
+        case 'error':
+          icon = '<i class="fas fa-exclamation-circle"></i>';
+          break;
+        case 'warning':
+          icon = '<i class="fas fa-exclamation-triangle"></i>';
+          break;
+        case 'test':
+          icon = '<i class="fas fa-flask"></i>';
+          break;
+        case 'api':
+          icon = '<i class="fas fa-exchange-alt"></i>';
+          break;
+        case 'response':
+          icon = '<i class="fas fa-reply"></i>';
+          break;
+        default:
+          icon = '<i class="fas fa-info-circle"></i>';
+      }
+      
+      line.innerHTML = `<span class="log-timestamp">[${log.timestamp}]</span> <span class="log-icon">${icon}</span> <span class="log-message">${log.message}</span>`;
+      line.style.opacity = '0';
+      line.style.transform = 'translateY(10px)';
+      consoleOutput.appendChild(line);
+      
+      // Animate in
+      setTimeout(() => {
+        line.style.transition = 'all 0.3s ease';
+        line.style.opacity = '1';
+        line.style.transform = 'translateY(0)';
+      }, index * 30);
+    });
+  }
   
   if (autoScroll) {
     setTimeout(() => {
@@ -105,18 +136,113 @@ function toggleAutoScroll() {
   statusEl.style.color = autoScroll ? '#34d399' : '#f87171';
 }
 
-// Loading functionality
-function showLoading(button) {
-  const originalText = button.textContent;
-  button.innerHTML = '<span class="loader"></span>Processing...';
+// Enhanced loading functionality
+function showLoading(button, loadingText = 'Processing...') {
+  const originalHTML = button.innerHTML;
+  button.innerHTML = `<span class="loader"></span>${loadingText}`;
   button.classList.add('loading');
   button.disabled = true;
   
   return () => {
-    button.textContent = originalText;
+    button.innerHTML = originalHTML;
     button.classList.remove('loading');
     button.disabled = false;
   };
+}
+
+// Global execution state tracking
+let isExecutionRunning = false;
+let currentExecutionType = null;
+
+function setExecutionState(running, type = null) {
+  isExecutionRunning = running;
+  currentExecutionType = type;
+  
+  if (running) {
+    executionStartTime = Date.now();
+    startProgressIndicator();
+  } else {
+    executionStartTime = null;
+    stopProgressIndicator();
+  }
+  
+  // Disable/enable all execution buttons
+  const executionButtons = [
+    'generate-btn',
+    'run-positive-btn', 
+    'run-all-btn',
+    'run-endpoints-btn'
+  ];
+  
+  executionButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.disabled = running;
+      if (running && type && btnId.includes(type)) {
+        btn.classList.add('loading');
+      } else {
+        btn.classList.remove('loading');
+      }
+    }
+  });
+  
+  // Update console tab indicator
+  const consoleTab = document.querySelector('a[href="#tab-console"]');
+  if (consoleTab) {
+    if (running) {
+      consoleTab.innerHTML = '<i class="fas fa-terminal"></i> Execution Console <span class="status-indicator status-running"><i class="fas fa-spinner fa-spin"></i> Running</span>';
+    } else {
+      consoleTab.innerHTML = '<i class="fas fa-terminal"></i> Execution Console';
+    }
+  }
+}
+
+function startProgressIndicator() {
+  const consoleOutput = document.getElementById('console-output');
+  if (!consoleOutput) return;
+  
+  // Add progress bar to console
+  const progressBar = document.createElement('div');
+  progressBar.id = 'execution-progress';
+  progressBar.className = 'progress-bar';
+  progressBar.innerHTML = '<div class="progress-fill" style="width: 0%"></div>';
+  consoleOutput.appendChild(progressBar);
+  
+  // Update progress every second
+  progressInterval = setInterval(() => {
+    if (executionStartTime) {
+      const elapsed = Date.now() - executionStartTime;
+      const progress = Math.min((elapsed / 30000) * 100, 95); // Max 95% until completion
+      const progressFill = progressBar.querySelector('.progress-fill');
+      if (progressFill) {
+        progressFill.style.width = progress + '%';
+      }
+    }
+  }, 1000);
+}
+
+function stopProgressIndicator() {
+  if (progressInterval) {
+    clearInterval(progressInterval);
+    progressInterval = null;
+  }
+  
+  // Complete the progress bar
+  const progressBar = document.getElementById('execution-progress');
+  if (progressBar) {
+    const progressFill = progressBar.querySelector('.progress-fill');
+    if (progressFill) {
+      progressFill.style.width = '100%';
+      progressFill.style.background = 'linear-gradient(90deg, #34d399, #10b981)';
+    }
+    
+    // Remove progress bar after 2 seconds
+    setTimeout(() => {
+      if (progressBar && progressBar.parentNode) {
+        progressBar.parentNode.removeChild(progressBar);
+      }
+    }, 2000);
+  }
 }
 
 // Enhanced form submissions
@@ -127,7 +253,28 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
       const submitButton = form.querySelector('button[type="submit"]');
       if (submitButton) {
-        const hideLoading = showLoading(submitButton);
+        let executionType = null;
+        
+        // Determine execution type based on form
+        if (form.id === 'generate-form') {
+          executionType = 'generate';
+          setExecutionState(true, 'generate');
+        } else if (form.action.includes('run-positive')) {
+          executionType = 'positive';
+          setExecutionState(true, 'positive');
+        } else if (form.action.includes('run-all-tests')) {
+          executionType = 'all';
+          setExecutionState(true, 'all');
+        }
+        
+        const hideLoading = showLoading(submitButton, executionType ? 'Running...' : 'Processing...');
+        
+        // Auto-switch to console tab for execution
+        if (executionType) {
+          setTimeout(() => {
+            selectTab({preventDefault: () => {}}, 'tab-console');
+          }, 500);
+        }
         
         // Hide loading after 3 seconds (in case redirect is slow)
         setTimeout(hideLoading, 3000);
@@ -661,6 +808,9 @@ function toggleEndpointSelection(endpointId) {
     checkbox.checked = true;
   }
   
+  // Debug log to help identify issues
+  console.log(`Selected endpoints: ${Array.from(selectedEndpoints).join(', ')} (${selectedEndpoints.size} total)`);
+  
   updateRunButton();
 }
 
@@ -669,14 +819,22 @@ function updateRunButton() {
   const countSpan = document.getElementById('selected-count');
   
   const count = selectedEndpoints.size;
-  countSpan.textContent = count;
   
+  console.log(`Updating button: count=${count}, countSpan exists=${!!countSpan}`);
+  
+  // Update the count in the span
+  if (countSpan) {
+    countSpan.textContent = count;
+    console.log(`Updated countSpan textContent to: ${countSpan.textContent}`);
+  } else {
+    console.error('countSpan element not found!');
+  }
+  
+  // Update button state
   if (count > 0) {
     runBtn.disabled = false;
-    runBtn.textContent = `Run Endpoints (${count} selected)`;
   } else {
     runBtn.disabled = true;
-    runBtn.textContent = 'Run Endpoints (0 selected)';
   }
 }
 
@@ -686,14 +844,24 @@ function runSelectedEndpoints() {
     return;
   }
   
+  if (isExecutionRunning) {
+    alert('Another test execution is already running. Please wait for it to complete.');
+    return;
+  }
+  
   const runBtn = document.getElementById('run-endpoints-btn');
-  const originalText = runBtn.textContent;
+  const endpointIds = Array.from(selectedEndpoints);
+  
+  // Set execution state
+  setExecutionState(true, 'individual');
   
   // Show loading state
-  runBtn.innerHTML = '<span class="loader"></span>Running Tests...';
-  runBtn.disabled = true;
+  const hideLoading = showLoading(runBtn, 'Running Tests...');
   
-  const endpointIds = Array.from(selectedEndpoints);
+  // Auto-switch to console tab
+  setTimeout(() => {
+    selectTab({preventDefault: () => {}}, 'tab-console');
+  }, 500);
   
   fetch('/run-individual-endpoints', {
     method: 'POST',
@@ -710,7 +878,7 @@ function runSelectedEndpoints() {
       // Show success message
       const notice = document.createElement('div');
       notice.className = 'notice success';
-      notice.textContent = data.message;
+      notice.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}`;
       document.querySelector('h1').insertAdjacentElement('afterend', notice);
       
       // Auto-remove notice after 5 seconds
@@ -727,8 +895,8 @@ function runSelectedEndpoints() {
   })
   .finally(() => {
     // Restore button state
-    runBtn.textContent = originalText;
-    runBtn.disabled = false;
+    hideLoading();
+    setExecutionState(false);
   });
 }
 

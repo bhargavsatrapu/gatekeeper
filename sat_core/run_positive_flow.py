@@ -47,7 +47,8 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
             "You also have access to execution logs of previous API calls, which include real responses.\n\n"
             "Your task is:\n"
             "1. Replace placeholders with realistic dummy values if the field is independent.\n"
-            "2. If the field depends on previous API responses (e.g., user_id, token, product_id), pick the actual value from the execution logs provided.\n\n"
+            "2. If the field depends on previous API responses (e.g., user_id, token, product_id), pick the actual value from the execution logs provided.\n"
+            "3. Update the 'url' field using BASE_URL + ENDPOINT. This step is mandatory.\n\n"
             "⚠️ Rules:\n"
             "- Modify ONLY: url, headers, query_params, input_payload.\n"
             "- Do not remove or rename fields.\n"
@@ -57,6 +58,7 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
             f"Execution Logs:\n{json.dumps(execution_logs, indent=2)}\n\n"
             f"API Input with placeholders:\n{json.dumps(llm_input, indent=2)}\n\n"
             "Return JSON with placeholders replaced by actual values."
+
         )
 
         response = client.models.generate_content(model="gemini-2.5-flash", contents=llm_prompt)
@@ -70,7 +72,7 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
             enriched_fields = llm_input
 
         execution_case = {
-            "url": enriched_fields.get("url", first_row["url"]),
+            "url": enriched_fields.get("url"),
             "method": first_row["method"],
             "headers": enriched_fields.get("headers", first_row["headers"]),
             "query_params": enriched_fields.get("query_params", first_row["query_params"]),
