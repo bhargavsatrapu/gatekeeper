@@ -19,6 +19,9 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
     executions_logs: Dict[str, Dict[str, Any]] = {}
     BASE_URL_LOCAL = BASE_URL
 
+    print("endpoints_list------------------------------")
+    print(endpoints_list)
+
     if len(endpoints_list) == 0 :
         endpoints_to_test=endpoint_tables
     else:

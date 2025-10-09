@@ -74,6 +74,38 @@ def run_all_tests():
     return RedirectResponse(url="/?msg=All%20tests%20execution%20triggered", status_code=303)
 
 
+@app.post("/run-individual-endpoints")
+async def run_individual_endpoints(request: Request):
+    from pydantic import BaseModel
+    from typing import List
+    
+    class EndpointRequest(BaseModel):
+        endpoint_ids: List[int]
+    
+    try:
+        body = await request.json()
+        endpoint_ids = body.get("endpoint_ids", [])
+        
+        if not endpoint_ids:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "No endpoint IDs provided"}
+            )
+        
+        # Call the backend function with the selected endpoint IDs
+        __execute_all_test_cases_differnt_endpoint(endpoint_ids)
+        
+        return JSONResponse(
+            status_code=200,
+            content={"message": f"Test execution started for {len(endpoint_ids)} endpoints"}
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
+
+
 # Console API routes
 @app.get("/api/console-logs")
 def api_get_console_logs():

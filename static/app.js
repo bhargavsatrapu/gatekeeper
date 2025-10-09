@@ -534,4 +534,222 @@ function clearTestcases() {
   endpointFilter.value = '';
 }
 
+// Individual Endpoints functionality
+let selectedEndpoints = new Set();
+
+function loadIndividualEndpoints() {
+  const container = document.getElementById('individual-endpoints-container');
+  const grid = document.getElementById('endpoints-grid');
+  
+  // Show loading state
+  grid.innerHTML = `
+    <div class="loading-endpoints">
+      <div class="loader"></div>
+      <div>Loading endpoints...</div>
+    </div>
+  `;
+  
+  container.style.display = 'block';
+  document.getElementById('clear-individual-btn').style.display = 'block';
+  
+  // Fetch endpoints
+  fetch('/api/endpoints')
+    .then(response => response.json())
+    .then(data => {
+      if (data.endpoints && data.endpoints.length > 0) {
+        renderIndividualEndpoints(data.endpoints);
+      } else {
+        grid.innerHTML = `
+          <div class="no-endpoints">
+            <h4>No endpoints found</h4>
+            <p>Upload a Swagger file first to see endpoints here.</p>
+          </div>
+        `;
+      }
+    })
+    .catch(error => {
+      console.error('Error loading endpoints:', error);
+      grid.innerHTML = `
+        <div class="no-endpoints">
+          <h4>Error loading endpoints</h4>
+          <p>Please try again or check if the database is accessible.</p>
+        </div>
+      `;
+    });
+}
+
+function renderIndividualEndpoints(endpoints) {
+  const grid = document.getElementById('endpoints-grid');
+
+  if (!Array.isArray(endpoints)) {
+    grid.innerHTML = `
+      <div class="no-endpoints">
+        <h4>Invalid endpoints data</h4>
+        <p>Expected a list of endpoints from the server.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const safeCards = endpoints.map((raw) => {
+    const id = Number(raw && raw.id) || 0;
+    const method = ((raw && raw.method) ? String(raw.method) : 'GET').toLowerCase();
+    const methodLabel = ((raw && raw.method) ? String(raw.method) : 'GET').toUpperCase();
+    const path = (raw && raw.path) ? String(raw.path) : '/unknown';
+    const summary = (raw && raw.summary) ? String(raw.summary) : 'No summary available';
+    const tagsRaw = raw && raw.tags;
+    const tags = Array.isArray(tagsRaw)
+      ? tagsRaw
+      : (tagsRaw ? [String(tagsRaw)] : []);
+
+    const tagsHtml = tags.length > 0
+      ? tags.map(tag => `<span class="tag">${String(tag)}</span>`).join('')
+      : '<span class="tag">No tags</span>';
+
+    return {
+      id,
+      method,
+      methodLabel,
+      path,
+      summary,
+      tagsHtml,
+    };
+  });
+
+  const cardsHTML = safeCards.map(endpoint => `
+    <div class="endpoint-card" data-endpoint-id="${endpoint.id}" onclick="toggleEndpointSelection(${endpoint.id})">
+      <div class="endpoint-card-header">
+        <span class="method-badge method-${endpoint.method}">${endpoint.methodLabel}</span>
+        <div class="endpoint-selection-indicator">
+          <input type="checkbox" id="endpoint-${endpoint.id}" onchange="toggleEndpointSelection(${endpoint.id})" />
+        </div>
+      </div>
+      <div class="endpoint-card-body">
+        <div class="endpoint-path">${endpoint.path}</div>
+        <div class="endpoint-summary">${endpoint.summary}</div>
+        <div class="endpoint-tags">${endpoint.tagsHtml}</div>
+      </div>
+    </div>
+  `).join('');
+
+  grid.innerHTML = cardsHTML;
+
+  // Add animation to cards
+  const cards = grid.querySelectorAll('.endpoint-card');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 50);
+  });
+}
+
+function toggleEndpointSelection(endpointId) {
+  const card = document.querySelector(`[data-endpoint-id="${endpointId}"]`);
+  const checkbox = document.getElementById(`endpoint-${endpointId}`);
+  
+  if (selectedEndpoints.has(endpointId)) {
+    selectedEndpoints.delete(endpointId);
+    card.classList.remove('selected');
+    checkbox.checked = false;
+  } else {
+    selectedEndpoints.add(endpointId);
+    card.classList.add('selected');
+    checkbox.checked = true;
+  }
+  
+  updateRunButton();
+}
+
+function updateRunButton() {
+  const runBtn = document.getElementById('run-endpoints-btn');
+  const countSpan = document.getElementById('selected-count');
+  
+  const count = selectedEndpoints.size;
+  countSpan.textContent = count;
+  
+  if (count > 0) {
+    runBtn.disabled = false;
+    runBtn.textContent = `Run Endpoints (${count} selected)`;
+  } else {
+    runBtn.disabled = true;
+    runBtn.textContent = 'Run Endpoints (0 selected)';
+  }
+}
+
+function runSelectedEndpoints() {
+  if (selectedEndpoints.size === 0) {
+    alert('Please select at least one endpoint to test.');
+    return;
+  }
+  
+  const runBtn = document.getElementById('run-endpoints-btn');
+  const originalText = runBtn.textContent;
+  
+  // Show loading state
+  runBtn.innerHTML = '<span class="loader"></span>Running Tests...';
+  runBtn.disabled = true;
+  
+  const endpointIds = Array.from(selectedEndpoints);
+  
+  fetch('/run-individual-endpoints', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      endpoint_ids: endpointIds
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.message) {
+      // Show success message
+      const notice = document.createElement('div');
+      notice.className = 'notice success';
+      notice.textContent = data.message;
+      document.querySelector('h1').insertAdjacentElement('afterend', notice);
+      
+      // Auto-remove notice after 5 seconds
+      setTimeout(() => {
+        notice.remove();
+      }, 5000);
+    } else if (data.error) {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error running endpoints:', error);
+    alert('Error running endpoints: ' + error.message);
+  })
+  .finally(() => {
+    // Restore button state
+    runBtn.textContent = originalText;
+    runBtn.disabled = false;
+  });
+}
+
+function clearIndividualEndpoints() {
+  const container = document.getElementById('individual-endpoints-container');
+  const clearBtn = document.getElementById('clear-individual-btn');
+  
+  container.style.display = 'none';
+  clearBtn.style.display = 'none';
+  
+  // Clear selections
+  selectedEndpoints.clear();
+  updateRunButton();
+  
+  // Clear any selected states
+  document.querySelectorAll('.endpoint-card').forEach(card => {
+    card.classList.remove('selected');
+  });
+  document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+}
+
 

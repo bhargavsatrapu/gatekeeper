@@ -28,15 +28,17 @@ def __run_only_positive_flow():
     plan_and_run_positive_order()
 
 
-def __execute_all_test_cases_differnt_endpoint():
+def __execute_all_test_cases_differnt_endpoint(endpoint_ids=None):
     """
     Executes all test cases for the specified endpoints.
 
     Args:
-        Accepts a numeric array as an argument.
+        endpoint_ids: A numeric array as an argument.
         - If the array contains specific endpoint IDs (e.g., [1, 2]),
           it will run all test cases for those endpoints.
-        - If the array is empty, it will perform extensive testing
+        - If the array is empty or None, it will perform extensive testing
           for all available endpoints.
     """
-    order_testcases_and_execute([])
+    if endpoint_ids is None:
+        endpoint_ids = []
+    order_testcases_and_execute(endpoint_ids)

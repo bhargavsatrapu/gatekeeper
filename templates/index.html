@@ -72,6 +72,29 @@
     </form>
   </section>
 
+  <section id="tab-individual" class="tab">
+    <h2>Test Individual Endpoints</h2>
+    <div class="individual-endpoints-section">
+      <div class="endpoints-controls">
+        <button type="button" onclick="loadIndividualEndpoints()">Load Endpoints</button>
+        <button type="button" onclick="clearIndividualEndpoints()" id="clear-individual-btn" style="display: none;">Clear View</button>
+      </div>
+      
+      <div id="individual-endpoints-container" class="individual-endpoints-container" style="display: none;">
+        <h3>Select Endpoints to Test</h3>
+        <div class="endpoints-grid" id="endpoints-grid">
+          <!-- Endpoint cards will be loaded here -->
+        </div>
+        
+        <div class="run-endpoints-section">
+          <button type="button" onclick="runSelectedEndpoints()" id="run-endpoints-btn" disabled>
+            Run Endpoints (<span id="selected-count">0</span> selected)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="tab-console" class="tab">
     <h2>Execution Console</h2>
     <div class="console-controls">
