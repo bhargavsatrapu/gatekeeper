@@ -11,6 +11,7 @@ from sat_core.ai_client import get_gemini_client
 from sat_core.fetch_endpoints import fetch_endpoints
 from sat_core.global_state import endpoint_tables
 from sat_core.call_api import call_api
+from sat_core.db_utils import create_execution_results_table,insert_execution_result
 
 # Add parent directory to path to import console logger
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -37,7 +38,7 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
         endpoints_to_test = {k: endpoint_tables[k] for k in endpoints_list if k in endpoint_tables}
         log_to_console(f"Testing {len(endpoints_to_test)} selected endpoints", "info")
 
-
+    create_execution_results_table()
     for endpoint_id, table_name in endpoints_to_test.items():
         conn = psycopg2.connect(cursor_factory=RealDictCursor, **DB_CONFIG)
         cur = conn.cursor()
@@ -165,6 +166,7 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
                 "   - Never invent new valid tokens. Always reuse real ones found in the 'response' of execution logs when valid authentication is required.\n\n"
                 "⚠️ Rules:\n"
                 "- Modify ONLY: url, headers, query_params, input_payload.\n"
+                "- Update the 'url' field using BASE_URL + ENDPOINT. This step is mandatory.\n\n"
                 "- Do not remove or rename fields.\n"
                 "- Keep JSON structure intact.\n"
                 "- If multiple valid values exist in execution logs, pick any one.\n"
@@ -203,7 +205,20 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
             executions_logs[testcase.get("test_name", req["url"])] = {"request": req, "response": res}
             log_to_console(f"Completed step {step_index}/{len(order)} - {req['test_description']}", "success")
             time.sleep(1)
-
+            try:
+                insert_execution_result(
+                    req["test_description"],
+                    req["method"],
+                    req["url"],
+                    req["headers"],
+                    req["payload"],
+                    testcase["expected_status"],
+                    testcase["expected_schema"],
+                    res["status_code"],
+                    res["data"],
+                )
+            except:
+                pass
         execution_orders.extend(order)
         log_to_console(f"Completed execution for endpoint: {table_name}", "success")
 

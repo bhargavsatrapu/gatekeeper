@@ -9,6 +9,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from sat_core.ai_client import get_gemini_client
 from sat_core.plan_execution_order import plan_execution_order
+from sat_core.db_utils import create_execution_results_table,insert_execution_result
 
 
 
@@ -18,6 +19,7 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
 
     BASE_URL_LOCAL = BASE_URL
     client = get_gemini_client()
+    create_execution_results_table()
     print("execution_order is", execution_order)
     for current_id in execution_order:
         print("current_id is", current_id)
@@ -58,7 +60,6 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
             f"Execution Logs:\n{json.dumps(execution_logs, indent=2)}\n\n"
             f"API Input with placeholders:\n{json.dumps(llm_input, indent=2)}\n\n"
             "Return JSON with placeholders replaced by actual values."
-
         )
 
         response = client.models.generate_content(model="gemini-2.5-flash", contents=llm_prompt)
@@ -91,6 +92,20 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
         print("results are :", result)
         execution_logs[execution_case["url"]] = {"request": execution_case, "response": result}
         time.sleep(1)
+        try:
+            insert_execution_result(
+                execution_case["test_description"],
+                execution_case["method"],
+                execution_case["url"],
+                execution_case["headers"],
+                execution_case["payload"],
+                first_row["expected_status"],
+                first_row["expected_schema"],
+                result["status_code"],
+                result["data"],
+            )
+        except:
+            pass
 
     return execution_logs
 

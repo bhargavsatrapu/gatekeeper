@@ -1,0 +1,33 @@
+# SmartAPI Tester Dependencies
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+jinja2==3.1.2
+
+# Database
+psycopg2-binary==2.9.9
+
+# HTTP Requests
+requests==2.31.0
+httpx==0.25.2
+
+# Data Processing & Validation
+pydantic==2.5.0
+python-multipart==0.0.6
+jsonschema==4.20.0
+
+# AI/ML - Google Generative AI
+google-generativeai==0.3.2
+google-genai==0.2.0
+
+# Utilities
+python-dotenv==1.0.0
+typing-extensions==4.8.0
+
+# Development & Testing (Optional)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Additional utilities
+aiofiles==23.2.1
