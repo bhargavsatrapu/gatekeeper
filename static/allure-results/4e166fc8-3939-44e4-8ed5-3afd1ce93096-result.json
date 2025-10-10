@@ -1,0 +1,30 @@
+{
+  "uuid": "4e166fc8-3939-44e4-8ed5-3afd1ce93096",
+  "historyId": "4e166fc8-3939-44e4-8ed5-3afd1ce93096",
+  "fullName": "Schema validation for unauthorized get user profile response",
+  "name": "Schema validation for unauthorized get user profile response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117918132,
+  "stop": 1760117918132,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-23019093-cefa-42b4-8b88-a5c44d731b10.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-8929a814-8cba-46e6-b5b1-b4b0d7559cf6.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-2f6805e0-246e-4d3a-9fb4-218c2dd0b837.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

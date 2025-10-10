@@ -1,0 +1,19 @@
+{
+  "status_code": 400,
+  "headers": {
+    "X-Powered-By": "Express",
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "67",
+    "ETag": "W/\"43-RBXMfdJG+0IVkxB6PoSUrldrlQs\"",
+    "Date": "Fri, 10 Oct 2025 17:35:16 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "data": {
+    "success": false,
+    "error": {
+      "message": "email and password required"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "uuid": "5a7a7b89-6d36-46ee-906b-96a69c6956d0",
+  "historyId": "5a7a7b89-6d36-46ee-906b-96a69c6956d0",
+  "fullName": "Attempt to register with missing password",
+  "name": "Attempt to register with missing password",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117616096,
+  "stop": 1760117616096,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-5f010b4c-4c4a-415c-9785-4a8949d3f428.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-b3fa7d06-1f91-4d04-aa9c-ae14b8587180.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-19d1ff17-ea44-41bf-ad9a-0740b8919c40.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

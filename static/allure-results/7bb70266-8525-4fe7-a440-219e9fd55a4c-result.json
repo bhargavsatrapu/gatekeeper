@@ -1,0 +1,30 @@
+{
+  "uuid": "7bb70266-8525-4fe7-a440-219e9fd55a4c",
+  "historyId": "7bb70266-8525-4fe7-a440-219e9fd55a4c",
+  "fullName": "Attempt to get user profile with invalid token",
+  "name": "Attempt to get user profile with invalid token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117946427,
+  "stop": 1760117946427,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-f8427623-27ec-4843-b0bc-5585e152a18c.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-b43b3699-ffcb-40a4-81e1-6378f281a600.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-31f34488-e365-4523-a821-b311e2eb1656.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "positive_test_user_1@example.com",
+    "password": "PositivePass!123",
+    "username": "positive_user_one"
+  },
+  "test_description": "Register a new user successfully"
+}

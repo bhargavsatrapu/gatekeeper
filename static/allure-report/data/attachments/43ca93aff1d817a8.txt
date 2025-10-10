@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "invalid-email",
+    "password": "SecurePassword123!",
+    "username": "test_user_invalid_email"
+  },
+  "test_description": "Attempt to register with invalid email format"
+}

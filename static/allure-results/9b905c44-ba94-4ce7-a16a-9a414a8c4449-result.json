@@ -1,0 +1,30 @@
+{
+  "uuid": "9b905c44-ba94-4ce7-a16a-9a414a8c4449",
+  "historyId": "9b905c44-ba94-4ce7-a16a-9a414a8c4449",
+  "fullName": "Attempt to get user profile with missing token",
+  "name": "Attempt to get user profile with missing token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117927791,
+  "stop": 1760117927791,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-47e479fc-26ba-4e65-986a-fc42dd72228c.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-e0bc602a-97d5-4ca0-9789-0718e4cf9aed.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-f08aae4c-dbcc-4f33-8132-4f56d9f07c86.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

@@ -1,0 +1,30 @@
+{
+  "uuid": "9557a474-4f90-4665-8a00-1aebd8e9315c",
+  "historyId": "9557a474-4f90-4665-8a00-1aebd8e9315c",
+  "fullName": "Attempt to register with existing email",
+  "name": "Attempt to register with existing email",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117579389,
+  "stop": 1760117579389,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-f84ff7af-ba81-451e-983a-a2570a6028e0.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-92fda705-04be-4425-abd7-e0cd119e8f3d.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-736264e1-a54d-416d-83d7-8108087316ef.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

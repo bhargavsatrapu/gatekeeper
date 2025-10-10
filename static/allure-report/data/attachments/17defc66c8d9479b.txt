@@ -1,0 +1,22 @@
+{
+  "status_code": 201,
+  "headers": {
+    "X-Powered-By": "Express",
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "187",
+    "ETag": "W/\"bb-xDB9rODK9at+GSsZ8F8jixCM2bk\"",
+    "Date": "Fri, 10 Oct 2025 17:40:36 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "data": {
+    "success": true,
+    "data": {
+      "id": "e2aa7bea-dacb-440b-9815-67cf6ffedf18",
+      "username": "new_user_register_123",
+      "email": "positive_new_user_123@example.com",
+      "createdAt": "2025-10-10T17:40:36.948Z"
+    }
+  }
+}

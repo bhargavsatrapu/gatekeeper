@@ -8,6 +8,8 @@ import io
 import threading
 from datetime import datetime
 from typing import List, Dict
+import subprocess
+import shutil
 
 # Import your backend interface functions (kept untouched)
 from backend_interface import (
@@ -25,6 +27,14 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 os.makedirs(TEMPLATES_DIR, exist_ok=True)
 os.makedirs(STATIC_DIR, exist_ok=True)
+
+# Fixed Allure directories
+ALLURE_RESULTS_DIR = os.path.join(STATIC_DIR, "allure-results")
+ALLURE_REPORT_DIR = os.path.join(STATIC_DIR, "allure-report")
+
+# Ensure directories exist
+os.makedirs(ALLURE_RESULTS_DIR, exist_ok=True)
+os.makedirs(ALLURE_REPORT_DIR, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
@@ -45,6 +55,16 @@ def serialize_for_json(obj):
         return [serialize_for_json(item) for item in obj]
     else:
         return obj
+
+def clean_allure_dirs():
+    """Clear previous Allure results and report before each run."""
+    if os.path.exists(ALLURE_RESULTS_DIR):
+        shutil.rmtree(ALLURE_RESULTS_DIR)
+    if os.path.exists(ALLURE_REPORT_DIR):
+        shutil.rmtree(ALLURE_REPORT_DIR)
+    os.makedirs(ALLURE_RESULTS_DIR, exist_ok=True)
+    os.makedirs(ALLURE_REPORT_DIR, exist_ok=True)
+
 
 
 @app.get("/")
@@ -78,14 +98,15 @@ def generate_testcases():
 
 @app.post("/run-positive")
 def run_positive():
+    clean_allure_dirs()  # ✅ Clean before execution, not inside the thread
     def run_positive_background():
         try:
             log_to_console("Starting positive flow execution", "info")
-            __run_only_positive_flow()
+            __run_only_positive_flow()  # Remove clean_allure_dirs() from here
             log_to_console("Positive flow execution completed successfully", "success")
         except Exception as e:
             log_to_console(f"Positive flow execution failed: {str(e)}", "error")
-    
+        
     # Start background thread
     thread = threading.Thread(target=run_positive_background, daemon=True)
     thread.start()
@@ -95,6 +116,7 @@ def run_positive():
 
 @app.post("/run-all-tests")
 def run_all_tests():
+    clean_allure_dirs()
     def run_all_tests_background():
         try:
             log_to_console("Starting all tests execution", "info")
@@ -130,6 +152,7 @@ async def run_individual_endpoints(request: Request):
         
         # Start execution in background thread to allow real-time log updates
         def run_tests_background():
+            clean_allure_dirs()
             try:
                 log_to_console(f"Starting test execution for {len(endpoint_ids)} endpoints", "info")
                 __execute_all_test_cases_differnt_endpoint(endpoint_ids)
@@ -300,6 +323,36 @@ async def get_schema_issues():
             status_code=500,
             content={"error": f"Failed to get schema issues: {str(e)}"}
         )
+
+# ✅ Allure Report Builder
+# ======================================================
+@app.post("/api/build-allure")
+def api_build_allure():
+    if not os.path.exists(ALLURE_RESULTS_DIR):
+        return JSONResponse({
+            "status": "no_results",
+            "message": f"No allure-results folder found at {ALLURE_RESULTS_DIR}"
+        }, status_code=400)
+
+    # Clean previous report
+    if os.path.exists(ALLURE_REPORT_DIR):
+        shutil.rmtree(ALLURE_REPORT_DIR)
+    os.makedirs(ALLURE_REPORT_DIR, exist_ok=True)
+
+    allure_exe = r"C:\Users\ruchitha.devulapally\AppData\Roaming\npm\allure.cmd"
+    # allure_exe = "allure"
+    cmd = [allure_exe, "generate", ALLURE_RESULTS_DIR, "-o", ALLURE_REPORT_DIR, "--clean"]
+
+    try:
+        subprocess.run(cmd, check=True)
+        report_url = "/static/allure-report/index.html"
+        return {"status": "ok", "report_path": report_url}
+    except subprocess.CalledProcessError as e:
+        return JSONResponse({
+            "status": "error",
+            "message": f"Allure generation failed: {e}"
+        }, status_code=500)
+
 
 
 if __name__ == "__main__":

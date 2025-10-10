@@ -1,0 +1,13 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "missing.username.test@example.com",
+    "password": "StrongPassword!789"
+  },
+  "test_description": "Attempt to register with missing username"
+}

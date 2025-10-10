@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "test_user_789@example.com",
+    "password": "NewStrongPassword!789",
+    "username": "new_user_789"
+  },
+  "test_description": "Schema validation for successful registration response"
+}

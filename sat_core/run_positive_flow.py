@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Dict, Any
+from typing import Dict, Any,Optional
 
 from sat_core.config import BASE_URL,DB_CONFIG
 from sat_core.global_state import endpoint_tables
@@ -16,12 +16,27 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from console_logger import log_to_console
+from sat_core.reporting import (
+    validate_response,
+    write_allure_test_with_attachments,
+    get_allure_results_dir,
+    clean_allure_results
+)
+import shutil
+import subprocess
 
 
 
-def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, Any]] | None = None) -> Dict[str, Any]:
+def run_positive_flow(
+    execution_order: Any,
+    execution_logs: Dict[str, Dict[str, Any]] | None = None,
+    results_dir: Optional[str] = None  # ✅ Added compatible typing
+) -> Dict[str, Any]:
     if execution_logs is None:
         execution_logs = {}
+    if results_dir is None:
+        results_dir = get_allure_results_dir()
+    clean_allure_results()
 
     log_to_console("🚀 Starting Positive Flow Execution", "info")
     log_to_console(f"📋 Processing {len(execution_order)} test cases", "info")
@@ -103,6 +118,35 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
         execution_logs[execution_case["url"]] = {"request": execution_case, "response": result}
         log_to_console(f"✅ Completed test case: {execution_case['test_description']}", "success")
         time.sleep(1)
+        # Validate expected_status and expected_schema
+        expected_status = None
+        expected_schema = None
+        try:
+            expected_status = int(first_row.get("expected_status")) if first_row.get("expected_status") else None
+        except Exception:
+            expected_status = None
+        try:
+            schema_raw = first_row.get("expected_schema")
+            if isinstance(schema_raw, str) and schema_raw.strip():
+                expected_schema = json.loads(schema_raw)
+            elif isinstance(schema_raw, dict):
+                expected_schema = schema_raw
+        except Exception:
+            expected_schema = None
+
+        passed, assertions = validate_response(result, expected_status, expected_schema)
+
+        # Write Allure attachment
+        write_allure_test_with_attachments(
+        test_name=execution_case["test_description"],
+        passed=passed,
+        request=execution_case,
+        response=result,
+        assertions=assertions,
+        description="Positive Testcase Execution",
+        results_dir=get_allure_results_dir()  # <-- explicitly pass correct path
+    )
+
         try:
             insert_execution_result(
                 execution_case["test_description"],
@@ -123,10 +167,53 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
 
 
 def plan_and_run_positive_order():
-    # Example run requires endpoint_tables pre-populated and cases persisted
+    # ✅ Get base project directory dynamically
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    base_static_dir = os.path.join(base_dir, "static")
+
+    # ✅ Ensure static directory exists (in case it’s missing)
+    os.makedirs(base_static_dir, exist_ok=True)
+
+    # Fixed folders for results & reports
+    results_dir = os.path.join(base_static_dir, "allure-results")
+    report_dir = os.path.join(base_static_dir, "allure-report")
+
+    # Clean folders before execution
+    if os.path.exists(results_dir):
+        shutil.rmtree(results_dir)
+    if os.path.exists(report_dir):
+        shutil.rmtree(report_dir)
+    os.makedirs(results_dir, exist_ok=True)
+    os.makedirs(report_dir, exist_ok=True)
+
+    # Step 1: Determine execution order
     order = plan_execution_order()
-    logs = run_positive_flow(order)
-    print(json.dumps(logs, indent=2, default=str))
+
+    # Step 2: Run positive flow
+    logs = run_positive_flow(order, results_dir=results_dir)
+
+    # Step 3: Generate Allure report
+    allure_exe = r"C:\Users\ruchitha.devulapally\AppData\Roaming\npm\allure.cmd"
+    cmd = [allure_exe, "generate", results_dir, "-o", report_dir, "--clean"]
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"✅ Allure report generated at: {report_dir}")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Allure report generation failed: {e.stderr}")
+
+    # Step 4: Save metadata for UI
+    latest_run_meta = {
+        "status": "ok",
+        "type": "positive",
+        "report_path": "/static/allure-report/index.html"
+    }
+
+    with open(os.path.join(base_static_dir, "latest_run.json"), "w") as f:
+        json.dump(latest_run_meta, f, indent=2)
+
+    print("💾 latest_run.json updated:", latest_run_meta["report_path"])
+    return logs, report_dir
+
 
 
 

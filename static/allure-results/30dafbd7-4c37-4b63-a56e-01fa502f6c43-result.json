@@ -1,0 +1,30 @@
+{
+  "uuid": "30dafbd7-4c37-4b63-a56e-01fa502f6c43",
+  "historyId": "30dafbd7-4c37-4b63-a56e-01fa502f6c43",
+  "fullName": "Attempt to logout with an expired token",
+  "name": "Attempt to logout with an expired token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117822107,
+  "stop": 1760117822107,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-60f3acab-ab23-4b6f-a802-c00e6ada73aa.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-212ccb6e-23a0-438d-a018-983c24c9ac38.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-5bfba9c7-3378-4086-b338-e14c6da211c2.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

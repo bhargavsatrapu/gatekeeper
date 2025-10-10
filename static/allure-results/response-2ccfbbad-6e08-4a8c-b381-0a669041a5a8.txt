@@ -1,0 +1,19 @@
+{
+  "status_code": 200,
+  "headers": {
+    "X-Powered-By": "Express",
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "281",
+    "ETag": "W/\"119-s1WknZV9YMgmIMr3VNUUybE3J/o\"",
+    "Date": "Fri, 10 Oct 2025 17:40:46 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "data": {
+    "success": true,
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE4MDQ2LCJleHAiOjE3NjAxMjE2NDZ9.YxFlnYq4ZyHuH2XayTbLKuXx_NM3epap6JeKdbFaRbY"
+    }
+  }
+}

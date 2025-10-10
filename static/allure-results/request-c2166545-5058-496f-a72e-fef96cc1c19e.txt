@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "not.an.email",
+    "password": "p",
+    "username": "user!"
+  },
+  "test_description": "Schema validation for error response on invalid input"
+}

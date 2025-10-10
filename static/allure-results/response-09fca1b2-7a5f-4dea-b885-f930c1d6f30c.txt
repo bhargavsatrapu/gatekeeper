@@ -1,0 +1,19 @@
+{
+  "status_code": 401,
+  "headers": {
+    "X-Powered-By": "Express",
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "57",
+    "ETag": "W/\"39-usj3bfzRWguEP0Yn2g/qUGsfdsQ\"",
+    "Date": "Fri, 10 Oct 2025 17:36:25 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "data": {
+    "success": false,
+    "error": {
+      "message": "Token invalidated"
+    }
+  }
+}

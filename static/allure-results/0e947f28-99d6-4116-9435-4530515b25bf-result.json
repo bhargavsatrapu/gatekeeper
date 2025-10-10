@@ -1,0 +1,30 @@
+{
+  "uuid": "0e947f28-99d6-4116-9435-4530515b25bf",
+  "historyId": "0e947f28-99d6-4116-9435-4530515b25bf",
+  "fullName": "Schema validation for successful update user profile response",
+  "name": "Schema validation for successful update user profile response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760118076977,
+  "stop": 1760118076977,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-9dfc0dd5-db34-4320-a1b6-2de80c216363.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-5a86d260-2187-4329-bf8e-ea010fd793af.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-c352c390-f362-4c9a-9d5a-f3336e174520.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

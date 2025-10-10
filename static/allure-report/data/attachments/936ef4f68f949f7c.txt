@@ -1,0 +1,11 @@
+{
+  "url": "http://localhost:3000/users/logout",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer wrong_token"
+  },
+  "query_params": {},
+  "payload": {},
+  "test_description": "Schema validation for unauthorized logout response"
+}

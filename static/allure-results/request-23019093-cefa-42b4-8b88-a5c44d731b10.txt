@@ -1,0 +1,10 @@
+{
+  "url": "http://localhost:3000/users/me",
+  "method": "GET",
+  "headers": {
+    "Authorization": "Bearer wrong_token"
+  },
+  "query_params": {},
+  "payload": {},
+  "test_description": "Schema validation for unauthorized get user profile response"
+}

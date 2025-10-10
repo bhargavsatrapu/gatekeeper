@@ -1,0 +1,30 @@
+{
+  "uuid": "3649684a-d749-4da6-9e9d-11a58ac65db9",
+  "historyId": "3649684a-d749-4da6-9e9d-11a58ac65db9",
+  "fullName": "Schema validation for error response on invalid input",
+  "name": "Schema validation for error response on invalid input",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1760117634741,
+  "stop": 1760117634741,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-c2166545-5058-496f-a72e-fef96cc1c19e.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-a74c6cd5-36b8-4adc-8d13-fcca6a884521.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-81e3415d-14ee-4f6c-9d5f-f6e890a29a32.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

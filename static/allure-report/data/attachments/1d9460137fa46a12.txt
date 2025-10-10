@@ -1,0 +1,12 @@
+{
+  "url": "http://localhost:3000/users/login",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "password": "SecurePassword!555"
+  },
+  "test_description": "Attempt to login with missing email"
+}

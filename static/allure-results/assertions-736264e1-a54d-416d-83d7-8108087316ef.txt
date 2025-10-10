@@ -1,0 +1,11 @@
+{
+  "status_validation": {
+    "expected": 400,
+    "actual": 400,
+    "passed": true
+  },
+  "schema_validation": {
+    "passed": true
+  },
+  "errors": []
+}

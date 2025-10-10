@@ -1,0 +1,30 @@
+{
+  "uuid": "287b41fb-9748-4a08-b500-ea8ad8645079",
+  "historyId": "287b41fb-9748-4a08-b500-ea8ad8645079",
+  "fullName": "Attempt to login with missing password",
+  "name": "Attempt to login with missing password",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1760117716789,
+  "stop": 1760117716789,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-6d7f547c-d1dd-4d0c-bbe8-f157aa0a2e83.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-65708128-a8ff-4884-87cf-7d65d0e8c3b0.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-5d0f2da5-5fae-44ab-b3f5-e7366175b9e8.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

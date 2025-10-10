@@ -1,0 +1,30 @@
+{
+  "uuid": "882f69ef-743a-47b2-bd54-3344056bc818",
+  "historyId": "882f69ef-743a-47b2-bd54-3344056bc818",
+  "fullName": "Logout successfully with a valid token",
+  "name": "Logout successfully with a valid token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117775265,
+  "stop": 1760117775265,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-3f15e94c-f974-410b-a5f4-de8e1a7646f8.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-b4a8891c-729a-470b-ba74-0753c6ceae8a.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-8a806702-9a07-4ed4-9d08-f17c9fef1a79.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

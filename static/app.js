@@ -1639,4 +1639,30 @@ function showError(message) {
   }, 5000);
 }
 
+//Reports functionality
+function loadAllureReport() {
+  const iframe = document.getElementById('allure-frame');
+  // Try to build the report on demand, then load it
+  fetch('/api/build-allure', { method: 'POST' })
+    .then(r => r.json())
+    .then(res => {
+      if (res.status === 'ok' && res.report_path) {
+        iframe.src = res.report_path + '?t=' + Date.now(); // bust cache
+      } else if (res.status === 'no_results') {
+        iframe.srcdoc = '<div style="padding:16px;color:#6b7280;">No allure-results found yet. Run tests first.</div>';
+      } else if (res.status === 'cli_missing') {
+        iframe.srcdoc = '<div style="padding:16px;color:#b91c1c;">Allure CLI not found. Please install Allure on the host machine.</div>';
+      } else {
+        const msg = (res && res.message) ? res.message : 'Failed to build Allure report';
+        iframe.srcdoc = `<div style="padding:16px;color:#b91c1c;">${msg}</div>`;
+      }
+      selectTab({ preventDefault: () => {} }, 'tab-reports');
+    })
+    .catch(err => {
+      iframe.srcdoc = '<div style="padding:16px;color:#b91c1c;">Error building Allure report.</div>';
+      selectTab({ preventDefault: () => {} }, 'tab-reports');
+    });
+}
+
+
 

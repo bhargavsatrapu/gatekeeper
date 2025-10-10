@@ -1,0 +1,30 @@
+{
+  "uuid": "48114321-625d-49d7-9a0b-f36f67bfad84",
+  "historyId": "48114321-625d-49d7-9a0b-f36f67bfad84",
+  "fullName": "Register a new user successfully",
+  "name": "Register a new user successfully",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117557124,
+  "stop": 1760117557124,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-b02861cb-12eb-45d9-b235-0c4d69d26e84.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-f8887b19-2816-42e1-9c52-56e7a64908a5.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-715e4f01-781c-43f1-99c2-a1e9ba5c6ed0.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

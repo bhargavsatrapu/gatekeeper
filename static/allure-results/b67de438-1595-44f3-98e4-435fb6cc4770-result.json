@@ -1,0 +1,30 @@
+{
+  "uuid": "b67de438-1595-44f3-98e4-435fb6cc4770",
+  "historyId": "b67de438-1595-44f3-98e4-435fb6cc4770",
+  "fullName": "Schema validation for unauthorized login response",
+  "name": "Schema validation for unauthorized login response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117726670,
+  "stop": 1760117726670,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-764188e1-fd87-45de-b3d5-2a07cd79a6ff.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-8efddd55-3740-4b68-8805-0b5ddf51ac93.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-60d3b912-40c1-4ea0-8e3c-321a3b96880f.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

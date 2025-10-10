@@ -1,0 +1,30 @@
+{
+  "uuid": "eb2e849a-4c1f-4067-bee6-e717a54b02eb",
+  "historyId": "eb2e849a-4c1f-4067-bee6-e717a54b02eb",
+  "fullName": "Schema validation for successful registration response",
+  "name": "Schema validation for successful registration response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117564924,
+  "stop": 1760117564924,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-f50c7117-4c43-4f25-9906-198b6f813a4a.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-ae33e0ad-34b9-4cf8-8516-1476d0cdb440.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-1afa48f3-d557-4b4d-88d2-7ae0c2dc4f43.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

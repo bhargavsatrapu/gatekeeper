@@ -1,0 +1,11 @@
+{
+  "url": "http://localhost:3000/users/logout",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc"
+  },
+  "query_params": {},
+  "payload": {},
+  "test_description": "Schema validation for successful logout response"
+}

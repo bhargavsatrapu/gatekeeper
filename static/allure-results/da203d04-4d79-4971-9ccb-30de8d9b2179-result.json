@@ -1,0 +1,30 @@
+{
+  "uuid": "da203d04-4d79-4971-9ccb-30de8d9b2179",
+  "historyId": "da203d04-4d79-4971-9ccb-30de8d9b2179",
+  "fullName": "Get current user profile with valid token",
+  "name": "Get current user profile with valid token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117890128,
+  "stop": 1760117890128,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-58db0521-383b-4b55-90b2-db249394c701.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-a0cd4adb-685c-4084-a4b8-2f272fd08791.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-4117fc5e-d889-402a-bf2e-672bf03cdfdf.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

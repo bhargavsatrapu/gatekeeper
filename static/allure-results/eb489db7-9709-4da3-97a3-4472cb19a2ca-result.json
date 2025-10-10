@@ -1,0 +1,30 @@
+{
+  "uuid": "eb489db7-9709-4da3-97a3-4472cb19a2ca",
+  "historyId": "eb489db7-9709-4da3-97a3-4472cb19a2ca",
+  "fullName": "Attempt to logout with an invalid token",
+  "name": "Attempt to logout with an invalid token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117807038,
+  "stop": 1760117807038,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-7a9a8fae-ea5c-4783-b620-aa50b1a7d49a.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-0b55dd36-6bf1-4f66-b540-8c409ff04b93.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-a2740566-d542-4a75-bc80-45fdb9fcecd4.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

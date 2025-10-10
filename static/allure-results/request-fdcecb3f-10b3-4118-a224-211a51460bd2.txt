@@ -1,0 +1,13 @@
+{
+  "url": "http://localhost:3000/users/login",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "unregistered.user.123@example.com",
+    "password": "StrongPassword!999"
+  },
+  "test_description": "Attempt to login with unregistered email"
+}

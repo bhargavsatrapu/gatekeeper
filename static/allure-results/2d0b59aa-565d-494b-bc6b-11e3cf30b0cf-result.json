@@ -1,0 +1,30 @@
+{
+  "uuid": "2d0b59aa-565d-494b-bc6b-11e3cf30b0cf",
+  "historyId": "2d0b59aa-565d-494b-bc6b-11e3cf30b0cf",
+  "fullName": "Attempt to get user profile with expired token",
+  "name": "Attempt to get user profile with expired token",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1760117965335,
+  "stop": 1760117965335,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-b6b50b97-6af6-4fa1-955b-e10b639dd4b8.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-a27f0833-3562-4dd4-b5ce-ec83caafccd8.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-951e44e2-eebb-4703-a8fd-84445f2914e7.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

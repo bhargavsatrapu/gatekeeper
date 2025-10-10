@@ -1,0 +1,8 @@
+{
+  "url": "http://localhost:3000/users/me",
+  "method": "GET",
+  "headers": {},
+  "query_params": {},
+  "payload": {},
+  "test_description": "Attempt to get user profile with missing token"
+}

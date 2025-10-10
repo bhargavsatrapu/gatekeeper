@@ -1,0 +1,30 @@
+{
+  "uuid": "6f2fd773-1f5b-4d8c-877d-eb2738f060e2",
+  "historyId": "6f2fd773-1f5b-4d8c-877d-eb2738f060e2",
+  "fullName": "Schema validation for successful logout response",
+  "name": "Schema validation for successful logout response",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1760117785758,
+  "stop": 1760117785758,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-3301816e-21f3-468c-a794-e01902cc0b05.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-09fca1b2-7a5f-4dea-b885-f930c1d6f30c.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-b91d83ea-bc86-44f2-b000-6e6150dc6bea.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

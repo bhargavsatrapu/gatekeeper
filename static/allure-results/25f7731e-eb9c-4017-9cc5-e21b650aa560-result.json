@@ -1,0 +1,30 @@
+{
+  "uuid": "25f7731e-eb9c-4017-9cc5-e21b650aa560",
+  "historyId": "25f7731e-eb9c-4017-9cc5-e21b650aa560",
+  "fullName": "Attempt to register with missing username",
+  "name": "Attempt to register with missing username",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117591141,
+  "stop": 1760117591141,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-cc0c86a4-1f1c-406a-9e74-8f597e1a5a5c.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-8addd144-c110-4961-a7f5-d1750f86c965.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-fedd2595-0359-44db-b386-17f83517f918.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

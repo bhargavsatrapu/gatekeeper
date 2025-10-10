@@ -1,0 +1,13 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "password": "string - random secure password",
+    "username": "string - random unique username"
+  },
+  "test_description": "Attempt to register with missing email"
+}

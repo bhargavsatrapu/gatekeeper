@@ -1,1652 +1,1752 @@
 [
   {
-    "timestamp": "16:37:38",
-    "message": "Starting positive flow execution",
+    "timestamp": "23:02:30",
+    "message": "Generated execution order with 8 steps",
     "type": "info"
   },
   {
-    "timestamp": "16:37:50",
-    "message": "\ud83d\ude80 Starting Positive Flow Execution",
+    "timestamp": "23:02:30",
+    "message": "Starting execution of 8 test steps",
     "type": "info"
   },
   {
-    "timestamp": "16:37:50",
-    "message": "\ud83d\udccb Processing 7 test cases",
+    "timestamp": "23:02:30",
+    "message": "Executing step 1/8",
     "type": "info"
   },
   {
-    "timestamp": "16:37:55",
-    "message": "\ud83d\udd04 Executing test case: Successful user registration",
+    "timestamp": "23:02:36",
+    "message": "*****test_description : Register a new user successfully *****",
     "type": "test"
   },
   {
-    "timestamp": "16:37:55",
-    "message": "*****test_description : Successful user registration *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:37:55",
+    "timestamp": "23:02:36",
     "message": "method : POST",
     "type": "api"
   },
   {
-    "timestamp": "16:37:55",
+    "timestamp": "23:02:36",
     "message": "url : http://localhost:3000/users/register",
     "type": "api"
   },
   {
-    "timestamp": "16:37:55",
-    "message": "headers : {}",
+    "timestamp": "23:02:36",
+    "message": "headers : {'Content-Type': 'application/json'}",
     "type": "api"
   },
   {
-    "timestamp": "16:37:55",
-    "message": "payload : {'email': 'jane.doe.123@example.com', 'password': 'SecureP@ssw0rd!789', 'username': 'jane_doe_123'}",
+    "timestamp": "23:02:36",
+    "message": "payload : {'email': 'register.user.123@example.com', 'password': 'StrongPassword!1', 'username': 'new_user_123'}",
     "type": "api"
   },
   {
-    "timestamp": "16:37:55",
+    "timestamp": "23:02:37",
     "message": "status_code : 201",
     "type": "response"
   },
   {
-    "timestamp": "16:37:55",
-    "message": "response_data : {'success': True, 'data': {'id': '33fc82bb-5c51-4c5c-b06b-3ab0555c0b36', 'username': 'jane_doe_123', 'email': 'jane.doe.123@example.com', 'createdAt': '2025-10-10T11:07:55.754Z'}}",
+    "timestamp": "23:02:37",
+    "message": "response_data : {'success': True, 'data': {'id': '80fc4589-f724-44ab-a38f-5896a84e26d1', 'username': 'new_user_123', 'email': 'register.user.123@example.com', 'createdAt': '2025-10-10T17:32:37.063Z'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:37:55",
-    "message": "\u2705 Completed test case: Successful user registration",
+    "timestamp": "23:02:37",
+    "message": "Completed step 1/8 - Register a new user successfully | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:38:01",
-    "message": "\ud83d\udd04 Executing test case: Successful user login",
+    "timestamp": "23:02:37",
+    "message": "Executing step 2/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:02:44",
+    "message": "*****test_description : Schema validation for successful registration response *****",
     "type": "test"
   },
   {
-    "timestamp": "16:38:01",
-    "message": "*****test_description : Successful user login *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:38:01",
+    "timestamp": "23:02:44",
     "message": "method : POST",
     "type": "api"
   },
   {
-    "timestamp": "16:38:01",
+    "timestamp": "23:02:44",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:44",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:44",
+    "message": "payload : {'email': 'test_user_789@example.com', 'password': 'NewStrongPassword!789', 'username': 'new_user_789'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:44",
+    "message": "status_code : 201",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:02:44",
+    "message": "response_data : {'success': True, 'data': {'id': '95044889-307a-44cc-837a-3e668f66a12e', 'username': 'new_user_789', 'email': 'test_user_789@example.com', 'createdAt': '2025-10-10T17:32:44.841Z'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:02:44",
+    "message": "Completed step 2/8 - Schema validation for successful registration response | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:02:45",
+    "message": "Executing step 3/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "*****test_description : Attempt to register with existing email *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "payload : {'email': 'register.user.123@example.com', 'password': 'SecurePassword!987', 'username': 'unique_username_456'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "response_data : {'success': False, 'error': {'message': 'Email already registered'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "Completed step 3/8 - Attempt to register with existing email | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:02:59",
+    "message": "Executing step 4/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "*****test_description : Attempt to register with missing username *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "payload : {'email': 'missing.username.test@example.com', 'password': 'StrongPassword!789'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "response_data : {'success': False, 'error': {'message': 'username, email, password required'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "Completed step 4/8 - Attempt to register with missing username | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:03:11",
+    "message": "Executing step 5/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "*****test_description : Attempt to register with missing email *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "payload : {'password': 'string - random secure password', 'username': 'string - random unique username'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "response_data : {'success': False, 'error': {'message': 'username, email, password required'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:25",
+    "message": "Completed step 5/8 - Attempt to register with missing email | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:03:26",
+    "message": "Executing step 6/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "*****test_description : Attempt to register with missing password *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "payload : {'email': 'missing.pw.test@example.com', 'username': 'missing_pw_user'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "response_data : {'success': False, 'error': {'message': 'username, email, password required'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "Completed step 6/8 - Attempt to register with missing password | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:03:36",
+    "message": "Executing step 7/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "*****test_description : Attempt to register with invalid email format *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "payload : {'email': 'invalid-email', 'password': 'SecurePassword123!', 'username': 'test_user_invalid_email'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:42",
+    "message": "response_data : {'success': False, 'error': {'message': 'Email already registered'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:43",
+    "message": "Completed step 7/8 - Attempt to register with invalid email format | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:03:43",
+    "message": "Executing step 8/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "*****test_description : Schema validation for error response on invalid input *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "payload : {'email': 'not.an.email', 'password': 'p', 'username': 'user!'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "status_code : 201",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "response_data : {'success': True, 'data': {'id': '5cfce91d-b628-426e-a41e-ff022649f90d', 'username': 'user!', 'email': 'not.an.email', 'createdAt': '2025-10-10T17:33:54.668Z'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:03:54",
+    "message": "Completed step 8/8 - Schema validation for error response on invalid input | Passed: False",
+    "type": "error"
+  },
+  {
+    "timestamp": "23:03:55",
+    "message": "Completed execution for endpoint: api_testcases_users_register_post",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:03:55",
+    "message": "Starting execution for endpoint: api_testcases_users_login_post",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:03:55",
+    "message": "Found 7 test cases for this endpoint",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:14",
+    "message": "Generated execution order with 8 steps",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:14",
+    "message": "Starting execution of 8 test steps",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:14",
+    "message": "Executing step 1/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "*****test_description : Register a new user successfully *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'SecurePassword!555', 'username': 'positive_user_555'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "status_code : 201",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "response_data : {'success': True, 'data': {'id': 'aa4809cf-8f4a-42fd-8f5c-3eee8beb18b7', 'username': 'positive_user_555', 'email': 'new_positive_user_555@example.com', 'createdAt': '2025-10-10T17:34:23.317Z'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "Completed step 1/8 - Register a new user successfully | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:04:23",
+    "message": "Executing step 2/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:31",
+    "message": "*****test_description : Login successfully with valid credentials *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:04:31",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:31",
     "message": "url : http://localhost:3000/users/login",
     "type": "api"
   },
   {
-    "timestamp": "16:38:01",
-    "message": "headers : {}",
+    "timestamp": "23:04:31",
+    "message": "headers : {'Content-Type': 'application/json'}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:01",
-    "message": "payload : {'email': 'jane.doe.123@example.com', 'password': 'SecureP@ssw0rd!789'}",
+    "timestamp": "23:04:31",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'SecurePassword!555'}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:01",
+    "timestamp": "23:04:32",
     "message": "status_code : 200",
     "type": "response"
   },
   {
-    "timestamp": "16:38:01",
-    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzZmM4MmJiLTVjNTEtNGM1Yy1iMDZiLTNhYjA1NTVjMGIzNiIsImVtYWlsIjoiamFuZS5kb2UuMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NDgxLCJleHAiOjE3NjAwOTgwODF9.JdazSTxo81SfP-djlxm5_iPTXv37HsL0C0D9cVXjwxU'}}",
+    "timestamp": "23:04:32",
+    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NjcyLCJleHAiOjE3NjAxMjEyNzJ9.nCEE-kHXlWpIbHFKKeO_4MTh_5sSAuvUq68P0M3atiU'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:38:01",
-    "message": "\u2705 Completed test case: Successful user login",
+    "timestamp": "23:04:32",
+    "message": "Completed step 2/8 - Login successfully with valid credentials | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:38:09",
-    "message": "\ud83d\udd04 Executing test case: Get current user profile with valid token",
+    "timestamp": "23:04:32",
+    "message": "Executing step 3/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:40",
+    "message": "*****test_description : Schema validation for successful login response *****",
     "type": "test"
   },
   {
-    "timestamp": "16:38:09",
+    "timestamp": "23:04:40",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:40",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:40",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:40",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'SecurePassword!555'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:41",
+    "message": "status_code : 200",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:41",
+    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NjgxLCJleHAiOjE3NjAxMjEyODF9.Jg-sPAlM2pmL8oUkJcYFVahWsd737vkeI0AzVbQh4Zo'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:41",
+    "message": "Completed step 3/8 - Schema validation for successful login response | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:04:41",
+    "message": "Executing step 4/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "*****test_description : Attempt to login with unregistered email *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "payload : {'email': 'unregistered.user.123@example.com', 'password': 'StrongPassword!999'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "response_data : {'success': False, 'error': {'message': 'Invalid credentials'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:49",
+    "message": "Completed step 4/8 - Attempt to login with unregistered email | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:04:50",
+    "message": "Executing step 5/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "*****test_description : Attempt to login with valid email but incorrect password *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'WrongPassword!555'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:57",
+    "message": "response_data : {'success': False, 'error': {'message': 'Invalid credentials'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:04:58",
+    "message": "Completed step 5/8 - Attempt to login with valid email but incorrect password | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:04:58",
+    "message": "Executing step 6/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "*****test_description : Attempt to login with missing email *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "payload : {'password': 'SecurePassword!555'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "response_data : {'success': False, 'error': {'message': 'email and password required'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:04",
+    "message": "Completed step 6/8 - Attempt to login with missing email | Passed: False",
+    "type": "error"
+  },
+  {
+    "timestamp": "23:05:05",
+    "message": "Executing step 7/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "*****test_description : Attempt to login with missing password *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "payload : {'email': 'new_positive_user_555@example.com'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "status_code : 400",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "response_data : {'success': False, 'error': {'message': 'email and password required'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:16",
+    "message": "Completed step 7/8 - Attempt to login with missing password | Passed: False",
+    "type": "error"
+  },
+  {
+    "timestamp": "23:05:17",
+    "message": "Executing step 8/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "*****test_description : Schema validation for unauthorized login response *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "payload : {'email': 'unregistered.user.123@example.com', 'password': 'StrongPassword!999'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "response_data : {'success': False, 'error': {'message': 'Invalid credentials'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:26",
+    "message": "Completed step 8/8 - Schema validation for unauthorized login response | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:05:27",
+    "message": "Completed execution for endpoint: api_testcases_users_login_post",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:05:27",
+    "message": "Starting execution for endpoint: api_testcases_users_logout_post",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:27",
+    "message": "Found 6 test cases for this endpoint",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:42",
+    "message": "Generated execution order with 8 steps",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:42",
+    "message": "Starting execution of 8 test steps",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:42",
+    "message": "Executing step 1/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "*****test_description : Register a new user successfully *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "payload : {'email': 'register_pos_user_new@example.com', 'password': 'SecurePassword!2024', 'username': 'positive_new_user_register'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "status_code : 201",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "response_data : {'success': True, 'data': {'id': 'ad036457-f4cd-4801-b16d-1a93ef751945', 'username': 'positive_new_user_register', 'email': 'register_pos_user_new@example.com', 'createdAt': '2025-10-10T17:35:51.642Z'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:05:51",
+    "message": "Completed step 1/8 - Register a new user successfully | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:05:52",
+    "message": "Executing step 2/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "*****test_description : Login successfully with valid credentials *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'SecurePassword!555'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "status_code : 200",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:01",
+    "message": "Completed step 2/8 - Login successfully with valid credentials | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:06:02",
+    "message": "Executing step 3/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "*****test_description : Logout successfully with a valid token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "url : http://localhost:3000/users/logout",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "status_code : 200",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "response_data : {'success': True, 'data': {'message': 'Logged out'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "Completed step 3/8 - Logout successfully with a valid token | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:06:15",
+    "message": "Executing step 4/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "*****test_description : Schema validation for successful logout response *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "url : http://localhost:3000/users/logout",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "response_data : {'success': False, 'error': {'message': 'Token invalidated'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:25",
+    "message": "Completed step 4/8 - Schema validation for successful logout response | Passed: False",
+    "type": "error"
+  },
+  {
+    "timestamp": "23:06:26",
+    "message": "Executing step 5/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "*****test_description : Attempt to logout with missing token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "url : http://localhost:3000/users/logout",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "response_data : {'success': False, 'error': {'message': 'Missing Authorization header'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:33",
+    "message": "Completed step 5/8 - Attempt to logout with missing token | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:06:34",
+    "message": "Executing step 6/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:06:46",
+    "message": "*****test_description : Attempt to logout with an invalid token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:06:46",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:46",
+    "message": "url : http://localhost:3000/users/logout",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:46",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:46",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:06:47",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:47",
+    "message": "response_data : {'success': False, 'error': {'message': 'Token invalidated'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:06:47",
+    "message": "Completed step 6/8 - Attempt to logout with an invalid token | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:06:47",
+    "message": "Executing step 7/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "*****test_description : Attempt to logout with an expired token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "url : http://localhost:3000/users/logout",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "response_data : {'success': False, 'error': {'message': 'Token invalidated'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "Completed step 7/8 - Attempt to logout with an expired token | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:07:02",
+    "message": "Executing step 8/8",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "*****test_description : Schema validation for unauthorized logout response *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "url : http://localhost:3000/users/logout",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer wrong_token'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "Completed step 8/8 - Schema validation for unauthorized logout response | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:07:10",
+    "message": "Completed execution for endpoint: api_testcases_users_logout_post",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:07:11",
+    "message": "Starting execution for endpoint: api_testcases_users_me_get",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:11",
+    "message": "Found 6 test cases for this endpoint",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:31",
+    "message": "Generated execution order with 9 steps",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:31",
+    "message": "Starting execution of 9 test steps",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:31",
+    "message": "Executing step 1/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "*****test_description : Register a new user successfully *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "url : http://localhost:3000/users/register",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "payload : {'email': 'positive_test_user_1@example.com', 'password': 'PositivePass!123', 'username': 'positive_user_one'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "status_code : 201",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "response_data : {'success': True, 'data': {'id': 'a302f56d-b925-4a4d-8d56-a0d2bea003bf', 'username': 'positive_user_one', 'email': 'positive_test_user_1@example.com', 'createdAt': '2025-10-10T17:37:41.744Z'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:07:41",
+    "message": "Completed step 1/9 - Register a new user successfully | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:07:42",
+    "message": "Executing step 2/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:07:59",
+    "message": "*****test_description : Login successfully with valid credentials *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:07:59",
+    "message": "method : POST",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:59",
+    "message": "url : http://localhost:3000/users/login",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:59",
+    "message": "headers : {'Content-Type': 'application/json'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:07:59",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'SecurePassword!555'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:00",
+    "message": "status_code : 200",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:08:00",
+    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3ODgwLCJleHAiOjE3NjAxMjE0ODB9.1yssKDayf_UGTAsYYIfdD7-JIwoEeeVrDkSc-8mo-C8'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:08:00",
+    "message": "Completed step 2/9 - Login successfully with valid credentials | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:08:00",
+    "message": "Executing step 3/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:08:10",
     "message": "*****test_description : Get current user profile with valid token *****",
     "type": "test"
   },
   {
-    "timestamp": "16:38:09",
+    "timestamp": "23:08:10",
     "message": "method : GET",
     "type": "api"
   },
   {
-    "timestamp": "16:38:09",
+    "timestamp": "23:08:10",
     "message": "url : http://localhost:3000/users/me",
     "type": "api"
   },
   {
-    "timestamp": "16:38:09",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzZmM4MmJiLTVjNTEtNGM1Yy1iMDZiLTNhYjA1NTVjMGIzNiIsImVtYWlsIjoiamFuZS5kb2UuMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NDgxLCJleHAiOjE3NjAwOTgwODF9.JdazSTxo81SfP-djlxm5_iPTXv37HsL0C0D9cVXjwxU'}",
+    "timestamp": "23:08:10",
+    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3ODgwLCJleHAiOjE3NjAxMjE0ODB9.1yssKDayf_UGTAsYYIfdD7-JIwoEeeVrDkSc-8mo-C8'}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:09",
+    "timestamp": "23:08:10",
     "message": "payload : {}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:09",
+    "timestamp": "23:08:10",
     "message": "status_code : 200",
     "type": "response"
   },
   {
-    "timestamp": "16:38:09",
-    "message": "response_data : {'success': True, 'data': {'id': '33fc82bb-5c51-4c5c-b06b-3ab0555c0b36', 'username': 'jane_doe_123', 'email': 'jane.doe.123@example.com', 'createdAt': '2025-10-10T11:07:55.754Z'}}",
+    "timestamp": "23:08:10",
+    "message": "response_data : {'success': True, 'data': {'id': 'aa4809cf-8f4a-42fd-8f5c-3eee8beb18b7', 'username': 'positive_user_555', 'email': 'new_positive_user_555@example.com', 'createdAt': '2025-10-10T17:34:23.317Z'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:38:09",
-    "message": "\u2705 Completed test case: Get current user profile with valid token",
+    "timestamp": "23:08:10",
+    "message": "Completed step 3/9 - Get current user profile with valid token | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:38:18",
-    "message": "\ud83d\udd04 Executing test case: Successful update of current user username with valid token",
+    "timestamp": "23:08:10",
+    "message": "Executing step 4/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:08:26",
+    "message": "*****test_description : Schema validation for successful get user profile response *****",
     "type": "test"
   },
   {
-    "timestamp": "16:38:18",
-    "message": "*****test_description : Successful update of current user username with valid token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzZmM4MmJiLTVjNTEtNGM1Yy1iMDZiLTNhYjA1NTVjMGIzNiIsImVtYWlsIjoiamFuZS5kb2UuMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NDgxLCJleHAiOjE3NjAwOTgwODF9.JdazSTxo81SfP-djlxm5_iPTXv37HsL0C0D9cVXjwxU'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "payload : {'username': 'jane_doe_123'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "response_data : {'success': True, 'data': {'id': '33fc82bb-5c51-4c5c-b06b-3ab0555c0b36', 'username': 'jane_doe_123', 'email': 'jane.doe.123@example.com', 'createdAt': '2025-10-10T11:07:55.754Z', 'updatedAt': '2025-10-10T11:08:18.748Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:38:18",
-    "message": "\u2705 Completed test case: Successful update of current user username with valid token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "\ud83d\udd04 Executing test case: Successful product creation with valid token",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "*****test_description : Successful product creation with valid token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzZmM4MmJiLTVjNTEtNGM1Yy1iMDZiLTNhYjA1NTVjMGIzNiIsImVtYWlsIjoiamFuZS5kb2UuMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NDgxLCJleHAiOjE3NjAwOTgwODF9.JdazSTxo81SfP-djlxm5_iPTXv37HsL0C0D9cVXjwxU'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "payload : {'name': 'Super Comfy Ergonomic Chair', 'price': 349.99}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "response_data : {'success': True, 'data': {'id': '55cfa232-9181-4b87-9480-423e5c671ee7', 'name': 'Super Comfy Ergonomic Chair', 'price': 349.99, 'createdBy': '33fc82bb-5c51-4c5c-b06b-3ab0555c0b36', 'createdAt': '2025-10-10T11:08:30.357Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:38:30",
-    "message": "\u2705 Completed test case: Successful product creation with valid token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:38:45",
-    "message": "\ud83d\udd04 Executing test case: Get list of all products",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:38:45",
-    "message": "*****test_description : Get list of all products *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:38:45",
+    "timestamp": "23:08:26",
     "message": "method : GET",
     "type": "api"
   },
   {
-    "timestamp": "16:38:45",
-    "message": "url : http://localhost:3000/products",
+    "timestamp": "23:08:26",
+    "message": "url : http://localhost:3000/users/me",
     "type": "api"
   },
   {
-    "timestamp": "16:38:45",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzZmM4MmJiLTVjNTEtNGM1Yy1iMDZiLTNhYjA1NTVjMGIzNiIsImVtYWlsIjoiamFuZS5kb2UuMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NDgxLCJleHAiOjE3NjAwOTgwODF9.JdazSTxo81SfP-djlxm5_iPTXv37HsL0C0D9cVXjwxU'}",
+    "timestamp": "23:08:26",
+    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3ODgwLCJleHAiOjE3NjAxMjE0ODB9.1yssKDayf_UGTAsYYIfdD7-JIwoEeeVrDkSc-8mo-C8'}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:45",
+    "timestamp": "23:08:26",
     "message": "payload : {}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:45",
+    "timestamp": "23:08:26",
     "message": "status_code : 200",
     "type": "response"
   },
   {
-    "timestamp": "16:38:45",
-    "message": "response_data : {'success': True, 'data': [{'id': '11f517b6-da00-4205-bd0e-10e9dd42a3a8', 'name': 'Wireless Ergonomic Mouse', 'price': 49.99, 'createdBy': '9c854664-4f96-413d-9a4f-983710d2d7da', 'createdAt': '2025-10-10T10:45:42.060Z'}, {'id': '491b130e-1d92-465f-b785-344331eff059', 'name': 'Luxury Smartwatch X', 'price': 299.99, 'createdBy': '5f3a236b-a477-46e1-ab97-5358c8949f46', 'createdAt': '2025-10-10T10:47:26.126Z'}, {'id': '93ff8fb0-cf38-489e-a788-c498e7dc52be', 'name': 'Zero Price Product', 'price': 0, 'createdBy': '5f3a236b-a477-46e1-ab97-5358c8949f46', 'createdAt': '2025-10-10T10:47:37.078Z'}, {'id': '843bd8a7-a379-4aca-b52e-72efefe41849', 'name': 'Super Widget Pro Max', 'price': 49.99, 'createdBy': '5f3a236b-a477-46e1-ab97-5358c8949f46', 'createdAt': '2025-10-10T10:47:47.240Z'}, {'id': '14bf6d18-d22b-429a-a677-a09c85fb8f5a', 'name': 'Product with Negative Price', 'price': -10.5, 'createdBy': '5f3a236b-a477-46e1-ab97-5358c8949f46', 'createdAt': '2025-10-10T10:48:24.171Z'}, {'id': 'e1ed200f-8dda-43de-8a63-f3941e201ba0', 'name': 'SuperWidget v3', 'price': 49.99, 'createdBy': '98c2ca78-8f3f-49d9-9b6d-3e4702f125c1', 'createdAt': '2025-10-10T10:51:15.804Z'}, {'id': '748da92c-4984-41e7-a3ef-0601c37c858d', 'name': 'Widget Pro X', 'price': 129.99, 'createdBy': '98c2ca78-8f3f-49d9-9b6d-3e4702f125c1', 'createdAt': '2025-10-10T10:51:25.126Z'}, {'id': '95e4d0fe-d8b8-446e-ace1-08f7bf36d1f0', 'name': 'EcoWidget Mini', 'price': 0, 'createdBy': '98c2ca78-8f3f-49d9-9b6d-3e4702f125c1', 'createdAt': '2025-10-10T10:51:31.570Z'}, {'id': '79dc94d2-f064-419c-bd3b-d9fd0e69b30f', 'name': 'Product with Negative Price', 'price': -10, 'createdBy': '98c2ca78-8f3f-49d9-9b6d-3e4702f125c1', 'createdAt': '2025-10-10T10:52:08.239Z'}, {'id': '55cfa232-9181-4b87-9480-423e5c671ee7', 'name': 'Super Comfy Ergonomic Chair', 'price': 349.99, 'createdBy': '33fc82bb-5c51-4c5c-b06b-3ab0555c0b36', 'createdAt': '2025-10-10T11:08:30.357Z'}]}",
+    "timestamp": "23:08:26",
+    "message": "response_data : {'success': True, 'data': {'id': 'aa4809cf-8f4a-42fd-8f5c-3eee8beb18b7', 'username': 'positive_user_555', 'email': 'new_positive_user_555@example.com', 'createdAt': '2025-10-10T17:34:23.317Z'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:38:45",
-    "message": "\u2705 Completed test case: Get list of all products",
+    "timestamp": "23:08:26",
+    "message": "Completed step 4/9 - Schema validation for successful get user profile response | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:38:56",
-    "message": "\ud83d\udd04 Executing test case: Successful user logout with valid token",
+    "timestamp": "23:08:27",
+    "message": "Executing step 5/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "*****test_description : Schema validation for unauthorized get user profile response *****",
     "type": "test"
   },
   {
-    "timestamp": "16:38:56",
-    "message": "*****test_description : Successful user logout with valid token *****",
+    "timestamp": "23:08:38",
+    "message": "method : GET",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "url : http://localhost:3000/users/me",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "headers : {'Authorization': 'Bearer wrong_token'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "Completed step 5/9 - Schema validation for unauthorized get user profile response | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:08:38",
+    "message": "Executing step 6/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "*****test_description : Attempt to get user profile with missing token *****",
     "type": "test"
   },
   {
-    "timestamp": "16:38:56",
+    "timestamp": "23:08:47",
+    "message": "method : GET",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "url : http://localhost:3000/users/me",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "headers : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "response_data : {'success': False, 'error': {'message': 'Missing Authorization header'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:08:47",
+    "message": "Completed step 6/9 - Attempt to get user profile with missing token | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:08:48",
+    "message": "Executing step 7/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "*****test_description : Attempt to get user profile with invalid token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "method : GET",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "url : http://localhost:3000/users/me",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "headers : {'Authorization': 'Bearer wrong_token'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "status_code : 401",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "Completed step 7/9 - Attempt to get user profile with invalid token | Passed: True",
+    "type": "success"
+  },
+  {
+    "timestamp": "23:09:06",
+    "message": "Executing step 8/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "*****test_description : Attempt to get user profile with expired token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "method : GET",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "url : http://localhost:3000/users/me",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3NzYxLCJleHAiOjE3NjAxMjEzNjF9.LdBPJPofEyep7SI33666L0ZUnLz4pQOqn1QlQ5FLVNc'}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "payload : {}",
+    "type": "api"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "status_code : 200",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "response_data : {'success': True, 'data': {'id': 'aa4809cf-8f4a-42fd-8f5c-3eee8beb18b7', 'username': 'positive_user_555', 'email': 'new_positive_user_555@example.com', 'createdAt': '2025-10-10T17:34:23.317Z'}}",
+    "type": "response"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "Completed step 8/9 - Attempt to get user profile with expired token | Passed: False",
+    "type": "error"
+  },
+  {
+    "timestamp": "23:09:25",
+    "message": "Executing step 9/9",
+    "type": "info"
+  },
+  {
+    "timestamp": "23:10:12",
+    "message": "*****test_description : Logout successfully with a valid token *****",
+    "type": "test"
+  },
+  {
+    "timestamp": "23:10:12",
     "message": "method : POST",
     "type": "api"
   },
   {
-    "timestamp": "16:38:56",
+    "timestamp": "23:10:12",
     "message": "url : http://localhost:3000/users/logout",
     "type": "api"
   },
   {
-    "timestamp": "16:38:56",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMzZmM4MmJiLTVjNTEtNGM1Yy1iMDZiLTNhYjA1NTVjMGIzNiIsImVtYWlsIjoiamFuZS5kb2UuMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NDgxLCJleHAiOjE3NjAwOTgwODF9.JdazSTxo81SfP-djlxm5_iPTXv37HsL0C0D9cVXjwxU'}",
+    "timestamp": "23:10:12",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3ODgwLCJleHAiOjE3NjAxMjE0ODB9.1yssKDayf_UGTAsYYIfdD7-JIwoEeeVrDkSc-8mo-C8'}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:56",
+    "timestamp": "23:10:12",
     "message": "payload : {}",
     "type": "api"
   },
   {
-    "timestamp": "16:38:56",
+    "timestamp": "23:10:12",
     "message": "status_code : 200",
     "type": "response"
   },
   {
-    "timestamp": "16:38:56",
+    "timestamp": "23:10:12",
     "message": "response_data : {'success': True, 'data': {'message': 'Logged out'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:38:56",
-    "message": "\u2705 Completed test case: Successful user logout with valid token",
+    "timestamp": "23:10:12",
+    "message": "Completed step 9/9 - Logout successfully with a valid token | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:38:57",
-    "message": "\ud83c\udf89 Positive Flow Execution Completed Successfully",
+    "timestamp": "23:10:12",
+    "message": "Completed execution for endpoint: api_testcases_users_me_get",
     "type": "success"
   },
   {
-    "timestamp": "16:38:57",
-    "message": "Positive flow execution completed successfully",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:39:50",
-    "message": "Generating AI analysis for latest execution results",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:39:50",
-    "message": "AI analysis completed successfully",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:40:38",
-    "message": "Starting test execution for 2 endpoints",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:40:38",
-    "message": "Processing 2 selected endpoints",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:40:38",
-    "message": "Testing 2 selected endpoints",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:40:38",
+    "timestamp": "23:10:13",
     "message": "Starting execution for endpoint: api_testcases_users_me_put",
     "type": "info"
   },
   {
-    "timestamp": "16:40:38",
-    "message": "Found 9 test cases for this endpoint",
+    "timestamp": "23:10:13",
+    "message": "Found 8 test cases for this endpoint",
     "type": "info"
   },
   {
-    "timestamp": "16:40:57",
+    "timestamp": "23:10:27",
     "message": "Generated execution order with 11 steps",
     "type": "info"
   },
   {
-    "timestamp": "16:40:57",
+    "timestamp": "23:10:27",
     "message": "Starting execution of 11 test steps",
     "type": "info"
   },
   {
-    "timestamp": "16:40:57",
+    "timestamp": "23:10:27",
     "message": "Executing step 1/11",
     "type": "info"
   },
   {
-    "timestamp": "16:41:02",
-    "message": "*****test_description : Successful user registration *****",
+    "timestamp": "23:10:36",
+    "message": "*****test_description : Register a new user successfully *****",
     "type": "test"
   },
   {
-    "timestamp": "16:41:02",
+    "timestamp": "23:10:36",
     "message": "method : POST",
     "type": "api"
   },
   {
-    "timestamp": "16:41:02",
+    "timestamp": "23:10:36",
     "message": "url : http://localhost:3000/users/register",
     "type": "api"
   },
   {
-    "timestamp": "16:41:02",
-    "message": "headers : {}",
+    "timestamp": "23:10:36",
+    "message": "headers : {'Content-Type': 'application/json'}",
     "type": "api"
   },
   {
-    "timestamp": "16:41:02",
-    "message": "payload : {'email': 'testuser_123@example.com', 'password': 'SecurePassword123!', 'username': 'testuser123'}",
+    "timestamp": "23:10:36",
+    "message": "payload : {'email': 'positive_new_user_123@example.com', 'password': 'SecurePassword!2025', 'username': 'new_user_register_123'}",
     "type": "api"
   },
   {
-    "timestamp": "16:41:02",
+    "timestamp": "23:10:36",
     "message": "status_code : 201",
     "type": "response"
   },
   {
-    "timestamp": "16:41:02",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 'testuser123', 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z'}}",
+    "timestamp": "23:10:36",
+    "message": "response_data : {'success': True, 'data': {'id': 'e2aa7bea-dacb-440b-9815-67cf6ffedf18', 'username': 'new_user_register_123', 'email': 'positive_new_user_123@example.com', 'createdAt': '2025-10-10T17:40:36.948Z'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:41:02",
-    "message": "Completed step 1/11 - Successful user registration",
+    "timestamp": "23:10:37",
+    "message": "Completed step 1/11 - Register a new user successfully | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:41:03",
+    "timestamp": "23:10:37",
     "message": "Executing step 2/11",
     "type": "info"
   },
   {
-    "timestamp": "16:41:10",
-    "message": "*****test_description : Successful user login *****",
+    "timestamp": "23:10:46",
+    "message": "*****test_description : Login successfully with valid credentials *****",
     "type": "test"
   },
   {
-    "timestamp": "16:41:10",
+    "timestamp": "23:10:46",
     "message": "method : POST",
     "type": "api"
   },
   {
-    "timestamp": "16:41:10",
+    "timestamp": "23:10:46",
     "message": "url : http://localhost:3000/users/login",
     "type": "api"
   },
   {
-    "timestamp": "16:41:10",
-    "message": "headers : {}",
+    "timestamp": "23:10:46",
+    "message": "headers : {'Content-Type': 'application/json'}",
     "type": "api"
   },
   {
-    "timestamp": "16:41:10",
-    "message": "payload : {'email': 'testuser_123@example.com', 'password': 'SecurePassword123!'}",
+    "timestamp": "23:10:46",
+    "message": "payload : {'email': 'new_positive_user_555@example.com', 'password': 'SecurePassword!555'}",
     "type": "api"
   },
   {
-    "timestamp": "16:41:10",
+    "timestamp": "23:10:46",
     "message": "status_code : 200",
     "type": "response"
   },
   {
-    "timestamp": "16:41:10",
-    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}}",
+    "timestamp": "23:10:46",
+    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE4MDQ2LCJleHAiOjE3NjAxMjE2NDZ9.YxFlnYq4ZyHuH2XayTbLKuXx_NM3epap6JeKdbFaRbY'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:41:10",
-    "message": "Completed step 2/11 - Successful user login",
+    "timestamp": "23:10:46",
+    "message": "Completed step 2/11 - Login successfully with valid credentials | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:41:11",
+    "timestamp": "23:10:47",
     "message": "Executing step 3/11",
     "type": "info"
   },
   {
-    "timestamp": "16:41:19",
-    "message": "*****test_description : Successful update of current user username with valid token *****",
+    "timestamp": "23:11:03",
+    "message": "*****test_description : Update current user profile username with valid token *****",
     "type": "test"
   },
   {
-    "timestamp": "16:41:19",
+    "timestamp": "23:11:03",
     "message": "method : PUT",
     "type": "api"
   },
   {
-    "timestamp": "16:41:19",
+    "timestamp": "23:11:03",
     "message": "url : http://localhost:3000/users/me",
     "type": "api"
   },
   {
-    "timestamp": "16:41:19",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}",
+    "timestamp": "23:11:03",
+    "message": "headers : {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE4MDQ2LCJleHAiOjE3NjAxMjE2NDZ9.YxFlnYq4ZyHuH2XayTbLKuXx_NM3epap6JeKdbFaRbY'}",
     "type": "api"
   },
   {
-    "timestamp": "16:41:19",
-    "message": "payload : {'username': 'new_valid_username789'}",
+    "timestamp": "23:11:03",
+    "message": "payload : {'username': 'updated_user_profile'}",
     "type": "api"
   },
   {
-    "timestamp": "16:41:19",
+    "timestamp": "23:11:03",
     "message": "status_code : 200",
     "type": "response"
   },
   {
-    "timestamp": "16:41:19",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 'new_valid_username789', 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z', 'updatedAt': '2025-10-10T11:11:19.744Z'}}",
+    "timestamp": "23:11:03",
+    "message": "response_data : {'success': True, 'data': {'id': 'aa4809cf-8f4a-42fd-8f5c-3eee8beb18b7', 'username': 'updated_user_profile', 'email': 'new_positive_user_555@example.com', 'createdAt': '2025-10-10T17:34:23.317Z', 'updatedAt': '2025-10-10T17:41:03.607Z'}}",
     "type": "response"
   },
   {
-    "timestamp": "16:41:19",
-    "message": "Completed step 3/11 - Successful update of current user username with valid token",
+    "timestamp": "23:11:03",
+    "message": "Completed step 3/11 - Update current user profile username with valid token | Passed: True",
     "type": "success"
   },
   {
-    "timestamp": "16:41:20",
+    "timestamp": "23:11:04",
     "message": "Executing step 4/11",
     "type": "info"
   },
   {
-    "timestamp": "16:41:31",
-    "message": "*****test_description : Schema validation for 200 response on successful user profile update *****",
+    "timestamp": "23:11:16",
+    "message": "*****test_description : Schema validation for successful update user profile response *****",
     "type": "test"
   },
   {
-    "timestamp": "16:41:31",
+    "timestamp": "23:11:16",
     "message": "method : PUT",
     "type": "api"
   },
   {
-    "timestamp": "16:41:31",
+    "timestamp": "23:11:16",
     "message": "url : http://localhost:3000/users/me",
     "type": "api"
-  },
-  {
-    "timestamp": "16:41:31",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:31",
-    "message": "payload : {'username': 'positive_test_user_update'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:31",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:31",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 'positive_test_user_update', 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z', 'updatedAt': '2025-10-10T11:11:31.512Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:31",
-    "message": "Completed step 4/11 - Schema validation for 200 response on successful user profile update",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:41:32",
-    "message": "Executing step 5/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "*****test_description : Update user profile with invalid username type *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "payload : {'username': 12345}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 12345, 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z', 'updatedAt': '2025-10-10T11:11:38.679Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:38",
-    "message": "Completed step 5/11 - Update user profile with invalid username type",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:41:39",
-    "message": "Executing step 6/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "*****test_description : Schema validation for 400 response on invalid input for user profile update *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "payload : {'username': 12345}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 12345, 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z', 'updatedAt': '2025-10-10T11:11:46.586Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:46",
-    "message": "Completed step 6/11 - Schema validation for 400 response on invalid input for user profile update",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:41:47",
-    "message": "Executing step 7/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "*****test_description : Update user profile with empty username string *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "payload : {'username': ''}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 12345, 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z', 'updatedAt': '2025-10-10T11:11:46.586Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:41:56",
-    "message": "Completed step 7/11 - Update user profile with empty username string",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:41:57",
-    "message": "Executing step 8/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "*****test_description : Update user profile with an empty request body *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NjcwLCJleHAiOjE3NjAwOTgyNzB9.kaUrdirIJLgcCHK5f170YZP_8pZOZKK_RAFP_Plamo0'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "payload : {}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "response_data : {'success': True, 'data': {'id': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'username': 12345, 'email': 'testuser_123@example.com', 'createdAt': '2025-10-10T11:11:02.712Z', 'updatedAt': '2025-10-10T11:11:46.586Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:03",
-    "message": "Completed step 8/11 - Update user profile with an empty request body",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:42:04",
-    "message": "Executing step 9/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "*****test_description : Update user profile with missing token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "headers : {}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "payload : {'username': 'auth_test_username_valid'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "status_code : 401",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "response_data : {'success': False, 'error': {'message': 'Missing Authorization header'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:20",
-    "message": "Completed step 9/11 - Update user profile with missing token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:42:21",
-    "message": "Executing step 10/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "*****test_description : Update user profile with invalid token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "headers : {'Authorization': 'Bearer invalid_or_expired_token_12345'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "payload : {'username': 'auth_test_username_valid'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "status_code : 401",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:27",
-    "message": "Completed step 10/11 - Update user profile with invalid token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:42:28",
-    "message": "Executing step 11/11",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "*****test_description : Schema validation for 401 response on unauthorized user profile update *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "method : PUT",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "url : http://localhost:3000/users/me",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "headers : {'Authorization': 'Bearer wrong_token'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "payload : {'username': 'unauthorized_user_test'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "status_code : 401",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:42:37",
-    "message": "Completed step 11/11 - Schema validation for 401 response on unauthorized user profile update",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:42:38",
-    "message": "Completed execution for endpoint: api_testcases_users_me_put",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:42:38",
-    "message": "Starting execution for endpoint: api_testcases_products_post",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:38",
-    "message": "Found 13 test cases for this endpoint",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:58",
-    "message": "Generated execution order with 16 steps",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:58",
-    "message": "Starting execution of 16 test steps",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:42:58",
-    "message": "Executing step 1/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:43:03",
-    "message": "*****test_description : Successful user registration *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:43:03",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:03",
-    "message": "url : http://localhost:3000/users/register",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:03",
-    "message": "headers : {}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:03",
-    "message": "payload : {'email': 'new_user_register_789@example.com', 'password': 'NewStrongPass!789', 'username': 'new_reg_user_456'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:04",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:04",
-    "message": "response_data : {'success': True, 'data': {'id': 'b884f74e-fe02-41a5-9ce5-d6c6df814d58', 'username': 'new_reg_user_456', 'email': 'new_user_register_789@example.com', 'createdAt': '2025-10-10T11:13:04.106Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:04",
-    "message": "Completed step 1/16 - Successful user registration",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:43:05",
-    "message": "Executing step 2/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:43:11",
-    "message": "*****test_description : Successful user login *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:43:11",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:11",
-    "message": "url : http://localhost:3000/users/login",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:11",
-    "message": "headers : {}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:11",
-    "message": "payload : {'email': 'testuser_123@example.com', 'password': 'SecurePassword123!'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:12",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:12",
-    "message": "response_data : {'success': True, 'data': {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:12",
-    "message": "Completed step 2/16 - Successful user login",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:43:13",
-    "message": "Executing step 3/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "*****test_description : Successful product creation with valid token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "payload : {'name': 'SuperWidget Pro', 'price': 99.99}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "response_data : {'success': True, 'data': {'id': 'bbcd967f-0c1c-4de3-9878-5c8d01e43444', 'name': 'SuperWidget Pro', 'price': 99.99, 'createdBy': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'createdAt': '2025-10-10T11:13:19.158Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:19",
-    "message": "Completed step 3/16 - Successful product creation with valid token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:43:20",
-    "message": "Executing step 4/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "*****test_description : Schema validation for 201 response on successful product creation *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "payload : {'name': 'Widget A V2', 'price': 59.99}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "response_data : {'success': True, 'data': {'id': 'd39e9fe1-4dad-4061-954c-249596969cb2', 'name': 'Widget A V2', 'price': 59.99, 'createdBy': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'createdAt': '2025-10-10T11:13:30.802Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:30",
-    "message": "Completed step 4/16 - Schema validation for 201 response on successful product creation",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:43:31",
-    "message": "Executing step 5/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "*****test_description : Product creation with zero price *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "payload : {'name': 'EdgeTestProduct_ZeroPrice', 'price': 0}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "response_data : {'success': True, 'data': {'id': 'ec044c95-c859-4cbb-bca3-1255482e7660', 'name': 'EdgeTestProduct_ZeroPrice', 'price': 0, 'createdBy': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'createdAt': '2025-10-10T11:13:38.506Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:38",
-    "message": "Completed step 5/16 - Product creation with zero price",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:43:39",
-    "message": "Executing step 6/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "*****test_description : Product creation with empty name string *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "payload : {'name': '', 'price': 45.5}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "status_code : 400",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "response_data : {'success': False, 'error': {'message': 'name and numeric price required'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:43:49",
-    "message": "Completed step 6/16 - Product creation with empty name string",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:43:50",
-    "message": "Executing step 7/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "*****test_description : Product creation with missing name field *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "payload : {'price': 49.99}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "status_code : 400",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "response_data : {'success': False, 'error': {'message': 'name and numeric price required'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:05",
-    "message": "Completed step 7/16 - Product creation with missing name field",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:44:06",
-    "message": "Executing step 8/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "*****test_description : Product creation with missing price field *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "payload : {'name': 'TestProduct_MissingPrice'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "status_code : 400",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "response_data : {'success': False, 'error': {'message': 'name and numeric price required'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:18",
-    "message": "Completed step 8/16 - Product creation with missing price field",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:44:19",
-    "message": "Executing step 9/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "*****test_description : Product creation with invalid name type *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "payload : {'name': 12345, 'price': 50.0}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "response_data : {'success': True, 'data': {'id': '0f591d5f-2d90-405b-b648-72f31990968e', 'name': 12345, 'price': 50, 'createdBy': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'createdAt': '2025-10-10T11:14:26.804Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:26",
-    "message": "Completed step 9/16 - Product creation with invalid name type",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:44:27",
-    "message": "Executing step 10/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "*****test_description : Product creation with invalid price type *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "payload : {'name': 'InvalidPriceProduct', 'price': 'not_a_number'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "status_code : 400",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "response_data : {'success': False, 'error': {'message': 'name and numeric price required'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:37",
-    "message": "Completed step 10/16 - Product creation with invalid price type",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:44:38",
-    "message": "Executing step 11/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "*****test_description : Product creation with negative price *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "payload : {'name': 'NegativePriceProduct', 'price': -10.5}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "status_code : 201",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "response_data : {'success': True, 'data': {'id': '2ab80bea-bdbb-48b8-9355-6eb8072d728f', 'name': 'NegativePriceProduct', 'price': -10.5, 'createdBy': '6b5046a9-9ef3-4902-a155-ef0ce854bcb0', 'createdAt': '2025-10-10T11:14:44.169Z'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:44:44",
-    "message": "Completed step 11/16 - Product creation with negative price",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:44:45",
-    "message": "Executing step 12/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "*****test_description : Schema validation for 400 response on invalid input for product creation *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "payload : {'price': 75.0}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "status_code : 400",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "response_data : {'success': False, 'error': {'message': 'name and numeric price required'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:03",
-    "message": "Completed step 12/16 - Schema validation for 400 response on invalid input for product creation",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:04",
-    "message": "Executing step 13/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "*****test_description : Product creation with missing token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "headers : {}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "payload : {'name': 'MissingTokenProduct_AuthTest', 'price': 78.99}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "status_code : 401",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "response_data : {'success': False, 'error': {'message': 'Missing Authorization header'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:10",
-    "message": "Completed step 13/16 - Product creation with missing token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:11",
-    "message": "Executing step 14/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "*****test_description : Product creation with invalid token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "headers : {'Authorization': 'Bearer wrong_token'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "payload : {'name': 'InvalidTokenProduct_Test', 'price': 89.99}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "status_code : 401",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:19",
-    "message": "Completed step 14/16 - Product creation with invalid token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:20",
-    "message": "Executing step 15/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "*****test_description : Schema validation for 401 response on unauthorized product creation *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "url : http://localhost:3000/products",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "headers : {'Authorization': 'Bearer wrong_token'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "payload : {'name': 'UnauthorizedProductTest', 'price': 123.45}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "status_code : 401",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "response_data : {'success': False, 'error': {'message': 'Invalid or expired token'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:25",
-    "message": "Completed step 15/16 - Schema validation for 401 response on unauthorized product creation",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:26",
-    "message": "Executing step 16/16",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "*****test_description : Successful user logout with valid token *****",
-    "type": "test"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "method : POST",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "url : http://localhost:3000/users/logout",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "headers : {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZiNTA0NmE5LTllZjMtNDkwMi1hMTU1LWVmMGNlODU0YmNiMCIsImVtYWlsIjoidGVzdHVzZXJfMTIzQGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMDk0NzkyLCJleHAiOjE3NjAwOTgzOTJ9.x8z20qfjDK4SGG7Eo3xGFsGKFj2s0PlLR5lVHHB_aWY'}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "payload : {}",
-    "type": "api"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "status_code : 200",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "response_data : {'success': True, 'data': {'message': 'Logged out'}}",
-    "type": "response"
-  },
-  {
-    "timestamp": "16:45:35",
-    "message": "Completed step 16/16 - Successful user logout with valid token",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:36",
-    "message": "Completed execution for endpoint: api_testcases_products_post",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:36",
-    "message": "All endpoint executions completed successfully",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:36",
-    "message": "Test execution completed successfully",
-    "type": "success"
-  },
-  {
-    "timestamp": "16:45:44",
-    "message": "Generating AI analysis for latest execution results",
-    "type": "info"
-  },
-  {
-    "timestamp": "16:45:44",
-    "message": "AI analysis completed successfully",
-    "type": "success"
   }
 ]

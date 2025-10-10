@@ -1,0 +1,30 @@
+{
+  "uuid": "e31bc46a-6d62-44a9-8fb1-20a2e0785f29",
+  "historyId": "e31bc46a-6d62-44a9-8fb1-20a2e0785f29",
+  "fullName": "Attempt to logout with missing token",
+  "name": "Attempt to logout with missing token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117793841,
+  "stop": 1760117793841,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-0ac321e0-f6a0-4c46-9179-f09158830a0e.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-44323e44-5c5e-4f76-a440-f51fe9270ecc.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-a4268f29-3bf2-4294-aa2e-7763a4d37c24.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

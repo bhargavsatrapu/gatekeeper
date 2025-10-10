@@ -1,0 +1,10 @@
+{
+  "url": "http://localhost:3000/users/me",
+  "method": "GET",
+  "headers": {
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE3ODgwLCJleHAiOjE3NjAxMjE0ODB9.1yssKDayf_UGTAsYYIfdD7-JIwoEeeVrDkSc-8mo-C8"
+  },
+  "query_params": {},
+  "payload": {},
+  "test_description": "Get current user profile with valid token"
+}

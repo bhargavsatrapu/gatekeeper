@@ -1,0 +1,30 @@
+{
+  "uuid": "d3f02dc3-6128-49d9-bc40-9aeb9001b762",
+  "historyId": "d3f02dc3-6128-49d9-bc40-9aeb9001b762",
+  "fullName": "Attempt to login with valid email but incorrect password",
+  "name": "Attempt to login with valid email but incorrect password",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117697998,
+  "stop": 1760117697998,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-518d5b85-0968-4635-ad67-0f3043826aae.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-6cabf21d-93a3-4b6b-b607-3386070fc94c.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-03de08b6-54be-4faa-8000-cc68449ac77c.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

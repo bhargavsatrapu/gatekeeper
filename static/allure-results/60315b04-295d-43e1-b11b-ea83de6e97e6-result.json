@@ -1,0 +1,30 @@
+{
+  "uuid": "60315b04-295d-43e1-b11b-ea83de6e97e6",
+  "historyId": "60315b04-295d-43e1-b11b-ea83de6e97e6",
+  "fullName": "Update current user profile username with valid token",
+  "name": "Update current user profile username with valid token",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760118063676,
+  "stop": 1760118063676,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-60d8e675-7765-4c5a-b6df-4209799203ee.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-4fec659e-2cba-4057-9f83-25cf17cb01d7.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-8bf5fb03-5fa1-4fa2-af39-d05d88974f61.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

@@ -1,0 +1,30 @@
+{
+  "uuid": "888c24b4-e2b1-4e18-8a42-ab7f13f5cd7b",
+  "historyId": "888c24b4-e2b1-4e18-8a42-ab7f13f5cd7b",
+  "fullName": "Schema validation for successful get user profile response",
+  "name": "Schema validation for successful get user profile response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117906752,
+  "stop": 1760117906752,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-acce1a21-d353-4da2-989b-4b0a576910cb.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-d5687a48-7e2a-463b-97e2-dadda6b9d519.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-dcfdd250-1d76-4abb-a05b-0ed0b92bcaf8.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

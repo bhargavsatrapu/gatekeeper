@@ -1,0 +1,23 @@
+{
+  "status_code": 200,
+  "headers": {
+    "X-Powered-By": "Express",
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "228",
+    "ETag": "W/\"e4-uGpGRyQNRTMqMenqlontHa19V5I\"",
+    "Date": "Fri, 10 Oct 2025 17:41:16 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "data": {
+    "success": true,
+    "data": {
+      "id": "aa4809cf-8f4a-42fd-8f5c-3eee8beb18b7",
+      "username": "updated_username_schema",
+      "email": "new_positive_user_555@example.com",
+      "createdAt": "2025-10-10T17:34:23.317Z",
+      "updatedAt": "2025-10-10T17:41:16.843Z"
+    }
+  }
+}

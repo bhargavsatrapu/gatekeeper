@@ -1,0 +1,30 @@
+{
+  "uuid": "48fad4b2-7505-4a66-882f-0842de23ca2c",
+  "historyId": "48fad4b2-7505-4a66-882f-0842de23ca2c",
+  "fullName": "Attempt to register with missing email",
+  "name": "Attempt to register with missing email",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117605671,
+  "stop": 1760117605671,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-0d859a05-0844-48a0-a9ce-be62b1794634.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-42a3ed55-17c1-49c3-b1a0-66dc81ac6de0.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-98c907c5-3b84-4e50-b9b1-acb114146d5b.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

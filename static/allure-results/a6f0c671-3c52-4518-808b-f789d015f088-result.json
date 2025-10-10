@@ -1,0 +1,30 @@
+{
+  "uuid": "a6f0c671-3c52-4518-808b-f789d015f088",
+  "historyId": "a6f0c671-3c52-4518-808b-f789d015f088",
+  "fullName": "Attempt to login with missing email",
+  "name": "Attempt to login with missing email",
+  "status": "failed",
+  "stage": "finished",
+  "start": 1760117704756,
+  "stop": 1760117704756,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-37e8dab7-72eb-465b-a1e4-bb90b08858c9.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-3769e5db-65a9-4a8d-a6fc-40abfb74d907.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-bdf8235b-fb1f-47a1-99f5-4ed0307e2c71.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

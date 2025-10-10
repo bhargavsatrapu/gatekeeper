@@ -1,0 +1,30 @@
+{
+  "uuid": "ede3fec6-0cea-43bf-9de4-7d3b71cbcbb4",
+  "historyId": "ede3fec6-0cea-43bf-9de4-7d3b71cbcbb4",
+  "fullName": "Schema validation for successful login response",
+  "name": "Schema validation for successful login response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117681070,
+  "stop": 1760117681070,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-717a0987-0973-4e3a-84bf-304983807d13.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-16c6ac7d-caf9-499c-8bc9-4fab16ebd315.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-84a94f22-3fd0-4d0a-a78a-b3bb20e187df.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

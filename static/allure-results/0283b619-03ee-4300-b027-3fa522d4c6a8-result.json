@@ -1,0 +1,30 @@
+{
+  "uuid": "0283b619-03ee-4300-b027-3fa522d4c6a8",
+  "historyId": "0283b619-03ee-4300-b027-3fa522d4c6a8",
+  "fullName": "Login successfully with valid credentials",
+  "name": "Login successfully with valid credentials",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117761754,
+  "stop": 1760117761754,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-a5dd458c-cfe5-4725-9501-2dc4cc51bac7.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-b939cea6-2c01-424f-aee2-4f7e29da33d0.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-73f10fbf-31b0-4e98-b2bf-1645eda75a8b.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

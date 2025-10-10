@@ -1,0 +1,30 @@
+{
+  "uuid": "e3e87903-5d91-4703-990c-f0c51cc4b61e",
+  "historyId": "e3e87903-5d91-4703-990c-f0c51cc4b61e",
+  "fullName": "Attempt to register with invalid email format",
+  "name": "Attempt to register with invalid email format",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117623037,
+  "stop": 1760117623037,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-82797fe6-a7b4-4df6-9853-2925384a2e5a.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-57ec8684-b6b0-4a52-89f3-ba0c93029e2b.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-a7ef0e8c-3d33-4d10-97a6-31ea88af5151.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

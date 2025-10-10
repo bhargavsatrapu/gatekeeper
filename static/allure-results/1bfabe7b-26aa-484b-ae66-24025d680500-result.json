@@ -1,0 +1,30 @@
+{
+  "uuid": "1bfabe7b-26aa-484b-ae66-24025d680500",
+  "historyId": "1bfabe7b-26aa-484b-ae66-24025d680500",
+  "fullName": "Schema validation for unauthorized logout response",
+  "name": "Schema validation for unauthorized logout response",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117830490,
+  "stop": 1760117830490,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-c3a6014e-3fa5-4768-be15-23c1a74b206f.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-1fd1233d-34c0-4701-a99b-8febc5886880.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-9df95e4d-8be1-4db8-8e45-7be0d37906fa.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

@@ -5,6 +5,7 @@ import os
 from typing import Dict, Any, List
 
 import psycopg2
+import subprocess
 from psycopg2.extras import RealDictCursor
 from sat_core.config import BASE_URL, DB_CONFIG
 from sat_core.ai_client import get_gemini_client
@@ -12,6 +13,18 @@ from sat_core.fetch_endpoints import fetch_endpoints
 from sat_core.global_state import endpoint_tables
 from sat_core.call_api import call_api
 from sat_core.db_utils import create_execution_results_table,insert_execution_result
+from sat_core.reporting import (
+    validate_response,
+    write_allure_test_with_attachments,
+    get_allure_results_dir,
+    clean_allure_results
+)
+executions_logs: Dict[str, Dict[str, Any]] = {}
+BASE_URL_LOCAL = BASE_URL
+
+# Clean previous Allure results before starting
+results_dir = get_allure_results_dir()
+clean_allure_results()
 
 # Add parent directory to path to import console logger
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -201,10 +214,52 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
                 "payload": enriched_fields.get("input_payload", testcase["input_payload"]),
                 "test_description": testcase["test_name"],
             }
-            res = call_api(req["method"], req["url"], req["headers"], req["query_params"], req["payload"], req["test_description"]) 
+           # --- Call API ---
+            res = call_api(
+                req["method"],
+                req["url"],
+                req["headers"],
+                req["query_params"],
+                req["payload"],
+                req["test_description"]
+            )
             executions_logs[testcase.get("test_name", req["url"])] = {"request": req, "response": res}
-            log_to_console(f"Completed step {step_index}/{len(order)} - {req['test_description']}", "success")
-            time.sleep(1)
+
+            # --- Validate Response ---
+            expected_status = None
+            expected_schema = None
+            try:
+                expected_status = int(testcase.get("expected_status")) if testcase.get("expected_status") else None
+            except Exception:
+                expected_status = None
+
+            try:
+                schema_raw = testcase.get("expected_schema")
+                if isinstance(schema_raw, str) and schema_raw.strip():
+                    expected_schema = json.loads(schema_raw)
+                elif isinstance(schema_raw, dict):
+                    expected_schema = schema_raw
+            except Exception:
+                expected_schema = None
+
+            passed, assertions = validate_response(res, expected_status, expected_schema)
+
+            # --- Write Allure Attachment ---
+            write_allure_test_with_attachments(
+                test_name=req["test_description"],
+                passed=passed,
+                request=req,
+                response=res,
+                assertions=assertions,
+                description="Ordered Testcase Execution",
+                results_dir=results_dir  # <- make sure this is defined earlier
+            )
+
+            # --- Log Status ---
+            log_to_console(f"Completed step {step_index}/{len(order)} - {req['test_description']} | Passed: {passed}", 
+                        "success" if passed else "error")
+
+            # --- Insert into DB ---
             try:
                 insert_execution_result(
                     req["test_description"],
@@ -217,14 +272,23 @@ def order_testcases_and_execute(endpoints_list: List[int]) -> List[Dict[str, int
                     res["status_code"],
                     res["data"],
                 )
-            except:
+            except Exception:
                 pass
+
         execution_orders.extend(order)
         log_to_console(f"Completed execution for endpoint: {table_name}", "success")
 
     print("✅ Final execution order:", execution_orders)
     log_to_console("All endpoint executions completed successfully", "success")
     return execution_orders
+
+# report_dir = results_dir.replace("allure-results", "allure-report")
+# cmd = ["allure", "generate", results_dir, "-o", report_dir, "--clean"]
+# try:
+#     subprocess.run(cmd, check=True)
+#     log_to_console(f"✅ Allure report generated at {report_dir}", "info")
+# except subprocess.CalledProcessError as e:
+#     log_to_console(f"❌ Allure report generation failed: {e}", "error")
 
 
 

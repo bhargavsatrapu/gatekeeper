@@ -1,0 +1,14 @@
+{
+  "url": "http://localhost:3000/users/register",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query_params": {},
+  "payload": {
+    "email": "register.user.123@example.com",
+    "password": "SecurePassword!987",
+    "username": "unique_username_456"
+  },
+  "test_description": "Attempt to register with existing email"
+}

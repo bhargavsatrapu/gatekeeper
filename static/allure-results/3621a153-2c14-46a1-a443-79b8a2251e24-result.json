@@ -1,0 +1,30 @@
+{
+  "uuid": "3621a153-2c14-46a1-a443-79b8a2251e24",
+  "historyId": "3621a153-2c14-46a1-a443-79b8a2251e24",
+  "fullName": "Attempt to login with unregistered email",
+  "name": "Attempt to login with unregistered email",
+  "status": "passed",
+  "stage": "finished",
+  "start": 1760117689839,
+  "stop": 1760117689839,
+  "steps": [],
+  "attachments": [
+    {
+      "name": "Request",
+      "source": "request-fdcecb3f-10b3-4118-a224-211a51460bd2.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Response",
+      "source": "response-8c2ebb98-3442-48cc-82ed-85e2b0bfdaef.txt",
+      "type": "application/json"
+    },
+    {
+      "name": "Assertions",
+      "source": "assertions-d997da1f-5c67-4952-b42f-809cbc686cff.txt",
+      "type": "application/json"
+    }
+  ],
+  "description": "Ordered Testcase Execution",
+  "labels": []
+}

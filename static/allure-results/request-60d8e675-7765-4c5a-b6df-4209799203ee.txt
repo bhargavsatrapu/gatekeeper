@@ -1,0 +1,13 @@
+{
+  "url": "http://localhost:3000/users/me",
+  "method": "PUT",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDgwOWNmLThmNGEtNDJmZC04ZjVjLTNlZWU4YmViMThiNyIsImVtYWlsIjoibmV3X3Bvc2l0aXZlX3VzZXJfNTU1QGV4YW1wbGUuY29tIiwiaWF0IjoxNzYwMTE4MDQ2LCJleHAiOjE3NjAxMjE2NDZ9.YxFlnYq4ZyHuH2XayTbLKuXx_NM3epap6JeKdbFaRbY"
+  },
+  "query_params": {},
+  "payload": {
+    "username": "updated_user_profile"
+  },
+  "test_description": "Update current user profile username with valid token"
+}
