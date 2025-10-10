@@ -32,6 +32,20 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 # Import console logging system
 from console_logger import get_console_logs, clear_console, log_to_console
 
+# Import AI reports service
+from sat_core.ai_reports_service import generate_ai_report
+
+def serialize_for_json(obj):
+    """Recursively serialize objects for JSON, converting datetime to strings"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        return {key: serialize_for_json(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [serialize_for_json(item) for item in obj]
+    else:
+        return obj
+
 
 @app.get("/")
 def home(request: Request, msg: str | None = None, show_view_btn: str | None = None):
@@ -213,6 +227,79 @@ def get_testcases():
         return {"testcases": testcases}
     except Exception as e:
         return {"error": str(e), "testcases": {}}
+
+
+# AI Reports API Endpoints
+@app.get("/api/ai-reports/analysis")
+async def get_ai_analysis():
+    """Get AI analysis of execution results"""
+    try:
+        log_to_console("Generating AI analysis for latest execution results", "info")
+        analysis_result = generate_ai_report()
+        log_to_console("AI analysis completed successfully", "success")
+        
+        # Ensure the result is JSON serializable
+        serialized_result = serialize_for_json(analysis_result)
+        return JSONResponse(content=serialized_result)
+    except Exception as e:
+        log_to_console(f"Error generating AI analysis: {str(e)}", "error")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to generate AI analysis: {str(e)}"}
+        )
+
+
+@app.post("/api/ai-reports/regenerate")
+async def regenerate_ai_analysis(request: Request):
+    """Regenerate AI analysis with fresh data"""
+    try:
+        log_to_console("Regenerating AI analysis with fresh data", "info")
+        analysis_result = generate_ai_report()
+        log_to_console("AI analysis regenerated successfully", "success")
+        
+        # Ensure the result is JSON serializable
+        serialized_result = serialize_for_json(analysis_result)
+        return JSONResponse(content=serialized_result)
+    except Exception as e:
+        log_to_console(f"Error regenerating AI analysis: {str(e)}", "error")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to regenerate AI analysis: {str(e)}"}
+        )
+
+
+@app.get("/api/ai-reports/endpoint-stability")
+async def get_endpoint_stability():
+    """Get endpoint stability analysis"""
+    try:
+        analysis_result = generate_ai_report()
+        endpoint_stability = analysis_result.get("endpoint_stability", [])
+        
+        # Ensure the result is JSON serializable
+        serialized_result = serialize_for_json({"endpoint_stability": endpoint_stability})
+        return JSONResponse(content=serialized_result)
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get endpoint stability: {str(e)}"}
+        )
+
+
+@app.get("/api/ai-reports/schema-issues")
+async def get_schema_issues():
+    """Get schema validation issues"""
+    try:
+        analysis_result = generate_ai_report()
+        schema_issues = analysis_result.get("schema_issues", [])
+        
+        # Ensure the result is JSON serializable
+        serialized_result = serialize_for_json({"schema_issues": schema_issues})
+        return JSONResponse(content=serialized_result)
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get schema issues: {str(e)}"}
+        )
 
 
 if __name__ == "__main__":

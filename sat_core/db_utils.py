@@ -259,7 +259,18 @@ class DatabaseUtils:
                 # Parse JSONB columns back to dictionaries
                 for jsonb_col in ['input_headers', 'input_payload', 'expected_schema', 'actual_data']:
                     if result_dict[jsonb_col]:
-                        result_dict[jsonb_col] = json.loads(result_dict[jsonb_col])
+                        # Check if it's already a dict (from psycopg2 JSONB handling)
+                        if isinstance(result_dict[jsonb_col], dict):
+                            # Already a dictionary, no need to parse
+                            continue
+                        elif isinstance(result_dict[jsonb_col], str):
+                            # It's a JSON string, parse it
+                            try:
+                                result_dict[jsonb_col] = json.loads(result_dict[jsonb_col])
+                            except (json.JSONDecodeError, TypeError):
+                                # If parsing fails, keep the original value
+                                logger.warning(f"Failed to parse JSONB column {jsonb_col}: {result_dict[jsonb_col]}")
+                                continue
                 result_list.append(result_dict)
             
             logger.info(f"Retrieved {len(result_list)} execution results")

@@ -36,7 +36,7 @@
       <div class="endpoints-controls">
         <div class="search-input-wrapper">
           <i class="fas fa-search"></i>
-          <input type="text" id="endpoint-search" placeholder="Search endpoints..." onkeyup="filterEndpoints()">
+        <input type="text" id="endpoint-search" placeholder="Search endpoints..." onkeyup="filterEndpoints()">
         </div>
         <button onclick="clearEndpoints()">
           <i class="fas fa-times"></i> Clear View
@@ -75,7 +75,7 @@
       <div class="testcases-controls">
         <div class="search-input-wrapper">
           <i class="fas fa-search"></i>
-          <input type="text" id="testcase-search" placeholder="Search test cases..." onkeyup="filterTestcases()">
+        <input type="text" id="testcase-search" placeholder="Search test cases..." onkeyup="filterTestcases()">
         </div>
         <select id="endpoint-filter" onchange="filterByEndpoint()">
           <option value="">All Endpoints</option>
@@ -197,6 +197,9 @@
       <button onclick="toggleAutoScroll()">
         <i class="fas fa-arrows-alt-v"></i> Auto Scroll: <span id="auto-scroll-status">ON</span>
       </button>
+      <div id="console-status" class="console-status inactive">
+        <i class="fas fa-circle" style="color: #6b7280;"></i> Paused
+      </div>
     </div>
     <div id="console-output" class="console-output">
       <div class="console-line info">
@@ -210,6 +213,224 @@
     <div class="info-card">
       <i class="fas fa-info-circle"></i>
       <p>Success and error messages appear here after actions. The top bar notice also shows success messages.</p>
+    </div>
+  </section>
+
+  <section id="tab-ai-reports" class="tab">
+    <h2><i class="fas fa-robot"></i> AI Reports</h2>
+    <div class="info-card">
+      <i class="fas fa-info-circle"></i>
+      <p>AI-powered analysis of your test execution results with insights, recommendations, and detailed reports.</p>
+    </div>
+    
+    <!-- AI Reports Dashboard -->
+    <div id="ai-reports-dashboard" class="ai-reports-dashboard">
+      
+      <!-- Controls -->
+      <div class="reports-controls">
+        <div class="analysis-info">
+          <i class="fas fa-info-circle"></i>
+          <span>Analyzing latest execution results from the database</span>
+        </div>
+        <div class="action-buttons">
+          <button id="generate-analysis-btn" onclick="generateAIAnalysis()">
+            <i class="fas fa-robot"></i> Generate Analysis
+          </button>
+          <button id="regenerate-analysis-btn" onclick="regenerateAIAnalysis()" style="display: none;">
+            <i class="fas fa-sync-alt"></i> Regenerate Analysis
+          </button>
+          <button id="export-report-btn" onclick="exportReport()" style="display: none;">
+            <i class="fas fa-download"></i> Export Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="ai-analysis-loader" class="ai-analysis-loader" style="display: none;">
+        <div class="loader-content">
+          <div class="ai-loader">
+            <div class="brain-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="loading-rings">
+              <div class="ring"></div>
+              <div class="ring"></div>
+              <div class="ring"></div>
+            </div>
+          </div>
+          <h3>AI Analysis in Progress</h3>
+          <p>Analyzing test execution data and generating insights...</p>
+          <div class="analysis-steps">
+            <div class="step active">
+              <i class="fas fa-database"></i>
+              <span>Fetching execution data</span>
+            </div>
+            <div class="step">
+              <i class="fas fa-chart-bar"></i>
+              <span>Calculating metrics</span>
+            </div>
+            <div class="step">
+              <i class="fas fa-robot"></i>
+              <span>AI analysis</span>
+            </div>
+            <div class="step">
+              <i class="fas fa-lightbulb"></i>
+              <span>Generating insights</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Metrics -->
+      <div id="summary-metrics" class="summary-metrics" style="display: none;">
+        <div class="metric-card">
+          <div class="metric-icon">
+            <i class="fas fa-list-check"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="total-tests">0</div>
+            <div class="metric-label">Total Tests</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon success">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="passed-tests">0</div>
+            <div class="metric-label">Passed</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon error">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="failed-tests">0</div>
+            <div class="metric-label">Failed</div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon info">
+            <i class="fas fa-percentage"></i>
+          </div>
+          <div class="metric-content">
+            <div class="metric-value" id="pass-rate">0%</div>
+            <div class="metric-label">Pass Rate</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div id="charts-section" class="charts-section" style="display: none;">
+        <div class="chart-container">
+          <h3><i class="fas fa-chart-pie"></i> Test Results Distribution</h3>
+          <div id="pass-fail-chart" class="chart"></div>
+        </div>
+      </div>
+
+      <!-- Failed Tests Details -->
+      <div id="failed-tests-details" class="failed-tests-details" style="display: none;">
+        <h3><i class="fas fa-exclamation-triangle"></i> Failed Tests Details</h3>
+        <div class="failed-tests-summary">
+          <div class="summary-stats">
+            <div class="stat-item">
+              <span class="stat-label">Total Failed Tests:</span>
+              <span class="stat-value" id="total-failed-count">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Most Common Error:</span>
+              <span class="stat-value" id="most-common-error">None</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Failure Rate:</span>
+              <span class="stat-value" id="overall-failure-rate">0%</span>
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="failed-tests-table">
+            <thead>
+              <tr>
+                <th>Test Name</th>
+                <th>Endpoint</th>
+                <th>Method</th>
+                <th>Expected Status</th>
+                <th>Actual Status</th>
+                <th>Error Type</th>
+                <th>Failure Reason</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="failed-tests-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Endpoint Stability Table -->
+      <div id="endpoint-stability" class="endpoint-stability" style="display: none;">
+        <h3><i class="fas fa-shield-alt"></i> Endpoint Stability Analysis</h3>
+        <div class="table-container">
+          <table id="stability-table">
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Total Tests</th>
+                <th>Failed Tests</th>
+                <th>Failure Rate</th>
+                <th>Priority</th>
+                <th>Common Issues</th>
+              </tr>
+            </thead>
+            <tbody id="stability-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Schema Issues Table -->
+      <div id="schema-issues" class="schema-issues" style="display: none;">
+        <h3><i class="fas fa-code"></i> Schema Validation Issues</h3>
+        <div class="table-container">
+          <table id="schema-table">
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Issue Type</th>
+                <th>Field Name</th>
+                <th>Expected Type</th>
+                <th>Actual Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="schema-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div id="ai-insights" class="ai-insights" style="display: none;">
+        <div class="insights-header">
+          <h3><i class="fas fa-lightbulb"></i> AI Insights & Recommendations</h3>
+        </div>
+        <div class="insights-content">
+          <div class="narrative-card">
+            <h4><i class="fas fa-comment-dots"></i> Analysis Summary</h4>
+            <p id="ai-narrative">Loading analysis...</p>
+          </div>
+          <div class="recommendations-card">
+            <h4><i class="fas fa-tasks"></i> Recommendations</h4>
+            <ul id="ai-recommendations"></ul>
+          </div>
+          <div class="fixes-card">
+            <h4><i class="fas fa-wrench"></i> Suggested Fixes</h4>
+            <div id="ai-suggested-fixes"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 </div>

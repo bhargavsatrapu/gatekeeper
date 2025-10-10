@@ -11,12 +11,21 @@ from sat_core.ai_client import get_gemini_client
 from sat_core.plan_execution_order import plan_execution_order
 from sat_core.db_utils import create_execution_results_table,insert_execution_result
 
+# Add parent directory to path to import console logger
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from console_logger import log_to_console
+
 
 
 def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, Any]] | None = None) -> Dict[str, Any]:
     if execution_logs is None:
         execution_logs = {}
 
+    log_to_console("🚀 Starting Positive Flow Execution", "info")
+    log_to_console(f"📋 Processing {len(execution_order)} test cases", "info")
+    
     BASE_URL_LOCAL = BASE_URL
     client = get_gemini_client()
     create_execution_results_table()
@@ -81,6 +90,7 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
             "test_description": first_row["test_name"],
         }
 
+        log_to_console(f"🔄 Executing test case: {execution_case['test_description']}", "test")
         result = call_api(
             execution_case["method"],
             execution_case["url"],
@@ -91,6 +101,7 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
         )
         print("results are :", result)
         execution_logs[execution_case["url"]] = {"request": execution_case, "response": result}
+        log_to_console(f"✅ Completed test case: {execution_case['test_description']}", "success")
         time.sleep(1)
         try:
             insert_execution_result(
@@ -107,6 +118,7 @@ def run_positive_flow(execution_order: Any, execution_logs: Dict[str, Dict[str, 
         except:
             pass
 
+    log_to_console("🎉 Positive Flow Execution Completed Successfully", "success")
     return execution_logs
 
 

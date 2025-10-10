@@ -30,16 +30,35 @@ let autoScroll = true;
 let lastLogCount = 0;
 let executionStartTime = null;
 let progressInterval = null;
+let isConsoleActive = false;
 
 function startConsolePolling() {
   if (consolePollingInterval) return;
-  consolePollingInterval = setInterval(fetchConsoleLogs, 1000);
+  isConsoleActive = true;
+  updateConsoleStatus();
+  // Start with faster polling for immediate updates
+  consolePollingInterval = setInterval(fetchConsoleLogs, 500);
 }
 
 function stopConsolePolling() {
   if (consolePollingInterval) {
     clearInterval(consolePollingInterval);
     consolePollingInterval = null;
+  }
+  isConsoleActive = false;
+  updateConsoleStatus();
+}
+
+function updateConsoleStatus() {
+  const statusIndicator = document.getElementById('console-status');
+  if (statusIndicator) {
+    if (isConsoleActive) {
+      statusIndicator.innerHTML = '<i class="fas fa-circle" style="color: #10b981; animation: pulse 2s infinite;"></i> Live';
+      statusIndicator.className = 'console-status active';
+    } else {
+      statusIndicator.innerHTML = '<i class="fas fa-circle" style="color: #6b7280;"></i> Paused';
+      statusIndicator.className = 'console-status inactive';
+    }
   }
 }
 
@@ -50,6 +69,14 @@ function fetchConsoleLogs() {
       if (data.logs && data.logs.length > lastLogCount) {
         updateConsole(data.logs);
         lastLogCount = data.logs.length;
+        
+        // Adjust polling frequency based on activity
+        if (consolePollingInterval) {
+          clearInterval(consolePollingInterval);
+          // If we're getting frequent updates, poll faster
+          const interval = data.logs.length > lastLogCount + 5 ? 300 : 500;
+          consolePollingInterval = setInterval(fetchConsoleLogs, interval);
+        }
       }
     })
     .catch(error => console.error('Error fetching logs:', error));
@@ -62,6 +89,9 @@ function updateConsole(logs) {
   // Only add new logs to avoid rebuilding everything
   if (logs.length > currentLogCount) {
     const newLogs = logs.slice(currentLogCount);
+    
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
     
     newLogs.forEach((log, index) => {
       const line = document.createElement('div');
@@ -95,21 +125,29 @@ function updateConsole(logs) {
       line.innerHTML = `<span class="log-timestamp">[${log.timestamp}]</span> <span class="log-icon">${icon}</span> <span class="log-message">${log.message}</span>`;
       line.style.opacity = '0';
       line.style.transform = 'translateY(10px)';
-      consoleOutput.appendChild(line);
-      
-      // Animate in
-      setTimeout(() => {
-        line.style.transition = 'all 0.3s ease';
-        line.style.opacity = '1';
-        line.style.transform = 'translateY(0)';
-      }, index * 30);
+      fragment.appendChild(line);
     });
+    
+    // Append all new logs at once for better performance
+    consoleOutput.appendChild(fragment);
+    
+    // Animate new logs in
+    const newElements = consoleOutput.children;
+    for (let i = currentLogCount; i < newElements.length; i++) {
+      const element = newElements[i];
+      setTimeout(() => {
+        element.style.transition = 'all 0.3s ease';
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+      }, (i - currentLogCount) * 20);
+    }
   }
   
+  // Optimize scrolling for large log volumes
   if (autoScroll) {
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       consoleOutput.scrollTop = consoleOutput.scrollHeight;
-    }, 100);
+    });
   }
 }
 
@@ -1060,6 +1098,545 @@ function clearIndividualEndpoints() {
   document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
     checkbox.checked = false;
   });
+}
+
+// AI Reports Functions
+let currentAnalysisData = null;
+
+function generateAIAnalysis() {
+  const loader = document.getElementById('ai-analysis-loader');
+  const generateBtn = document.getElementById('generate-analysis-btn');
+  
+  // Show loader and disable button
+  loader.style.display = 'block';
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+  
+  // Hide previous results
+  hideAnalysisResults();
+  
+  // Start step animation
+  startAnalysisStepAnimation();
+  
+  // Fetch AI analysis
+  fetch('/api/ai-reports/analysis')
+    .then(response => response.json())
+    .then(data => {
+      currentAnalysisData = data;
+      displayAnalysisResults(data);
+      hideLoader();
+      showActionButtons();
+    })
+    .catch(error => {
+      console.error('Error generating AI analysis:', error);
+      hideLoader();
+      showError('Failed to generate AI analysis. Please try again.');
+    });
+}
+
+function regenerateAIAnalysis() {
+  const loader = document.getElementById('ai-analysis-loader');
+  const regenerateBtn = document.getElementById('regenerate-analysis-btn');
+  
+  // Show loader and disable button
+  loader.style.display = 'block';
+  regenerateBtn.disabled = true;
+  regenerateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Regenerating...';
+  
+  // Start step animation
+  startAnalysisStepAnimation();
+  
+  // Fetch regenerated analysis
+  fetch('/api/ai-reports/regenerate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({})
+  })
+    .then(response => response.json())
+    .then(data => {
+      currentAnalysisData = data;
+      displayAnalysisResults(data);
+      hideLoader();
+      showActionButtons();
+    })
+    .catch(error => {
+      console.error('Error regenerating AI analysis:', error);
+      hideLoader();
+      showError('Failed to regenerate AI analysis. Please try again.');
+    });
+}
+
+function startAnalysisStepAnimation() {
+  const steps = document.querySelectorAll('.analysis-steps .step');
+  let currentStep = 0;
+  
+  // Reset all steps
+  steps.forEach((step, index) => {
+    step.classList.remove('active');
+    if (index === 0) {
+      step.classList.add('active');
+    }
+  });
+  
+  // Animate through steps
+  const stepInterval = setInterval(() => {
+    if (currentStep < steps.length - 1) {
+      steps[currentStep].classList.remove('active');
+      currentStep++;
+      steps[currentStep].classList.add('active');
+    } else {
+      clearInterval(stepInterval);
+    }
+  }, 2000); // Change step every 2 seconds
+}
+
+function hideLoader() {
+  const loader = document.getElementById('ai-analysis-loader');
+  const generateBtn = document.getElementById('generate-analysis-btn');
+  const regenerateBtn = document.getElementById('regenerate-analysis-btn');
+  
+  loader.style.display = 'none';
+  generateBtn.disabled = false;
+  generateBtn.innerHTML = '<i class="fas fa-robot"></i> Generate Analysis';
+  regenerateBtn.disabled = false;
+  regenerateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Regenerate Analysis';
+}
+
+function hideAnalysisResults() {
+  const sections = [
+    'summary-metrics',
+    'charts-section', 
+    'failed-tests-details',
+    'endpoint-stability',
+    'schema-issues',
+    'ai-insights'
+  ];
+  
+  sections.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.style.display = 'none';
+    }
+  });
+}
+
+function displayAnalysisResults(data) {
+  // Display summary metrics
+  displaySummaryMetrics(data.summary_metrics);
+  
+  // Display charts
+  displayCharts(data);
+  
+  // Display AI insights
+  displayAIInsights(data.ai_insights);
+  
+  // Display endpoint stability
+  displayEndpointStability(data.endpoint_stability);
+  
+  // Display schema issues
+  displaySchemaIssues(data.schema_issues);
+  
+  // Display failed tests details
+  displayFailedTestsDetails(data.failed_tests_details);
+  
+  // Show all sections
+  showAnalysisResults();
+}
+
+function displaySummaryMetrics(metrics) {
+  document.getElementById('total-tests').textContent = metrics.total_tests || 0;
+  document.getElementById('passed-tests').textContent = metrics.passed_tests || 0;
+  document.getElementById('failed-tests').textContent = metrics.failed_tests || 0;
+  document.getElementById('pass-rate').textContent = `${metrics.pass_rate || 0}%`;
+}
+
+function displayCharts(data) {
+  // Simple chart placeholder - in a real implementation, you'd use Chart.js or similar
+  const passFailChart = document.getElementById('pass-fail-chart');
+  
+  // Pass/Fail Chart - Create a single pie chart
+  const totalTests = data.summary_metrics.total_tests || 0;
+  const passedTests = data.summary_metrics.passed_tests || 0;
+  const failedTests = data.summary_metrics.failed_tests || 0;
+  
+  if (totalTests > 0) {
+    const passPercentage = Math.round((passedTests / totalTests) * 100);
+    const failPercentage = Math.round((failedTests / totalTests) * 100);
+    
+    // Create SVG pie chart using paths
+    const radius = 80;
+    const centerX = 90;
+    const centerY = 90;
+    
+    // Calculate angles for pie segments
+    const passAngle = (passPercentage / 100) * 360;
+    const failAngle = (failPercentage / 100) * 360;
+    
+    // Helper function to create arc path
+    function createArcPath(startAngle, endAngle) {
+      const start = polarToCartesian(centerX, centerY, radius, endAngle);
+      const end = polarToCartesian(centerX, centerY, radius, startAngle);
+      const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+      return `M ${centerX} ${centerY} L ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y} Z`;
+    }
+    
+    function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+      const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+      };
+    }
+    
+    // Create paths for each segment
+    const passPath = createArcPath(0, passAngle);
+    const failPath = createArcPath(passAngle, passAngle + failAngle);
+    
+    passFailChart.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: center; height: 100%; gap: 40px;">
+        <div style="position: relative; width: 180px; height: 180px;">
+          <svg width="180" height="180">
+            <!-- Passed tests segment -->
+            <path d="${passPath}" fill="url(#passGradient)" stroke="#fff" stroke-width="2"/>
+            <!-- Failed tests segment -->
+            <path d="${failPath}" fill="url(#failGradient)" stroke="#fff" stroke-width="2"/>
+            <!-- Gradients -->
+            <defs>
+              <linearGradient id="passGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#34d399;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="failGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#f87171;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <!-- Center text -->
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #1f2937;">${totalTests}</div>
+            <div style="font-size: 12px; color: #6b7280;">Total Tests</div>
+          </div>
+        </div>
+        <!-- Legend -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #34d399, #10b981);"></div>
+            <div>
+              <div style="font-weight: 600; color: #1f2937;">Passed</div>
+              <div style="font-size: 14px; color: #6b7280;">${passedTests} tests (${passPercentage}%)</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #f87171, #ef4444);"></div>
+            <div>
+              <div style="font-weight: 600; color: #1f2937;">Failed</div>
+              <div style="font-size: 14px; color: #6b7280;">${failedTests} tests (${failPercentage}%)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    passFailChart.innerHTML = '<div>No test data available</div>';
+  }
+  
+}
+
+function displayAIInsights(insights) {
+  document.getElementById('ai-narrative').textContent = insights.narrative || 'No analysis available';
+  
+  const recommendationsList = document.getElementById('ai-recommendations');
+  recommendationsList.innerHTML = '';
+  
+  if (insights.recommendations && insights.recommendations.length > 0) {
+    insights.recommendations.forEach(recommendation => {
+      const li = document.createElement('li');
+      li.textContent = recommendation;
+      recommendationsList.appendChild(li);
+    });
+  } else {
+    const li = document.createElement('li');
+    li.textContent = 'No specific recommendations available';
+    recommendationsList.appendChild(li);
+  }
+  
+  const fixesContainer = document.getElementById('ai-suggested-fixes');
+  fixesContainer.innerHTML = '';
+  
+  if (insights.suggested_fixes && insights.suggested_fixes.length > 0) {
+    insights.suggested_fixes.forEach(fix => {
+      const fixDiv = document.createElement('div');
+      fixDiv.style.cssText = 'padding: 16px; margin-bottom: 12px; background: rgba(255,255,255,0.5); border-radius: 12px; border-left: 4px solid #667eea;';
+      fixDiv.innerHTML = `
+        <div style="font-weight: 600; color: #374151; margin-bottom: 8px;">${fix.issue || 'Issue'}</div>
+        <div style="color: #6b7280; margin-bottom: 8px;">${fix.fix || 'Fix'}</div>
+        <span class="priority-tag priority-${(fix.priority || 'medium').toLowerCase()}" style="font-size: 10px;">${fix.priority || 'Medium'}</span>
+      `;
+      fixesContainer.appendChild(fixDiv);
+    });
+  } else {
+    fixesContainer.innerHTML = '<div style="color: #6b7280; text-align: center; padding: 20px;">No suggested fixes available</div>';
+  }
+}
+
+function displayEndpointStability(endpoints) {
+  const tbody = document.getElementById('stability-table-body');
+  tbody.innerHTML = '';
+  
+  if (endpoints && endpoints.length > 0) {
+    endpoints.forEach(endpoint => {
+      const row = document.createElement('tr');
+      
+      // Format endpoint URL for better readability
+      const endpointUrl = endpoint.endpoint || 'Unknown';
+      const formattedUrl = endpointUrl.length > 50 ? 
+        endpointUrl.substring(0, 47) + '...' : endpointUrl;
+      
+      // Get failure rate styling class
+      const failureRate = endpoint.failure_rate || 0;
+      let failureRateClass = 'failure-rate-low';
+      if (failureRate > 30) {
+        failureRateClass = 'failure-rate-high';
+      } else if (failureRate > 10) {
+        failureRateClass = 'failure-rate-medium';
+      }
+      
+      // Format common issues for better display
+      const commonIssues = endpoint.common_issues || [];
+      const formattedIssues = commonIssues.length > 0 ? 
+        commonIssues.slice(0, 2).join(', ') + (commonIssues.length > 2 ? '...' : '') : 
+        'No issues detected';
+      
+      row.innerHTML = `
+        <td title="${endpointUrl}">${formattedUrl}</td>
+        <td><span style="background: #e0f2fe; color: #0277bd; padding: 4px 8px; border-radius: 6px; font-weight: 600;">${endpoint.total_tests || 0}</span></td>
+        <td><span style="background: #ffebee; color: #c62828; padding: 4px 8px; border-radius: 6px; font-weight: 600;">${endpoint.failed_tests || 0}</span></td>
+        <td><span class="${failureRateClass}">${failureRate}%</span></td>
+        <td><span class="priority-tag priority-${(endpoint.priority || 'minor').toLowerCase()}">${endpoint.priority || 'Minor'}</span></td>
+        <td title="${commonIssues.join(', ')}">${formattedIssues}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } else {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td colspan="6" style="text-align: center; color: #6b7280; padding: 40px; font-style: italic;">
+        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+        No endpoint stability data available
+      </td>
+    `;
+    tbody.appendChild(row);
+  }
+}
+
+function displaySchemaIssues(issues) {
+  const tbody = document.getElementById('schema-table-body');
+  tbody.innerHTML = '';
+  
+  if (issues && issues.length > 0) {
+    issues.forEach(issue => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td style="font-family: monospace; font-weight: 500;">${issue.endpoint || 'Unknown'}</td>
+        <td>${issue.issue_type || 'Unknown'}</td>
+        <td>${issue.field_name || 'N/A'}</td>
+        <td>${issue.expected_type || 'N/A'}</td>
+        <td>${issue.actual_type || 'N/A'}</td>
+        <td>${issue.description || 'No description'}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } else {
+    const row = document.createElement('tr');
+    row.innerHTML = '<td colspan="6" style="text-align: center; color: #6b7280; padding: 20px;">No schema issues found</td>';
+    tbody.appendChild(row);
+  }
+}
+
+function displayFailedTestsDetails(failedTestsData) {
+  if (!failedTestsData) return;
+  
+  // Update summary stats
+  document.getElementById('total-failed-count').textContent = failedTestsData.total_failed_count || 0;
+  document.getElementById('most-common-error').textContent = failedTestsData.most_common_error || 'None';
+  
+  // Calculate overall failure rate
+  const totalTests = parseInt(document.getElementById('total-tests').textContent) || 0;
+  const failedCount = failedTestsData.total_failed_count || 0;
+  const failureRate = totalTests > 0 ? Math.round((failedCount / totalTests) * 100) : 0;
+  document.getElementById('overall-failure-rate').textContent = `${failureRate}%`;
+  
+  // Display failed tests table
+  const tbody = document.getElementById('failed-tests-table-body');
+  tbody.innerHTML = '';
+  
+  if (failedTestsData.failed_tests && failedTestsData.failed_tests.length > 0) {
+    failedTestsData.failed_tests.forEach(test => {
+      const row = document.createElement('tr');
+      
+      // Format timestamp
+      const timestamp = test.timestamp ? new Date(test.timestamp).toLocaleString() : 'Unknown';
+      
+      // Get error type class
+      const errorTypeClass = getErrorTypeClass(test.error_type);
+      
+      // Format failure reason for better display
+      const failureReason = test.failure_reason || 'No reason provided';
+      const formattedReason = formatFailureReason(failureReason);
+      
+      row.innerHTML = `
+        <td style="font-weight: 500;">${test.test_name || 'Unknown'}</td>
+        <td style="font-family: monospace; font-size: 12px;">${test.endpoint || 'Unknown'}</td>
+        <td><span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${test.method || 'Unknown'}</span></td>
+        <td><span class="status-expected">${test.expected_status || 0}</span></td>
+        <td><span class="status-actual">${test.actual_status || 0}</span></td>
+        <td><span class="${errorTypeClass}">${test.error_type || 'Unknown'}</span></td>
+        <td class="failure-reason-cell">${formattedReason}</td>
+        <td class="timestamp">${timestamp}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } else {
+    const row = document.createElement('tr');
+    row.innerHTML = '<td colspan="8" style="text-align: center; color: #6b7280; padding: 20px;">No failed tests found</td>';
+    tbody.appendChild(row);
+  }
+}
+
+function getErrorTypeClass(errorType) {
+  switch (errorType.toLowerCase()) {
+    case 'authentication':
+      return 'error-type-auth';
+    case 'server error':
+      return 'error-type-server';
+    case 'validation':
+      return 'error-type-validation';
+    case 'timeout':
+      return 'error-type-timeout';
+    default:
+      return 'error-type-other';
+  }
+}
+
+function formatFailureReason(reason) {
+  if (!reason || reason === 'No reason provided') {
+    return '<span style="color: #6b7280; font-style: italic;">No detailed reason available</span>';
+  }
+  
+  // Split the reason into parts for better formatting
+  const parts = reason.split(': ');
+  if (parts.length >= 2) {
+    const title = parts[0]; // The emoji and title part
+    const description = parts.slice(1).join(': '); // The rest of the description
+    
+    return `
+      <div class="failure-reason-content">
+        <div class="failure-reason-title">${title}</div>
+        <div class="failure-reason-description">${description}</div>
+      </div>
+    `;
+  }
+  
+  // Fallback for simple reasons
+  return `<div class="failure-reason-simple">${reason}</div>`;
+}
+
+function showAnalysisResults() {
+  const sections = [
+    'summary-metrics',
+    'charts-section', 
+    'failed-tests-details',
+    'endpoint-stability',
+    'schema-issues',
+    'ai-insights'
+  ];
+  
+  sections.forEach((sectionId, index) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      setTimeout(() => {
+        section.style.display = 'block';
+        section.style.animation = 'fadeIn 0.5s ease';
+      }, index * 200); // Stagger the animations
+    }
+  });
+}
+
+function showActionButtons() {
+  document.getElementById('regenerate-analysis-btn').style.display = 'inline-flex';
+  document.getElementById('export-report-btn').style.display = 'inline-flex';
+}
+
+function exportReport() {
+  if (!currentAnalysisData) {
+    showError('No analysis data available to export');
+    return;
+  }
+  
+  // Create a simple text report
+  const report = generateTextReport(currentAnalysisData);
+  
+  // Download as text file
+  const blob = new Blob([report], { type: 'text/plain' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ai-analysis-report-${new Date().toISOString().split('T')[0]}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
+function generateTextReport(data) {
+  const metrics = data.summary_metrics || {};
+  const insights = data.ai_insights || {};
+  
+  return `
+AI Analysis Report
+Generated: ${new Date().toLocaleString()}
+
+SUMMARY METRICS
+===============
+Total Tests: ${metrics.total_tests || 0}
+Passed Tests: ${metrics.passed_tests || 0}
+Failed Tests: ${metrics.failed_tests || 0}
+Pass Rate: ${metrics.pass_rate || 0}%
+
+AI INSIGHTS
+===========
+${insights.narrative || 'No analysis available'}
+
+RECOMMENDATIONS
+===============
+${(insights.recommendations || []).map((rec, i) => `${i + 1}. ${rec}`).join('\n')}
+
+SUGGESTED FIXES
+===============
+${(insights.suggested_fixes || []).map((fix, i) => `${i + 1}. ${fix.issue || 'Issue'}: ${fix.fix || 'Fix'} (Priority: ${fix.priority || 'Medium'})`).join('\n')}
+
+ENDPOINT STABILITY
+==================
+${(data.endpoint_stability || []).map(ep => `${ep.endpoint}: ${ep.failure_rate}% failure rate (${ep.priority})`).join('\n')}
+
+SCHEMA ISSUES
+=============
+${(data.schema_issues || []).map(issue => `${issue.endpoint}: ${issue.issue_type} - ${issue.field_name} (Expected: ${issue.expected_type}, Actual: ${issue.actual_type})`).join('\n')}
+  `.trim();
+}
+
+function showError(message) {
+  const notice = document.createElement('div');
+  notice.className = 'notice error';
+  notice.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+  document.querySelector('h1').insertAdjacentElement('afterend', notice);
+  
+  setTimeout(() => {
+    notice.remove();
+  }, 5000);
 }
 
 
