@@ -208,10 +208,15 @@
     </div>
   </section>
 
+  <!-- Allure Reports Section -->
   <section id="tab-reports" class="tab">
-    <h2>Allure Reports</h2>
+    <h2 class="allure-title">
+      Allure Reports
+      <button class="load-btn" onclick="loadAllureReport()">
+        <i class="fas fa-sync-alt"></i> Load Latest Report
+      </button>
+    </h2>
     <iframe id="allure-frame" src="" width="100%" height="600px" style="border:none;"></iframe>
-    <button onclick="loadAllureReport()">Load Latest Report</button>
   </section>
 
   <section id="tab-results" class="tab">
