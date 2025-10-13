@@ -48,11 +48,12 @@ def serialize_for_json(obj):
 
 
 @app.get("/")
-def home(request: Request, msg: str | None = None, show_view_btn: str | None = None):
+def home(request: Request, msg: str | None = None, show_view_btn: str | None = None, tab: str | None = None):
     return templates.TemplateResponse("index.html", {
         "request": request, 
         "msg": msg,
-        "show_view_btn": show_view_btn == "true"
+        "show_view_btn": show_view_btn == "true",
+        "active_tab": tab
     })
 
 
@@ -73,7 +74,7 @@ async def upload_swagger(request: Request, swagger_file: UploadFile = File(...))
 @app.post("/generate-testcases")
 def generate_testcases():
     __generate_testcases_for_every_endpoint()
-    return RedirectResponse(url="/?msg=Testcases%20generated%20successfully&show_view_btn=true", status_code=303)
+    return RedirectResponse(url="/?msg=Testcases%20generated%20successfully&show_view_btn=true&tab=generate", status_code=303)
 
 
 @app.post("/run-positive")

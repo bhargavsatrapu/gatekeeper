@@ -8,7 +8,7 @@
 {% endif %}
 
 <div class="tabs">
-  <section id="tab-upload" class="tab active">
+  <section id="tab-upload" class="tab {% if not active_tab or active_tab == 'upload' %}active{% endif %}">
     <h2><i class="fas fa-upload"></i> Swagger Upload</h2>
     <div class="upload-section">
       <form action="/upload-swagger" method="post" enctype="multipart/form-data">
@@ -48,7 +48,7 @@
     </div>
   </section>
 
-  <section id="tab-generate" class="tab">
+  <section id="tab-generate" class="tab {% if active_tab == 'generate' %}active{% endif %}">
     <h2><i class="fas fa-magic"></i> Generate Testcases</h2>
     <div class="generate-section">
       <div class="info-card">

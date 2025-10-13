@@ -430,6 +430,26 @@ function completeTestGeneration() {
 
 // Enhanced form submissions
 document.addEventListener('DOMContentLoaded', function() {
+  // Check for active tab parameter in URL and switch to it
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTab = urlParams.get('tab');
+  if (activeTab) {
+    const tabId = 'tab-' + activeTab;
+    const tabElement = document.getElementById(tabId);
+    if (tabElement) {
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.opacity = '0';
+      });
+      
+      // Add active class to the specified tab
+      setTimeout(() => {
+        tabElement.classList.add('active');
+        tabElement.style.opacity = '1';
+      }, 150);
+    }
+  }
   // Add loading to all form submissions
   const forms = document.querySelectorAll('form');
   forms.forEach(form => {
@@ -453,8 +473,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const hideLoading = showLoading(submitButton, executionType ? 'Running...' : 'Processing...');
         
-        // Auto-switch to console tab for execution
-        if (executionType) {
+        // Auto-switch to console tab for execution (but not for test generation)
+        if (executionType && executionType !== 'generate') {
           setTimeout(() => {
             selectTab({preventDefault: () => {}}, 'tab-console');
           }, 500);
