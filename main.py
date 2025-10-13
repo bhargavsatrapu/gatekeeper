@@ -158,6 +158,80 @@ async def run_individual_endpoints(request: Request):
 def api_get_console_logs():
     return {"logs": get_console_logs()}
 
+@app.get("/api/positive-apis")
+def get_positive_apis():
+    from sat_core.db_utils import DatabaseUtils
+    
+    positive_apis = []
+    
+    try:
+        db = DatabaseUtils()
+        connection = db.get_connection()
+        cursor = connection.cursor()
+        
+        # Get all endpoints from api_endpoints table
+        endpoints_query = "SELECT id, path, method, summary FROM api_endpoints"
+        cursor.execute(endpoints_query)
+        endpoints = cursor.fetchall()
+        
+        if not endpoints:
+            cursor.close()
+            connection.close()
+            return {"positive_apis": [], "message": "No endpoints found. Please generate test cases first."}
+        
+        # For each endpoint, try to find its corresponding test case table
+        for endpoint in endpoints:
+            endpoint_id, endpoint_path, method, description = endpoint
+            
+            # Construct the expected table name based on the pattern we saw
+            # Format: api_testcases_{path_with_underscores}_{method_lower}
+            # Remove leading slash and replace remaining slashes with underscores
+            clean_path = endpoint_path.lstrip('/').replace('/', '_')
+            table_name = f"api_testcases_{clean_path}_{method.lower()}"
+            
+            try:
+                # Check if the table exists and get the first row (positive test case)
+                query = f"SELECT * FROM {table_name} LIMIT 1"
+                cursor.execute(query)
+                result = cursor.fetchall()
+                
+                if result:
+                    # Get the first row
+                    first_row = result[0]
+                    
+                    # Get column names
+                    columns_query = f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}' ORDER BY ordinal_position"
+                    cursor.execute(columns_query)
+                    columns_result = cursor.fetchall()
+                    columns = [col[0] for col in columns_result]
+                    
+                    # Create a dictionary with column names and values
+                    api_data = {}
+                    for i, column in enumerate(columns):
+                        api_data[column] = first_row[i]
+                    
+                    # Add endpoint information
+                    api_data['endpoint_id'] = endpoint_id
+                    api_data['endpoint'] = endpoint_path
+                    api_data['method'] = method
+                    api_data['description'] = description
+                    api_data['table_name'] = table_name
+                    
+                    positive_apis.append(api_data)
+                    
+            except Exception as e:
+                print(f"Error fetching data from table {table_name}: {str(e)}")
+                continue
+        
+        cursor.close()
+        connection.close()
+                
+    except Exception as e:
+        print(f"Error in get_positive_apis: {str(e)}")
+        return {"error": str(e)}
+    
+    return {"positive_apis": positive_apis}
+
 @app.post("/api/clear-console")
 def api_clear_console():
     clear_console()
@@ -307,5 +381,3 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
-

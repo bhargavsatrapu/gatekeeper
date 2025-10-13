@@ -139,6 +139,12 @@
       <p>Run basic positive tests to verify that each endpoint is working correctly before extensive testing.</p>
     </div>
     
+    <form action="/run-positive" method="post">
+      <button type="submit" id="run-positive-btn">
+        <i class="fas fa-play"></i> Run Positive Flow
+      </button>
+    </form>
+    
     <div class="positive-controls">
       <button type="button" onclick="loadPositiveAPIs()" id="load-positive-btn">
         <i class="fas fa-download"></i> Load Positive APIs
@@ -154,12 +160,6 @@
         <!-- Positive test cases will be loaded here -->
       </div>
     </div>
-    
-    <form action="/run-positive" method="post">
-      <button type="submit" id="run-positive-btn">
-        <i class="fas fa-play"></i> Run Positive Flow
-      </button>
-    </form>
   </section>
 
   <section id="tab-all" class="tab">

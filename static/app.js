@@ -222,6 +222,94 @@ function updateNoticeMessage(status, message) {
   existingNotice.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
 }
 
+// Positive APIs functionality
+function loadPositiveAPIs() {
+  const loadBtn = document.getElementById('load-positive-btn');
+  const clearBtn = document.getElementById('clear-positive-btn');
+  const container = document.getElementById('positive-apis-container');
+  const grid = document.getElementById('positive-apis-grid');
+  
+  // Show loading state
+  loadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+  loadBtn.disabled = true;
+  
+  fetch('/api/positive-apis')
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error loading positive APIs: ' + data.error);
+        return;
+      }
+      
+      const positiveAPIs = data.positive_apis || [];
+      
+      if (positiveAPIs.length === 0) {
+        grid.innerHTML = '<div class="no-data">No positive test cases found. Please generate test cases first.</div>';
+      } else {
+        // Display positive APIs in list format
+        grid.innerHTML = `
+          <div class="positive-apis-list">
+            <div class="list-header">
+              <div class="header-item method-col">Method</div>
+              <div class="header-item url-col">URL</div>
+              <div class="header-item description-col">Test Description</div>
+              <div class="header-item status-col">Expected Status Code</div>
+            </div>
+            ${positiveAPIs.map(api => {
+              const method = api.method || 'GET';
+              const url = api.url || api.endpoint || 'N/A';
+              const status = api.expected_status || api.status || '200';
+              const description = api.test_name || api.description || 'No description';
+              
+              return `
+                <div class="list-item">
+                  <div class="list-cell method-col">
+                    <span class="method ${method.toLowerCase()}">${method}</span>
+                  </div>
+                  <div class="list-cell url-col">
+                    <code>${url}</code>
+                  </div>
+                  <div class="list-cell description-col">
+                    ${description}
+                  </div>
+                  <div class="list-cell status-col">
+                    <span class="status success">${status}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      
+      // Show container and buttons
+      container.style.display = 'block';
+      clearBtn.style.display = 'inline-block';
+      loadBtn.style.display = 'none';
+      
+    })
+    .catch(error => {
+      console.error('Error loading positive APIs:', error);
+      alert('Error loading positive APIs: ' + error.message);
+    })
+    .finally(() => {
+      // Reset button state
+      loadBtn.innerHTML = '<i class="fas fa-download"></i> Load Positive APIs';
+      loadBtn.disabled = false;
+    });
+}
+
+function clearPositiveAPIs() {
+  const loadBtn = document.getElementById('load-positive-btn');
+  const clearBtn = document.getElementById('clear-positive-btn');
+  const container = document.getElementById('positive-apis-container');
+  
+  // Hide container and buttons
+  container.style.display = 'none';
+  clearBtn.style.display = 'none';
+  loadBtn.style.display = 'inline-block';
+}
+
 // Enhanced loading functionality
 function showLoading(button, loadingText = 'Processing...') {
   const originalHTML = button.innerHTML;
