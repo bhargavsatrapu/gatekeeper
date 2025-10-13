@@ -91,7 +91,7 @@ def run_positive():
     thread = threading.Thread(target=run_positive_background, daemon=True)
     thread.start()
     
-    return RedirectResponse(url="/?msg=Positive%20flow%20execution%20started", status_code=303)
+    return RedirectResponse(url="/?msg=Positive%20flow%20execution%20started&tab=console", status_code=303)
 
 
 @app.post("/run-all-tests")
@@ -108,7 +108,7 @@ def run_all_tests():
     thread = threading.Thread(target=run_all_tests_background, daemon=True)
     thread.start()
     
-    return RedirectResponse(url="/?msg=All%20tests%20execution%20started", status_code=303)
+    return RedirectResponse(url="/?msg=All%20tests%20execution%20started&tab=console", status_code=303)
 
 
 @app.post("/run-individual-endpoints")

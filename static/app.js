@@ -68,6 +68,11 @@ function fetchConsoleLogs() {
     .then(data => {
       if (data.logs && data.logs.length > lastLogCount) {
         updateConsole(data.logs);
+        
+        // Check for execution completion messages
+        const newLogs = data.logs.slice(lastLogCount);
+        checkForExecutionCompletion(newLogs);
+        
         lastLogCount = data.logs.length;
         
         // Adjust polling frequency based on activity
@@ -172,6 +177,38 @@ function toggleAutoScroll() {
   const statusEl = document.getElementById('auto-scroll-status');
   statusEl.textContent = autoScroll ? 'ON' : 'OFF';
   statusEl.style.color = autoScroll ? '#34d399' : '#f87171';
+}
+
+function checkForExecutionCompletion(newLogs) {
+  // Check if any of the new logs indicate execution completion
+  newLogs.forEach(log => {
+    const message = log.message.toLowerCase();
+    
+    // Check for positive flow completion
+    if (message.includes('positive flow execution completed successfully')) {
+      updateNoticeMessage('success', 'Positive execution is completed');
+    } else if (message.includes('positive flow execution failed')) {
+      updateNoticeMessage('error', 'Positive execution failed');
+    }
+    
+    // Check for all tests completion
+    if (message.includes('all tests execution completed successfully')) {
+      updateNoticeMessage('success', 'All tests execution is completed');
+    } else if (message.includes('all tests execution failed')) {
+      updateNoticeMessage('error', 'All tests execution failed');
+    }
+  });
+}
+
+function updateNoticeMessage(status, message) {
+  // Find the existing notice element
+  const existingNotice = document.querySelector('.notice');
+  if (existingNotice) {
+    // Update the existing notice
+    existingNotice.className = `notice ${status}`;
+    const icon = status === 'success' ? 'check-circle' : 'exclamation-circle';
+    existingNotice.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+  }
 }
 
 // Enhanced loading functionality
@@ -447,6 +484,11 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => {
         tabElement.classList.add('active');
         tabElement.style.opacity = '1';
+        
+        // Start console polling if switching to console tab
+        if (activeTab === 'console') {
+          startConsolePolling();
+        }
       }, 150);
     }
   }
