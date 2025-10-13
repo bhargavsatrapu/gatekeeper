@@ -12,7 +12,8 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 @keyframes gradientShift {
@@ -24,9 +25,10 @@ body {
 /* Layout */
 .layout { 
   display: flex; 
-  min-height: 100vh; 
+  height: 100vh; 
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  overflow: hidden;
 }
 
 /* Sidebar */
@@ -36,9 +38,13 @@ body {
   color: #fff; 
   padding: 24px; 
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-  position: relative;
-  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow: hidden;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
 }
 
 .sidebar::before {
@@ -124,10 +130,12 @@ body {
 /* Content Area */
 .content { 
   flex: 1; 
+  margin-left: 280px;
   padding: 32px; 
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   overflow-y: auto;
+  height: 100vh;
 }
 
 .content h1 {
@@ -1435,11 +1443,15 @@ button:disabled::before {
   }
   
   .sidebar {
+    position: relative;
     width: 100%;
     height: auto;
+    top: auto;
+    left: auto;
   }
   
   .content {
+    margin-left: 0;
     padding: 20px;
   }
   
@@ -2371,5 +2383,4 @@ button:disabled::before {
   color: #6b7280;
   min-width: 150px;
 }
-
 
