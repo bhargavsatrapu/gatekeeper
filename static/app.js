@@ -197,18 +197,29 @@ function checkForExecutionCompletion(newLogs) {
     } else if (message.includes('all tests execution failed')) {
       updateNoticeMessage('error', 'All tests execution failed');
     }
+    
+    // Check for individual endpoints completion
+    if (message.includes('test execution completed successfully')) {
+      updateNoticeMessage('success', 'Individual endpoints execution is completed');
+    } else if (message.includes('test execution failed')) {
+      updateNoticeMessage('error', 'Individual endpoints execution failed');
+    }
   });
 }
 
 function updateNoticeMessage(status, message) {
   // Find the existing notice element
-  const existingNotice = document.querySelector('.notice');
-  if (existingNotice) {
-    // Update the existing notice
-    existingNotice.className = `notice ${status}`;
-    const icon = status === 'success' ? 'check-circle' : 'exclamation-circle';
-    existingNotice.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+  let existingNotice = document.querySelector('.notice');
+  if (!existingNotice) {
+    // Create notice element if it doesn't exist
+    existingNotice = document.createElement('div');
+    existingNotice.className = 'notice';
+    document.querySelector('h1').insertAdjacentElement('afterend', existingNotice);
   }
+  // Update the existing notice
+  existingNotice.className = `notice ${status}`;
+  const icon = status === 'success' ? 'check-circle' : 'exclamation-circle';
+  existingNotice.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
 }
 
 // Enhanced loading functionality
@@ -1100,7 +1111,18 @@ function runSelectedEndpoints() {
   // Show loading state
   const hideLoading = showLoading(runBtn, 'Running Tests...');
   
-  // Auto-switch to console tab
+  // Update existing notice to show "Running individual tests"
+  let existingNotice = document.querySelector('.notice');
+  if (!existingNotice) {
+    // Create notice element if it doesn't exist
+    existingNotice = document.createElement('div');
+    existingNotice.className = 'notice';
+    document.querySelector('h1').insertAdjacentElement('afterend', existingNotice);
+  }
+  existingNotice.className = 'notice info';
+  existingNotice.innerHTML = `<i class="fas fa-play"></i> Running individual tests`;
+  
+  // Navigate to console tab
   setTimeout(() => {
     selectTab({preventDefault: () => {}}, 'tab-console');
   }, 500);
@@ -1116,18 +1138,7 @@ function runSelectedEndpoints() {
   })
   .then(response => response.json())
   .then(data => {
-    if (data.message) {
-      // Show success message
-      const notice = document.createElement('div');
-      notice.className = 'notice success';
-      notice.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}`;
-      document.querySelector('h1').insertAdjacentElement('afterend', notice);
-      
-      // Auto-remove notice after 5 seconds
-      setTimeout(() => {
-        notice.remove();
-      }, 5000);
-    } else if (data.error) {
+    if (data.error) {
       alert('Error: ' + data.error);
     }
   })
