@@ -33,7 +33,6 @@ def clean_allure_results(results_dir: Optional[str] = None) -> None:
     os.makedirs(results_dir, exist_ok=True)
     print(f"🧹 Cleaned Allure results at: {results_dir}")
 
-# ======================================================
 # ✅ Validation Helpers
 # ======================================================
 
