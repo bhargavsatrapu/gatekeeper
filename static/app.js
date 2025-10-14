@@ -68,6 +68,11 @@ function fetchConsoleLogs() {
     .then(data => {
       if (data.logs && data.logs.length > lastLogCount) {
         updateConsole(data.logs);
+        
+        // Check for execution completion messages
+        const newLogs = data.logs.slice(lastLogCount);
+        checkForExecutionCompletion(newLogs);
+        
         lastLogCount = data.logs.length;
         
         // Adjust polling frequency based on activity
@@ -172,6 +177,137 @@ function toggleAutoScroll() {
   const statusEl = document.getElementById('auto-scroll-status');
   statusEl.textContent = autoScroll ? 'ON' : 'OFF';
   statusEl.style.color = autoScroll ? '#34d399' : '#f87171';
+}
+
+function checkForExecutionCompletion(newLogs) {
+  // Check if any of the new logs indicate execution completion
+  newLogs.forEach(log => {
+    const message = log.message.toLowerCase();
+    
+    // Check for positive flow completion
+    if (message.includes('positive flow execution completed successfully')) {
+      updateNoticeMessage('success', 'Positive execution is completed');
+    } else if (message.includes('positive flow execution failed')) {
+      updateNoticeMessage('error', 'Positive execution failed');
+    }
+    
+    // Check for all tests completion
+    if (message.includes('all tests execution completed successfully')) {
+      updateNoticeMessage('success', 'All tests execution is completed');
+    } else if (message.includes('all tests execution failed')) {
+      updateNoticeMessage('error', 'All tests execution failed');
+    }
+    
+    // Check for individual endpoints completion
+    if (message.includes('test execution completed successfully')) {
+      updateNoticeMessage('success', 'Individual endpoints execution is completed');
+    } else if (message.includes('test execution failed')) {
+      updateNoticeMessage('error', 'Individual endpoints execution failed');
+    }
+  });
+}
+
+function updateNoticeMessage(status, message) {
+  // Find the existing notice element
+  let existingNotice = document.querySelector('.notice');
+  if (!existingNotice) {
+    // Create notice element if it doesn't exist
+    existingNotice = document.createElement('div');
+    existingNotice.className = 'notice';
+    document.querySelector('h1').insertAdjacentElement('afterend', existingNotice);
+  }
+  // Update the existing notice
+  existingNotice.className = `notice ${status}`;
+  const icon = status === 'success' ? 'check-circle' : 'exclamation-circle';
+  existingNotice.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+}
+
+// Positive APIs functionality
+function loadPositiveAPIs() {
+  const loadBtn = document.getElementById('load-positive-btn');
+  const clearBtn = document.getElementById('clear-positive-btn');
+  const container = document.getElementById('positive-apis-container');
+  const grid = document.getElementById('positive-apis-grid');
+  
+  // Show loading state
+  loadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+  loadBtn.disabled = true;
+  
+  fetch('/api/positive-apis')
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error loading positive APIs: ' + data.error);
+        return;
+      }
+      
+      const positiveAPIs = data.positive_apis || [];
+      
+      if (positiveAPIs.length === 0) {
+        grid.innerHTML = '<div class="no-data">No positive test cases found. Please generate test cases first.</div>';
+      } else {
+        // Display positive APIs in list format
+        grid.innerHTML = `
+          <div class="positive-apis-list">
+            <div class="list-header">
+              <div class="header-item method-col">Method</div>
+              <div class="header-item url-col">URL</div>
+              <div class="header-item description-col">Test Description</div>
+              <div class="header-item status-col">Expected Status Code</div>
+            </div>
+            ${positiveAPIs.map(api => {
+              const method = api.method || 'GET';
+              const url = api.url || api.endpoint || 'N/A';
+              const status = api.expected_status || api.status || '200';
+              const description = api.test_name || api.description || 'No description';
+              
+              return `
+                <div class="list-item">
+                  <div class="list-cell method-col">
+                    <span class="method ${method.toLowerCase()}">${method}</span>
+                  </div>
+                  <div class="list-cell url-col">
+                    <code>${url}</code>
+                  </div>
+                  <div class="list-cell description-col">
+                    ${description}
+                  </div>
+                  <div class="list-cell status-col">
+                    <span class="status success">${status}</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      
+      // Show container and buttons
+      container.style.display = 'block';
+      clearBtn.style.display = 'inline-block';
+      loadBtn.style.display = 'none';
+      
+    })
+    .catch(error => {
+      console.error('Error loading positive APIs:', error);
+      alert('Error loading positive APIs: ' + error.message);
+    })
+    .finally(() => {
+      // Reset button state
+      loadBtn.innerHTML = '<i class="fas fa-download"></i> Load Positive APIs';
+      loadBtn.disabled = false;
+    });
+}
+
+function clearPositiveAPIs() {
+  const loadBtn = document.getElementById('load-positive-btn');
+  const clearBtn = document.getElementById('clear-positive-btn');
+  const container = document.getElementById('positive-apis-container');
+  
+  // Hide container and buttons
+  container.style.display = 'none';
+  clearBtn.style.display = 'none';
+  loadBtn.style.display = 'inline-block';
 }
 
 // Enhanced loading functionality
@@ -430,6 +566,31 @@ function completeTestGeneration() {
 
 // Enhanced form submissions
 document.addEventListener('DOMContentLoaded', function() {
+  // Check for active tab parameter in URL and switch to it
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTab = urlParams.get('tab');
+  if (activeTab) {
+    const tabId = 'tab-' + activeTab;
+    const tabElement = document.getElementById(tabId);
+    if (tabElement) {
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.opacity = '0';
+      });
+      
+      // Add active class to the specified tab
+      setTimeout(() => {
+        tabElement.classList.add('active');
+        tabElement.style.opacity = '1';
+        
+        // Start console polling if switching to console tab
+        if (activeTab === 'console') {
+          startConsolePolling();
+        }
+      }, 150);
+    }
+  }
   // Add loading to all form submissions
   const forms = document.querySelectorAll('form');
   forms.forEach(form => {
@@ -453,8 +614,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const hideLoading = showLoading(submitButton, executionType ? 'Running...' : 'Processing...');
         
-        // Auto-switch to console tab for execution
-        if (executionType) {
+        // Auto-switch to console tab for execution (but not for test generation)
+        if (executionType && executionType !== 'generate') {
           setTimeout(() => {
             selectTab({preventDefault: () => {}}, 'tab-console');
           }, 500);
@@ -1038,7 +1199,18 @@ function runSelectedEndpoints() {
   // Show loading state
   const hideLoading = showLoading(runBtn, 'Running Tests...');
   
-  // Auto-switch to console tab
+  // Update existing notice to show "Running individual tests"
+  let existingNotice = document.querySelector('.notice');
+  if (!existingNotice) {
+    // Create notice element if it doesn't exist
+    existingNotice = document.createElement('div');
+    existingNotice.className = 'notice';
+    document.querySelector('h1').insertAdjacentElement('afterend', existingNotice);
+  }
+  existingNotice.className = 'notice info';
+  existingNotice.innerHTML = `<i class="fas fa-play"></i> Running individual tests`;
+  
+  // Navigate to console tab
   setTimeout(() => {
     selectTab({preventDefault: () => {}}, 'tab-console');
   }, 500);
@@ -1054,18 +1226,7 @@ function runSelectedEndpoints() {
   })
   .then(response => response.json())
   .then(data => {
-    if (data.message) {
-      // Show success message
-      const notice = document.createElement('div');
-      notice.className = 'notice success';
-      notice.innerHTML = `<i class="fas fa-check-circle"></i> ${data.message}`;
-      document.querySelector('h1').insertAdjacentElement('afterend', notice);
-      
-      // Auto-remove notice after 5 seconds
-      setTimeout(() => {
-        notice.remove();
-      }, 5000);
-    } else if (data.error) {
+    if (data.error) {
       alert('Error: ' + data.error);
     }
   })
