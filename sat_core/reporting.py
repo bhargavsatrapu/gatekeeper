@@ -37,40 +37,38 @@ def clean_allure_results(results_dir: Optional[str] = None) -> None:
 # ✅ Validation Helpers
 # ======================================================
 
-def validate_response(
-    result: Dict[str, Any],
-    expected_status: Optional[int],
-    expected_schema: Optional[Dict[str, Any]]
-) -> Tuple[bool, Dict[str, Any]]:
-    """Validate response status code and JSON schema."""
-    details: Dict[str, Any] = {
-        "status_validation": None,
-        "schema_validation": None,
-        "errors": [],
-    }
-
+def validate_response(result, expected_status, expected_schema):
+    details = {"status_validation": None, "schema_validation": None, "errors": []}
     passed = True
 
-    # Validate Status Code
-    if expected_status is not None:
-        status_ok = result.get("status_code") == expected_status
-        details["status_validation"] = {
-            "expected": expected_status,
-            "actual": result.get("status_code"),
-            "passed": status_ok,
-        }
-        if not status_ok:
-            passed = False
+    # Status validation
+    status_ok = result.get("status_code") == expected_status
+    details["status_validation"] = {
+        "expected": expected_status,
+        "actual": result.get("status_code"),
+        "passed": status_ok,
+    }
+    if not status_ok:
+        passed = False
 
-    # Validate JSON Schema
+    # Schema validation
     if expected_schema:
-        try:
-            Draft7Validator(expected_schema).validate(result.get("data"))
-            details["schema_validation"] = {"passed": True}
-        except ValidationError as e:
-            passed = False
+        if not status_ok:
             details["schema_validation"] = {"passed": False}
-            details["errors"].append(str(e))
+            details["errors"].append(
+                f"Schema skipped due to failed status code ({result.get('status_code')})"
+            )
+        elif result.get("data") is None:
+            details["schema_validation"] = {"passed": False}
+            details["errors"].append("Response data missing or None.")
+        else:
+            try:
+                Draft7Validator(expected_schema).validate(result.get("data"))
+                details["schema_validation"] = {"passed": True}
+            except ValidationError as e:
+                details["schema_validation"] = {"passed": False}
+                details["errors"].append(str(e))
+                passed = False
 
     return passed, details
 
