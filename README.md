@@ -15,8 +15,13 @@ No changes to your backend logic; this UI only invokes them.
 - pip
 - `backend_interface.py` in project root with the functions above
 
-Install dependencies:
+Create a python virtual environment:
+python -m venv .venv
+.venv\Scripts\Activate.ps1 (powershell) 
 
+Install dependencies:
+pip install -r requirements.txt 
+ 
 ```bash
 pip install fastapi uvicorn jinja2
 ```
@@ -42,7 +47,7 @@ The uploaded Swagger JSON is saved at the project root as `swagger.json`.
 ## Run
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Open `http://localhost:8000`.
