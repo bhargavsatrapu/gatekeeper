@@ -8,7 +8,7 @@
 {% endif %}
 
 <div class="tabs">
-  <section id="tab-upload" class="tab active">
+  <section id="tab-upload" class="tab {% if not active_tab or active_tab == 'upload' %}active{% endif %}">
     <h2><i class="fas fa-upload"></i> Swagger Upload</h2>
     <div class="upload-section">
       <form action="/upload-swagger" method="post" enctype="multipart/form-data">
@@ -48,7 +48,7 @@
     </div>
   </section>
 
-  <section id="tab-generate" class="tab">
+  <section id="tab-generate" class="tab {% if active_tab == 'generate' %}active{% endif %}">
     <h2><i class="fas fa-magic"></i> Generate Testcases</h2>
     <div class="generate-section">
       <div class="info-card">
@@ -129,6 +129,7 @@
         <!-- Test cases will be loaded here -->
       </div>
     </div>
+    
   </section>
 
   <section id="tab-positive" class="tab">
@@ -137,11 +138,28 @@
       <i class="fas fa-info-circle"></i>
       <p>Run basic positive tests to verify that each endpoint is working correctly before extensive testing.</p>
     </div>
+    
     <form action="/run-positive" method="post">
       <button type="submit" id="run-positive-btn">
         <i class="fas fa-play"></i> Run Positive Flow
       </button>
     </form>
+    
+    <div class="positive-controls">
+      <button type="button" onclick="loadPositiveAPIs()" id="load-positive-btn">
+        <i class="fas fa-download"></i> Load Positive APIs
+      </button>
+      <button type="button" onclick="clearPositiveAPIs()" id="clear-positive-btn" style="display: none;">
+        <i class="fas fa-times"></i> Clear View
+      </button>
+    </div>
+    
+    <div id="positive-apis-container" class="positive-apis-container" style="display: none;">
+      <h3><i class="fas fa-list-check"></i> Positive Test Cases</h3>
+      <div class="positive-apis-grid" id="positive-apis-grid">
+        <!-- Positive test cases will be loaded here -->
+      </div>
+    </div>
   </section>
 
   <section id="tab-all" class="tab">
@@ -188,7 +206,7 @@
     </div>
   </section>
 
-  <section id="tab-console" class="tab">
+  <section id="tab-console" class="tab {% if active_tab == 'console' %}active{% endif %}">
     <h2><i class="fas fa-terminal"></i> Execution Console</h2>
     <div class="console-controls">
       <button onclick="clearConsole()">
@@ -207,26 +225,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Allure Reports Section -->
-  <section id="tab-reports" class="tab">
-    <h2 class="allure-title">
-      Allure Reports
-      <button class="load-btn" onclick="loadAllureReport()">
-        <i class="fas fa-sync-alt"></i> Load Latest Report
-      </button>
-    </h2>
-    <iframe id="allure-frame" src="" width="100%" height="600px" style="border:none;"></iframe>
-  </section>
-
-  <section id="tab-results" class="tab">
-    <h2><i class="fas fa-message"></i> Latest Messages</h2>
-    <div class="info-card">
-      <i class="fas fa-info-circle"></i>
-      <p>Success and error messages appear here after actions. The top bar notice also shows success messages.</p>
-    </div>
-  </section>
-
   <section id="tab-ai-reports" class="tab">
     <h2><i class="fas fa-robot"></i> AI Reports</h2>
     <div class="info-card">
@@ -443,8 +441,20 @@
       </div>
 
     </div>
+  </section> 
+  <!-- Allure Reports Section -->
+  <section id="tab-reports" class="tab">
+    <h2 class="allure-title">
+      Allure Reports
+      <button class="load-btn" onclick="loadAllureReport()">
+        <i class="fas fa-sync-alt"></i> Load Latest Report
+      </button>
+    </h2>
+    <iframe id="allure-frame" src="" width="100%" height="600px" style="border:none;"></iframe>
   </section>
+
 </div>
+
 
 {% endblock %}
 
