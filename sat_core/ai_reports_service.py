@@ -335,10 +335,12 @@ class AIReportsService:
         return issues[:3]  # Return top 3 issues
     
     def _get_failed_tests_details(self, execution_data: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Get detailed information about failed tests"""
+        """Get detailed information about failed tests with batch AI analysis"""
         failed_tests = []
         error_counts = {}
+        failed_results = []
         
+        # First pass: collect all failed tests and categorize errors
         for result in execution_data:
             if result.get('actual_status_code') != result.get('expected_status_code'):
                 # Determine error type
@@ -348,21 +350,30 @@ class AIReportsService:
                 # Count error types
                 error_counts[error_type] = error_counts.get(error_type, 0) + 1
                 
-                # Get failure reason
-                failure_reason = self._get_failure_reason(status_code, result)
-                
-                failed_test = {
-                    "test_name": result.get('test_name', 'Unknown'),
-                    "endpoint": result.get('input_url', 'Unknown'),
-                    "method": result.get('input_method', 'Unknown'),
-                    "expected_status": result.get('expected_status_code', 0),
-                    "actual_status": status_code,
-                    "error_type": error_type,
-                    "failure_reason": failure_reason,
-                    "timestamp": result.get('created_at', 'Unknown'),
-                    "actual_data": result.get('actual_data', {})
-                }
-                failed_tests.append(failed_test)
+                # Store failed result for batch processing
+                failed_results.append(result)
+        
+        # Batch AI analysis for all failed tests
+        failure_reasons = self._get_batch_failure_reasons(failed_results)
+        
+        # Second pass: create failed test objects with AI-generated reasons
+        for i, result in enumerate(failed_results):
+            status_code = result.get('actual_status_code', 0)
+            error_type = self._categorize_error_type(status_code)
+            failure_reason = failure_reasons[i] if i < len(failure_reasons) else "AI analysis failed"
+            
+            failed_test = {
+                "test_name": result.get('test_name', 'Unknown'),
+                "endpoint": result.get('input_url', 'Unknown'),
+                "method": result.get('input_method', 'Unknown'),
+                "expected_status": result.get('expected_status_code', 0),
+                "actual_status": status_code,
+                "error_type": error_type,
+                "failure_reason": failure_reason,
+                "timestamp": result.get('created_at', 'Unknown'),
+                "actual_data": result.get('actual_data', {})
+            }
+            failed_tests.append(failed_test)
         
         # Sort by timestamp (most recent first)
         failed_tests.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
@@ -392,34 +403,184 @@ class AIReportsService:
         else:
             return "Other"
     
+    def _get_batch_failure_reasons(self, failed_results: List[Dict[str, Any]]) -> List[str]:
+        """Get AI-generated failure reasons for all failed tests in a single batch call"""
+        if not failed_results:
+            return []
+        
+        try:
+            from sat_core.ai_client import get_gemini_client
+            client = get_gemini_client()
+            
+            # Create batch prompt for all failed tests
+            batch_prompt = f"""
+You are an expert API testing analyst. Analyze these {len(failed_results)} test failures and provide detailed, comprehensive failure descriptions for each one.
+
+**Failed Tests to Analyze:**
+
+"""
+            
+            # Add each failed test to the prompt
+            for i, result in enumerate(failed_results, 1):
+                expected_status = result.get('expected_status_code', 0)
+                actual_status = result.get('actual_status_code', 0)
+                endpoint = result.get('input_url', 'Unknown endpoint')
+                method = result.get('input_method', 'Unknown method')
+                request_body = result.get('request_body', {})
+                request_headers = result.get('request_headers', {})
+                actual_data = result.get('actual_data', {})
+                test_name = result.get('test_name', f'Test {i}')
+                
+                batch_prompt += f"""
+**Test {i}: {test_name}**
+- Endpoint: {endpoint}
+- HTTP Method: {method}
+- Expected Status Code: {expected_status}
+- Actual Status Code: {actual_status}
+- Request Body: {request_body}
+- Request Headers: {request_headers}
+- Response Data: {actual_data}
+
+"""
+            
+            batch_prompt += """
+**Your Task:**
+For each test failure above, provide a detailed analysis in 6-7 lines that includes:
+1. What the test was trying to accomplish based on the request
+2. Why it failed (root cause analysis considering request payload)
+3. What the status code means in context of the request
+4. Potential impact on the system
+5. Recommendations for fixing the issue (considering request data)
+
+**CRITICAL: Response Format Requirements:**
+You MUST respond in EXACTLY this format with NO additional text before or after:
+
+Test 1: [Your detailed analysis here - 6-7 lines]
+Test 2: [Your detailed analysis here - 6-7 lines]
+Test 3: [Your detailed analysis here - 6-7 lines]
+
+Do NOT include any introductory text, headers, or explanations. Start directly with "Test 1:" and end with the last test analysis. Each analysis should be 6-7 lines of detailed, professional QA engineer analysis.
+"""
+            
+            # Get AI response for all tests at once
+            response = client.models.generate_content(model="gemini-2.5-flash", contents=batch_prompt)
+            ai_response = response.text.strip()
+            
+            # Parse the response to extract individual failure reasons
+            failure_reasons = self._parse_batch_ai_response(ai_response, len(failed_results))
+            
+            return failure_reasons
+            
+        except Exception as e:
+            # Fallback: generate basic reasons for each test
+            fallback_reasons = []
+            for result in failed_results:
+                status_code = result.get('actual_status_code', 0)
+                expected_status = result.get('expected_status_code', 0)
+                fallback_reason = f"Unexpected Response: Received status code {status_code} instead of expected {expected_status}. This is an unexpected response that may indicate a configuration issue or API change. Error generating AI analysis: {str(e)}"
+                fallback_reasons.append(fallback_reason)
+            return fallback_reasons
+    
+    def _parse_batch_ai_response(self, ai_response: str, expected_count: int) -> List[str]:
+        """Parse batch AI response to extract individual failure reasons"""
+        failure_reasons = []
+        
+        # Try multiple parsing strategies
+        import re
+        
+        # Strategy 1: Split by "Test X:" pattern
+        test_sections = re.split(r'Test \d+:', ai_response)
+        
+        # Remove empty first element if it exists
+        if test_sections and not test_sections[0].strip():
+            test_sections = test_sections[1:]
+        
+        # Strategy 2: If that doesn't work well, try splitting by "**Test X:" pattern
+        if len(test_sections) < expected_count or any(len(s.strip()) < 10 for s in test_sections[:expected_count]):
+            test_sections = re.split(r'\*\*Test \d+:', ai_response)
+            if test_sections and not test_sections[0].strip():
+                test_sections = test_sections[1:]
+        
+        # Strategy 3: If still not working, try to split by double newlines and look for test patterns
+        if len(test_sections) < expected_count or any(len(s.strip()) < 10 for s in test_sections[:expected_count]):
+            paragraphs = ai_response.split('\n\n')
+            test_sections = []
+            for para in paragraphs:
+                if re.search(r'Test \d+', para) or re.search(r'\*\*Test \d+', para):
+                    test_sections.append(para)
+        
+        # Extract failure reasons from each section
+        for i, section in enumerate(test_sections):
+            if i < expected_count:
+                # Clean up the section
+                reason = section.strip()
+                # Remove any remaining markdown formatting
+                reason = re.sub(r'\*\*([^*]+)\*\*', r'\1', reason)  # Remove **bold**
+                reason = re.sub(r'^Test \d+:\s*', '', reason)  # Remove "Test X:" prefix
+                reason = re.sub(r'^\*\*Test \d+:\s*', '', reason)  # Remove "**Test X:" prefix
+                
+                if reason and len(reason) > 20:  # Ensure it's substantial content
+                    failure_reasons.append(reason)
+                else:
+                    # Fallback if section is empty or too short
+                    fallback_reason = f"AI analysis for test {i+1} was incomplete or too short."
+                    failure_reasons.append(fallback_reason)
+            else:
+                break
+        
+        # If we don't have enough reasons, pad with fallback messages
+        while len(failure_reasons) < expected_count:
+            fallback_reason = f"AI analysis for test {len(failure_reasons)+1} was not provided."
+            failure_reasons.append(fallback_reason)
+        
+        return failure_reasons[:expected_count]  # Ensure we don't exceed expected count
+
     def _get_failure_reason(self, status_code: int, result: Dict[str, Any]) -> str:
-        """Get human-readable failure reason with detailed explanations"""
+        """Get AI-generated detailed failure reason with comprehensive analysis"""
         expected_status = result.get('expected_status_code', 0)
         actual_data = result.get('actual_data', {})
         endpoint = result.get('input_url', 'Unknown endpoint')
         method = result.get('input_method', 'Unknown method')
+        request_body = result.get('request_body', {})
+        request_headers = result.get('request_headers', {})
         
-        # Base reason with detailed explanations
-        if status_code == 401:
-            return f"🔐 Authentication Failed: The API requires valid authentication credentials. Expected status {expected_status}, but got {status_code}. This usually means the API key, token, or authentication headers are missing, expired, or invalid."
-        elif status_code == 403:
-            return f"🚫 Access Forbidden: You don't have permission to access this resource. Expected status {expected_status}, but got {status_code}. The request was valid but the server is refusing to fulfill it due to insufficient permissions."
-        elif status_code == 404:
-            return f"🔍 Resource Not Found: The requested endpoint or resource doesn't exist. Expected status {expected_status}, but got {status_code}. Check if the URL path is correct and the resource exists on the server."
-        elif status_code == 400:
-            return f"❌ Bad Request: The request format or parameters are invalid. Expected status {expected_status}, but got {status_code}. This could be due to malformed JSON, missing required fields, or invalid parameter values."
-        elif status_code == 422:
-            return f"📝 Validation Error: The request data failed validation rules. Expected status {expected_status}, but got {status_code}. The request format is correct but the data doesn't meet the API's validation requirements."
-        elif status_code >= 500:
-            return f"🔥 Server Error: Internal server problem occurred. Expected status {expected_status}, but got {status_code}. This indicates a server-side issue that needs to be investigated by the API provider."
-        elif status_code == 408:
-            return f"⏰ Request Timeout: The server took too long to respond. Expected status {expected_status}, but got {status_code}. The request may be too complex or the server is overloaded."
-        elif status_code == 429:
-            return f"🚦 Rate Limit Exceeded: Too many requests sent to the API. Expected status {expected_status}, but got {status_code}. The API has rate limiting in place and the request limit has been exceeded."
-        elif status_code == 503:
-            return f"🔧 Service Unavailable: The API service is temporarily unavailable. Expected status {expected_status}, but got {status_code}. The server is down for maintenance or overloaded."
-        else:
-            return f"❓ Unexpected Response: Received status code {status_code} instead of expected {expected_status}. This is an unexpected response that may indicate a configuration issue or API change."
+        try:
+            from sat_core.ai_client import get_gemini_client
+            client = get_gemini_client()
+            
+            # Create AI prompt for detailed failure analysis
+            ai_prompt = f"""
+You are an expert API testing analyst. Analyze this test failure and provide a detailed, comprehensive failure description in 6-7 lines.
+
+**Test Context:**
+- Endpoint: {endpoint}
+- HTTP Method: {method}
+- Expected Status Code: {expected_status}
+- Actual Status Code: {status_code}
+- Request Body: {request_body}
+- Request Headers: {request_headers}
+- Response Data: {actual_data}
+
+**Your Task:**
+Generate a detailed failure analysis that includes:
+1. What the test was trying to accomplish based on the request
+2. Why it failed (root cause analysis considering request payload)
+3. What the status code means in context of the request
+4. Potential impact on the system
+5. Recommendations for fixing the issue (considering request data)
+
+Make it sound like a professional QA engineer's analysis. Be specific and actionable, considering both the request payload and response.
+"""
+            
+            # Get AI response
+            response = client.models.generate_content(model="gemini-2.5-flash", contents=ai_prompt)
+            ai_failure_reason = response.text.strip()
+            
+            return ai_failure_reason
+            
+        except Exception as e:
+            # Fallback to basic reason if AI fails
+            return f"Unexpected Response: Received status code {status_code} instead of expected {expected_status}. This is an unexpected response that may indicate a configuration issue or API change. Error generating AI analysis: {str(e)}"
     
     def _parse_ai_response(self, ai_response: str, execution_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Parse AI response when JSON parsing fails"""
