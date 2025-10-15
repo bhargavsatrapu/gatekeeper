@@ -193,7 +193,7 @@ def plan_and_run_positive_order():
     logs = run_positive_flow(order, results_dir=results_dir)
 
     # Step 3: Generate Allure report
-    allure_exe = r"C:\Users\ruchitha.devulapally\AppData\Roaming\npm\allure.cmd"
+    allure_exe = r"C:\nvm4w\nodejs\allure.cmd"
     cmd = [allure_exe, "generate", results_dir, "-o", report_dir, "--clean"]
     try:
         subprocess.run(cmd, check=True)

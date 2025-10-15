@@ -414,7 +414,7 @@ def api_build_allure():
         shutil.rmtree(ALLURE_REPORT_DIR)
     os.makedirs(ALLURE_REPORT_DIR, exist_ok=True)
 
-    allure_exe = r"C:\Users\ruchitha.devulapally\AppData\Roaming\npm\allure.cmd"
+    allure_exe = r"C:\nvm4w\nodejs\allure.cmd"
     # allure_exe = "allure"
     cmd = [allure_exe, "generate", ALLURE_RESULTS_DIR, "-o", ALLURE_REPORT_DIR, "--clean"]
 
